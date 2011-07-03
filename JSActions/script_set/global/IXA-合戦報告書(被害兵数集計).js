@@ -1,4 +1,6 @@
 // IXA-合戦報告書被害兵数集計
+//
+// 2011/05/26 大殿の報告書での不具合対応
 
 var Report = function(no, bh, wl, url, datetime) {
 	this.no = no;				//number
@@ -34,17 +36,20 @@ var reportscount;
 var repcount;
 var repflag;
 var urltop;
+var errno = 0;
 
 jsa_IXA_ReportAnalyse();
 
 function jsa_IXA_ReportAnalyse(){
 	
 	urltop = 'http://' + window.location.host + '/war/';
+	//alert("urltop="+urltop);
 	
 	if (document.URL.indexOf(urltop + 'list.php') < 0) {
 		alert(_jsaCScript.convertCharCodeTo("合戦報告書一覧のページではありません","shift_jis"));
 		return;
 	}
+	//alert(_jsaCScript.convertCharCodeTo("合戦報告書一覧のページ","shift_jis"));
 	
 	reports = new Array(0);
 	repcount = 0;
@@ -60,6 +65,7 @@ function jsa_IXA_ReportAnalyse(){
 		XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
 		null);
 		var icount = dom.snapshotLength;
+		//alert("icount="+icount);
 
 		var ss = dom.snapshotItem(0).getElementsByTagName("td");
 		reportscount = ss.length / 3;
@@ -133,7 +139,12 @@ function numFormat(n, digits) {
 
 function RequestAReport(n) {
 	var req = new XMLHttpRequest();
-	req.open('GET', urltop + reports[n].url, true);
+	var id = reports[n].url.match(/\?id=([0-9]+)&/);
+	id = RegExp.$1;
+	var url = urltop + "detail.php?id=" + id;
+	//alert("reports[n].url="+reports[n].url);
+	//alert("url="+urltop + reports[n].url);
+	req.open('GET', url, true);
 	req.setRequestHeader('User-agent', navigator.userAgent);
 	req.setRequestHeader('Accept','application/atom+xml,application/xml,text/xml');
 	//	onload: function(responseDetails) {
@@ -143,35 +154,59 @@ function RequestAReport(n) {
 	req.onreadystatechange = function (aEvt) {
 		if (req.readyState == 4) {
 			if(req.status == 200) {
-				//GM_log("table:"+table);
-				var ids = getClassTags(req.responseText, "div", "ig_battle_damagelist2");
-				reports[n].b_lance   = eval(rmvComma(getTagText(ids[0],"div")));
-				reports[n].h_lance   = eval(rmvComma(getTagText(ids[1],"div")));
-				ids = getClassTags(req.responseText, "div", "ig_battle_damagelist3");
-				reports[n].b_bowman  = eval(rmvComma(getTagText(ids[0],"div")));
-				reports[n].h_bowman  = eval(rmvComma(getTagText(ids[1],"div")));
-				ids = getClassTags(req.responseText, "div", "ig_battle_damagelist4");
-				reports[n].b_horse   = eval(rmvComma(getTagText(ids[0],"div")));
-				reports[n].h_horse   = eval(rmvComma(getTagText(ids[1],"div")));
-				ids = getClassTags(req.responseText, "div", "ig_battle_damagelist5");
-				reports[n].b_weapon  = eval(rmvComma(getTagText(ids[0],"div")));
-				reports[n].h_weapon  = eval(rmvComma(getTagText(ids[1],"div")));
-				var tbl = getClassTags(req.responseText, "div", "ig_battle_reportunit");
-				ids = getAttrTags(tbl[0], "a", "href", "");
-				reports[n].b_alli      = getTagText(ids[0],"a");
-				reports[n].b_alli_lnk  = getHref(ids[0]);
-				reports[n].b_name      = getTagText(ids[1],"a");
-				reports[n].b_name_lnk  = getHref(ids[1]);
-				reports[n].b_place     = getTagText(ids[2],"a");
-				reports[n].b_place_lnk = getHref(ids[2]);
-				ids = getAttrTags(tbl[1], "a", "href", "");
-				reports[n].h_alli      = getTagText(ids[0],"a");
-				reports[n].h_alli_lnk  = getHref(ids[0]);
-				reports[n].h_name      = getTagText(ids[1],"a");
-				reports[n].h_name_lnk  = getHref(ids[1]);
-				reports[n].h_place     = getTagText(ids[2],"a");
-				reports[n].h_place_lnk = getHref(ids[2]);
-				repcount++;
+				try {
+					var ids = getClassTags(req.responseText, "div", "ig_battle_damagelist2");
+					//alert("ids="+ids);
+					reports[n].b_lance   = eval(rmvComma(getTagText(11,ids[0],"div")));
+					reports[n].h_lance   = eval(rmvComma(getTagText(12,ids[1],"div")));
+					ids = getClassTags(req.responseText, "div", "ig_battle_damagelist3");
+					reports[n].b_bowman  = eval(rmvComma(getTagText(13,ids[0],"div")));
+					reports[n].h_bowman  = eval(rmvComma(getTagText(14,ids[1],"div")));
+					ids = getClassTags(req.responseText, "div", "ig_battle_damagelist4");
+					reports[n].b_horse   = eval(rmvComma(getTagText(15,ids[0],"div")));
+					reports[n].h_horse   = eval(rmvComma(getTagText(16,ids[1],"div")));
+					ids = getClassTags(req.responseText, "div", "ig_battle_damagelist5");
+					reports[n].b_weapon  = eval(rmvComma(getTagText(17,ids[0],"div")));
+					reports[n].h_weapon  = eval(rmvComma(getTagText(18,ids[1],"div")));
+					var tbl = getClassTags(req.responseText, "div", "ig_battle_reportunit");
+					//alert("tbl="+tbl);
+					ids = getAttrTags(tbl[0], "a", "href", "");
+					if (ids.length == 1) {
+						reports[n].b_alli      = "";
+						reports[n].b_alli_lnk  = "";
+						reports[n].b_name      = "";
+						reports[n].b_name_lnk  = "";
+						reports[n].b_place     = getTagText(3,ids[0],"a");
+						reports[n].b_place_lnk = getHref(ids[0]);
+					} else {
+						reports[n].b_alli      = getTagText(1,ids[0],"a");
+						reports[n].b_alli_lnk  = getHref(ids[0]);
+						reports[n].b_name      = getTagText(2,ids[1],"a");
+						reports[n].b_name_lnk  = getHref(ids[1]);
+						reports[n].b_place     = getTagText(3,ids[2],"a");
+						reports[n].b_place_lnk = getHref(ids[2]);
+					}
+					ids = getAttrTags(tbl[1], "a", "href", "");
+					if (ids.length == 1) {
+						reports[n].h_alli      = "";
+						reports[n].h_alli_lnk  = "";
+						reports[n].h_name      = "";
+						reports[n].h_name_lnk  = "";
+						reports[n].h_place     = getTagText(6,ids[0],"a");
+						reports[n].h_place_lnk = getHref(ids[0]);
+					} else {
+						reports[n].h_alli      = getTagText(7,ids[0],"a");
+						reports[n].h_alli_lnk  = getHref(ids[0]);
+						reports[n].h_name      = getTagText(8,ids[1],"a");
+						reports[n].h_name_lnk  = getHref(ids[1]);
+						reports[n].h_place     = getTagText(9,ids[2],"a");
+						reports[n].h_place_lnk = getHref(ids[2]);
+					}
+					repcount++;
+				} catch(e) {
+					alert("errno="+errno+"\ntbl[1]="+tbl[1]);
+				} finally {
+				}
 			} else {
 				alert( "#" + n + " Error loading page\n");
 				repflag = false;
@@ -274,10 +309,16 @@ function getClassTagText(html, tagName, className){
   return getClassTag(html, tagName, className) ? RegExp.$2 : "";
 }
 
-function getTagText(html,tagName) {
+function _getTagText(html,tagName) {
 	var reg = new RegExp("<" + tagName + "(\\s|.)*?>([^<]*)</" + tagName + ">", "i");
 	var tag = html.match(reg);
 	return (tag) ? RegExp.$2 : "";
+}
+
+function getTagText(n, html,tagName) {
+	errno = n;
+	var s = _getTagText(html,tagName);
+	return s;
 }
 
 function getIdTags(html, tagName, idName){

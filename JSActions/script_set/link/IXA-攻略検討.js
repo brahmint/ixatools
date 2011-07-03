@@ -91,7 +91,7 @@ function pickJoshuProfData(profUrl,x,y,c) {
 				//var mts = tbltxt.match(/land.php\?x=(-?[0-9]+)&y=(-?[0-9]+)&c=([0-9]+)/,"g");
 				var mts =getIxaHrefs(tbltxt);
 				var table = '<?xml version="1.0" encoding="UTF-8" ?><field>'
-							 +getTags(req.responseText,"table","common_table1 center").toString()
+							 +getTags(replaceNbsp(req.responseText),"table","common_table1 center").toString()
 							 + "</field>";
 				var parser = new DOMParser();
 				var xmldoc = parser.parseFromString(table,"text/xml");
@@ -117,10 +117,11 @@ function pickJoshuProfData(profUrl,x,y,c) {
 					s = trim(rmvTabs(s));
 					re = /\t(\-*\d+,\-*\d+)\t/;
 					s = s.replace(re, "\t$1\t");
-					re = /\t(\(\u672C\u62E0\u5730\))\t/;
+					re = /\t(\(\u672C\u62E0\u5730\))\t/;	//本拠地
 					s = s.replace(re, "$1\t");
 					territory = s.split("\t");	//種類、名前、座標、人口
-					ctp = ctype(mts[i*2 + 1]);
+					ctp = ctype(mts[i*2 + 1]);	//c=1～12
+					//alert("i="+i+"\nterritory="+territory);
 					teridata[territ0+i] = new Territ(territory[0], territory[1], territory[2], territory[3], territory[4], ctp);
 					//alert(teridata[territ0+i].toString());
 				}
@@ -151,31 +152,36 @@ function showAdvice(x0,y0,c) {
 	var px = -1;
 	for (var i = 0; i < teridata.length; i++) {
 		//alert("cn:"+cn + "  : "+ teridata[i].map);
-		if (cn == Number(teridata[i].map)) {	//同じマップの拠点であること
-			pos = teridata[i].pos.split(",");
-			x = parseFloat(pos[0]);
-			y = parseFloat(pos[1]);
-			d = Math.sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0));
-			if (teridata[i].condition == txtFall) {
-				//alert(txtFall +" "+ i);
-				if (d < dfmin) {
-					dfmin = d;
-					dfall = i;
+		//try {
+			if (cn == Number(teridata[i].map)) {	//同じマップの拠点であること
+			    pos = teridata[i].pos.split(",");
+				x = parseFloat(pos[0]);
+				y = parseFloat(pos[1]);
+				d = Math.sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0));
+				if (teridata[i].condition == txtFall) {
+					//alert(txtFall +" "+ i);
+					if (d < dfmin) {
+						dfmin = d;
+						dfall = i;
+					}
+				} else if (teridata[i].ttype == txtLand) {
+					//alert(txtLand +" "+ i);
+					if (d < dlmin) {
+						dlmin = d;
+						dland = i;
+					}
+				} else {
+					//alert(txtNorm +" "+ i);
+					if (d < dnmin) {
+						dnmin = d;
+						dnorm = i;
+					}
 				}
-			} else if (teridata[i].ttype == txtLand) {
-				//alert(txtLand +" "+ i);
-				if (d < dlmin) {
-					dlmin = d;
-					dland = i;
-				}
-			} else {
-				//alert(txtNorm +" "+ i);
-				if (d < dnmin) {
-					dnmin = d;
-					dnorm = i;
-				}
+				
 			}
-		}
+		//} catch(e) {
+		//	alert("error i="+i + "\nterridata.length="+teridata.length);
+		//}
 	}
 	if (dnmin <= dlmin) dlmin = 999;
 	if (dnmin <= dfmin) dfmin = 999;
@@ -396,3 +402,6 @@ function replaceAmp(s) {
 	return s.replace(/&amp;/g,'&');
 }
 
+function replaceNbsp(s) {
+	return s.replace(/&nbsp;/g,' ');
+}

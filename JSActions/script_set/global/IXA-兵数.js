@@ -67,7 +67,7 @@ function setSoldierNum(atype, no) {
 	case 'Ô”õ‚¦':
 		soldiers[8] += num;
 		break;
-	case '”jé’È':
+	case '”jé’Æ':
 		soldiers[9] += num;
 		break;
 	case 'Ué˜E':
@@ -144,7 +144,7 @@ function RequestSoldiers(url) {
 							_jsaCScript.convertCharCodeTo("‹R”n•º@","shift_jis") + ":" + soldiers[6] + "\n" +
 							_jsaCScript.convertCharCodeTo("¸‰s‹R”n","shift_jis") + ":" + soldiers[7] + "\n" +
 							_jsaCScript.convertCharCodeTo("Ô”õ‚¦@","shift_jis") + ":" + soldiers[8] + "\n" +
-							_jsaCScript.convertCharCodeTo("”jé’È@","shift_jis") + ":" + soldiers[9] + "\n" +
+							_jsaCScript.convertCharCodeTo("”jé’Æ@","shift_jis") + ":" + soldiers[9] + "\n" +
 							_jsaCScript.convertCharCodeTo("Ué˜E@","shift_jis") + ":" + soldiers[10] + "\n" +
 							_jsaCScript.convertCharCodeTo("‘å“›•º@","shift_jis") + ":" + soldiers[11] + "\n" +
 							_jsaCScript.convertCharCodeTo("“S–C‘«Œy","shift_jis") + ":" + soldiers[12] + "\n" +
