@@ -169,159 +169,18 @@ function chika_main($) {
 			var y = RegExp.$3;
 			var c = RegExp.$5;
 			var utype = RegExp.$1;
-//			if ('map' == utype) {
-//				var kw = 'x='+x.toString()+'&amp;y='+y.toString()+'&amp;c='+c.toString()+'" title="(.+)" alt="(.+)" onmouseover="(.+)"';
-//				var fd = window.document.body.innerHTML.match(kw);
-//				if (fd != null) {
-//					var ttl = RegExp.$1;
-//					var alt = RegExp.$2;
-//					var omo = RegExp.$3;
-//					kw = "rewrite\\('([^']+)', '([^']+)', '([^']+)', '([^']+)', '([^']+)'";
-//					var ra = omo.match(kw);
-//					if (ra != null) {
-//						var pname = RegExp.$1;  //領地名称
-//						var lname = RegExp.$2;  //城主
-//						var population = RegExp.$3;  //人口
-//						var pos = RegExp.$4;    //座標
-//						pos = pos.substring(1,pos.length-1);  //括弧を外す
-//						var alli = RegExp.$5;   //同盟名
-						pickJoshuProfData('http://' + window.location.host + '/user/',x,y,c);
+			pickJoshuProfData('http://' + window.location.host + '/user/',showAdvice, x,y,c);
 	
-//					} else {
-//						alert("cannot split");  //普通は起こらないはず
-//					}
-//				} else {
-//					alert("not match");  //普通は起こらないはず
-//				}
-//			} else {		// land.php
-//				
-//				alert("land");
-//			}
 		} else {
 			alert("ここはどこ？");
 		}
 	}
 	
-//	function pickJoshuProfData(profUrl,x,y,c) {
-//		GM_xmlhttpRequest({
-//			method: 'GET',
-//			url: profUrl,
-//			headers: { 	'User-agent': navigator.userAgent,
-//						'Accept': 'application/atom+xml,application/xml,text/xml',
-//			},
-//			onload: function(responseDetails) {
-//				var tbltxt = getTags(responseDetails.responseText,"table","common_table1 center").toString();
-//				//alert(tbltxt);  //コード表示
-//				//"/land.php?x=28&amp;y=-25&amp;c=12"
-//				//var mts = tbltxt.match(/land.php\?x=(-?[0-9]+)&y=(-?[0-9]+)&c=([0-9]+)/,"g");
-//				var mts =getIxaHrefs(tbltxt);
-//				var table = '<?xml version="1.0" encoding="UTF-8" ?><field>'
-//							 +getTags(replaceNbsp(responseDetails.responseText),"table","common_table1 center").toString()
-//							 + "</field>";
-//				var parser = new DOMParser();
-//				var xmldoc = parser.parseFromString(table,"text/xml");
-//				var trLinks = xmldoc.evaluate(
-//				'//tr[@class]',
-//				xmldoc,
-//				null,
-//				XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
-//				null);
-//				tericount = trLinks.snapshotLength;
-//				//alert('tericount=' + tericount);
-//				var thisLink, s, re;
-//				var territory = new Array(4);
-//				var territ0 = 0;
-//				var ctp;
-//				trcnt += tericount;
-//				for (var i = 0; i < tericount; i++) {
-//					thisLink = trLinks.snapshotItem(i);
-//					//alert("thisLink"+i.toString()+":"+thisLink.attributes.length);
-//					//GM_log("thisLink"+i.toString()+";"+thisLink.textContent);
-//					re = /\n\t/gm;
-//					s = thisLink.textContent.replace(re, "\t");
-//					s = trim(rmvTabs(s));
-//					re = /\t(\-*\d+,\-*\d+)\t/;
-//					s = s.replace(re, "\t$1\t");
-//					re = /\t(\(本拠地\))\t/;
-//					s = s.replace(re, "$1\t");
-//					territory = s.split("\t");	//種類、名前、座標、人口
-//					ctp = ctype(mts[i*2 + 1]);	//c=1～12
-//					//alert("i="+i+"\nterritory="+territory);
-//					teridata[territ0+i] = new Territ(territory[0], territory[1], territory[2], territory[3], territory[4], ctp);
-//					//alert(teridata[territ0+i].toString());
-//				}
-//				profDoneflag = true;
-//				showAdvice(x,y,c);
-//			}
-//
-//		});
-//	
-//		return;
-//	}
-
-
-//function pickJoshuProfData(profUrl,x,y,c) {
-//	GM_xmlhttpRequest({
-//		method: 'GET',
-//		url: profUrl,
-//		headers: { 	'User-agent': navigator.userAgent,
-//					'Accept': 'application/atom+xml,application/xml,text/xml',
-//		},
-//		onload: function(responseDetails) {
-//			var tbltxt = getTags(responseDetails.responseText,"table","common_table1 center").toString();
-//			//var mts =getIxaHrefs(tbltxt);
-//			var trs = getClassTags(tbltxt,'tr','fs[0-9]+');
-//			tericount = trs.length;
-//			//alert('tericount=' + tericount);
-//			var thisTr, s, re;
-//			var territ0 = 0;
-//			var ctp;
-//			trcnt += tericount;
-//			for (var i = 0; i < tericount; i++) {
-//				thisTr = trim(rmvTabs(trs[i]));
-//				//alert(thisTr);
-//				//alert(getClassTagText(thisTr,'tr','fs[0-9]+'));
-//				var tds = getTags(thisTr,'td',null);
-//				//alert(tds);
-//				var ttype = getTagText(tds[0],'td');
-//				//alert('ttype='+ttype);
-//				var tss1 = getTaggedContent(tds[1],'td',null);
-//				//alert('tss1='+tss1);
-//				var tvill = getTag(tss1,'a',null);
-//				//alert('tvill='+tvill);
-//				var textn = trim(tss1.substring(tvill.length));
-//				//alert('textn='+textn);
-//				var tname = trim(getTagText(tss1,'a'));
-//				//alert('tname='+tname);
-//				var tss2 = getTag(tds[2],'td',null);
-//				//alert('tss2='+tss2);
-//				var mts =getHref(tss2);
-//				//alert('mts='+mts);
-//				var tpos  = getTagText(tss2,'a');
-//				//alert('tpos='+tpos);
-//				var thref = getHref(tds[1]);
-//				//alert('thref='+thref);
-//				var tpopu = getTagText(tds[3],'td');
-//				//alert('tpopu='+tpopu);
-//				var tcond = trim(getTagText(tds[4],'span'));
-//				//alert('tcond='+tcond);
-//				//alert("thisLink"+i.toString()+":"+thisLink.attributes.length);
-//				//GM_log("thisLink"+i.toString()+";"+thisLink.textContent);
-//				ctp = ctype(mts);	//c=1～12
-//				//alert("i="+i+"\nterritory="+territory);
-//				teridata[territ0+i] = new Territ(ttype, tname+textn, tpos, tpopu, tcond, ctp);
-//				//alert(teridata[territ0+i].toString());
-//			}
-//			profDoneflag = true;
-//			showAdvice(x,y,c);
-//		}
-//
-//	});
-//
-//	return;
-//}
-	
-	function pickJoshuProfData(profUrl,x,y,c) {
+	// 城主プロフィール（自分の）から拠点データを収集する
+	// callback は alertで結果を出したい場合に指定
+	//    x,y,c は callbackする場合の攻撃先座標
+	//
+	function pickJoshuProfData(profUrl,callback,x,y,c) {
 		$.ajax({
 			url: profUrl, 
 			cache: false, 
@@ -354,7 +213,9 @@ function chika_main($) {
 					teridata[territ0+i] = new Territ(ttype, tname+textn, tpos, tpopu, tcond, ctp);
 				}
 				profDoneflag = true;
-				showAdvice(x,y,c);
+				if (callback != null) {		//showAdvice(x,y,c);
+						callback(x,y,c);
+				}
 			},
 			error: function (XMLHttpRequest, textStatus, errorThrown) {
 				alert('$.ajax error');
@@ -363,6 +224,7 @@ function chika_main($) {
 		});	
 		return;
 	}
+	
 	
 	function showAdvice(x0,y0,c) {
 		var s = "<<< ("+x0+","+y0+") への攻略検討 >>>";
@@ -666,23 +528,11 @@ function chika_main($) {
 			tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_dokochika"><img src="' + gifdoko + '" alt="どこ近" style="position: relative; top: +1px; "></a>';
 	        $('div.ig_mappanel_function_mid').find('a:last').after(tmp);
 		}
-		//         + '<a href="javascript:void(0);" onclick="return false;" id="do_tomochika"><img src="' + giftomo + '" alt="とも近" style="position: relative; top: +8px; "></a>'
-		//         + '<a href="javascript:void(0);" onclick="return false;" id="do_darechika"><img src="' + gifdare + '" alt="だれ近" style="position: relative; top: +8px; "></a>';
         $('#do_dokochika').live('click',function() {
 			//calc_dokochika();
 			setTimeout(calc_dokochika, 10);
 			//alert('now clicked dokochika');
         });
-		//$('#do_tomochika').live('click',function() {
-		//	//calc_dokochika();
-		//	alert('とも近は未実装');
-		//	//alert('now clicked dokochika');
-		//});
-		//$('#do_darechika').live('click',function() {
-		//	//calc_dokochika();
-		//	alert('だれ近は未実装');
-		//	//alert('now clicked dokochika');
-		//});
     }
 
 	cmd_dokochika();
