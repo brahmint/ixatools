@@ -14,11 +14,8 @@
 //
 // 2011/05/21 1.1 戦功が表示されないのを修正
 //                &m=[123] オプションに対応
-// 2011/07/07 1.2 作業中
+// 2011/07/07 1.2 jQuery対応
 //
-//-------------------------------------------------
-// Main
-//-------------------------------------------------
 
 //
 // Mokoと同じjQuery初期化
@@ -45,7 +42,9 @@ function bara_addJQuery(callback) {
     }
 }
 
-
+//-------------------------------------------------
+// Main
+//-------------------------------------------------
 function members_main($) {
 
 	var Territ = function ( ttype, tname, pos, population) {
@@ -167,15 +166,13 @@ function members_main($) {
 	//城主のプロフィールからデータを得る
 	function pickJoshuProfData(lordnn, n, profUrl) {
 		//GM_log("profUrl:" + profUrl);
-		GM_xmlhttpRequest({
-			method: 'GET',
-			url: profUrl,
-			headers: { 	'User-agent': navigator.userAgent,
-						'Accept': 'application/atom+xml,application/xml,text/xml',
-			},
-			onload: function(responseDetails) {
+		$.ajax({
+			url: profUrl, 
+			cache: false, 
+			dataType: "text",
+			success: function (html){
 				var s = '<?xml version="1.0" encoding="UTF-8" ?><field>'
-							 +getTags(responseDetails.responseText,"table","common_table1 center").toString()
+							 +getTags(html,"table","common_table1 center").toString()
 							 + "</field>";
 				var re = /&nbsp;/;               //開拓地の人口欄が&nbsp;なので正しく処理されない為の苦肉の策
 				var table = s.replace(re, "-");  //"&nbsp;"なら"-"で置き換える
@@ -189,7 +186,7 @@ function members_main($) {
 												null);
 				terricount = trLinks.snapshotLength;
 				//GM_log("terricount:"+terricount);
-				var details = getTags(responseDetails.responseText, "p", "family_rank_detail");
+				var details = getTags(html, "p", "family_rank_detail");
 				var senkou = 0;
 				if (details == null) {
 					senkou = 0;
@@ -228,8 +225,12 @@ function members_main($) {
 					gtcnt += 1;
 				}
 				//GM_log("lordnn.toString():"+lordnn.toString());
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				alert('$.ajax pickJoshuProfData error');
+				//console.log(textStatus);
 			}
-		});
+		});	
 		return;
 	}
 	
