@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name           doumei members
+// @version        1.2
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    doumei members info ver. 1.1
+// @description    同盟メンバー拠点情報 ver. 1.2
 // @include        http://w0*.sengokuixa.jp/alliance/info.php*&m=*
 // @copyright  2011+, brahmint@gmail.com
 // ==/UserScript==
@@ -43,10 +44,10 @@ var Lord = function( rank, lnk, joshuname, points, tribute, level, trnum, attl, 
 	}
 }
 
-var HONRYO = "\u672C\u9818";        //本領
-var SHORYO = "\u6240\u9818";        //所領
-var DEJIRO = "\u51FA\u57CE";        //出城
-var KAITAKU= "\u958B\u62D3\u5730";  //開拓地
+var HONRYO = "本領";        //本領
+var SHORYO = "所領";        //所領
+var DEJIRO = "出城";        //出城
+var KAITAKU= "開拓地";  //開拓地
 
 var dispoption = 0;			//出力オプション　1:すべて, 2:攻撃側のだけ, 3:本拠地だけ
 var lords = new Array(1);
