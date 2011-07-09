@@ -34,6 +34,32 @@ function bara_addJQuery(callback) {
 
 function count_main($) {
     // ここにメインの処理を書く
+	var gifdore = 'data:image/gif;base64,'+
+	'R0lGODlhNwAYAOYAAP/////2+f/w9f/s8v/l7v/i7P/D1/++1P+yzP+wyv+rx/+mxP+hwP+cve+c'+
+	'uP+Wuv+St++Us/+Os9+Wrv+Mre+MrN+NqP+Dre+Hqv9/qe+Cpv96ps+Hn/90o996m/9wn7+Cl+9y'+
+	'nP9rnN91mL97kc91k/9mme9kkr9zjK91id9kjc9pi+9gj69yh79tib9qhs9hht9Zhr9igp9rfL9Z'+
+	'fJ9jd79Veb9Sdq9Scb9OdI9Za59Qa39YZa9Ja39TYp9HZI9LYp9AX39KXI9BW39FWG9IVY89WW9E'+
+	'Un9AVX86UW85S38zTG81SF82RG8vRF8yQW8sQ18tPk8xOz8oL08hMD8gKj8aJy8eJC8aIS8UHR8V'+
+	'GB8RFh8PFB8MEw8HCQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
+	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5'+
+	'BAEHAAAALAAAAAA3ABgAAAf/gACCg4SFhoeIiYqECBcfJhAZJh0KCwwMDxcbFw+dDxkLCxAUGxsS'+
+	'DRKlEhChDQ0KDBIPkxcLB4YDFyIXCJMfIiIfCJYMC6kbEMmnDaESGR0ZnRfQp7DMqBImIh2lBYMC'+
+	'F7ofHx2aHR0mFArXCw2knA/s7ccUnRsZEhKhD6Ef6yYAPwwQZCybiQe7FMwKtiADBAcWin0ytYGf'+
+	'q32akEHQFO5avFMAASYQ1CBcNn3AVCRJEqSDjRZYvFhgxsADEiI0OLW7FGsFDnilMngQMqXEBVgA'+
+	'0QmSOE1EtgUvvnzpYSLLFyBfsCCARUJqhQwXIDTgyUFqlA1Dn3CR+sWLinW//wAK4ndJkoINHWRI'+
+	'pdFBhZcuQ4ZoWwBCaggJJWho4NdOh1QgNNhiUYLj3AYE6LQJAutqmjERkb+4OPejBzQRUKZ4kdqk'+
+	'ilQvMi5c83ElQtQqFFCVQtcgpAlBYTdQIKUAIIvHO1xnQSfCClu2W1hrOhVqQ2EvVbJnZ2KC1wYT'+
+	'CuYKf9eg1wUtz6WaCgmFrQ4GR75UWSUDyRIkKnKkl1oFYPFzS5UUDjcIGbHaF104sUIoCmwVw2pe'+
+	'lDCMD19McUEGQrAlgxFfUIEAD18QIRwwmjxD0iWfZJDBCc5VmMICFKSSzwUYWPWFFQchIMUXRSzw'+
+	'gAc3WGXDE18sIQKFQkBQiv8IFGTwwQPAySaKJkq0tQNjB5mAFwZYsIUjQM75wOAHru0gFQwfgCim'+
+	'BNNsUNJvAISjk4+PibDJBo+YgM8PUjlXBQRgfuFDBDMooIBrq23xSBKCosjmNB0IkspGFSlg1j14'+
+	'JmACCxMYysUPFE7RWwfOZdFFFRgU8ZwNFHSwhKDrMDORCAGa1IEEqrZVxRRVdBniBiLoCaIVjZhA'+
+	'BHREtiXVFlZU0Wx2XrTTzAYBGpMBAxlsoMMU+2FRQ0XfvfrlOjok8UMGLnwRhQc77iefPu24IkhF'+
+	'l8C4ya0PMFCSKeF0ckqwCUiSwSvOlAKEktGg8MILNqAggwwj3CMrlAAgINyPKwptoqIrroDFpgSV'+
+	'LNCdCQt84Eo+smgynCoSUNJyRSY1cAsAAjgDiigL3JOKbJc4M+MlDYwjsjYmrAKBvvdsNA45Cbgj'+
+	'S4oCDEJAPm520kAkbDrEcTgbndJBngDtYgpPSt4T0HADdvDAQIUcgAnP+rIZCdxKrsLm1wEtEM7F'+
+	'O7XKwC6P1mLAIoQXbngigQAAOw==';
+
 	var sdata = "足軽,1,1:長槍足軽,1,2:武士,1,4:弓足軽,2,1:長弓兵,2,2:弓騎馬,2,4:騎馬兵,3,1:精鋭騎馬,3,2:赤備え,3,4:破城槌,4,1:攻城櫓,4,2:大筒兵,4,4:鉄砲足軽,5,2:騎馬鉄砲,5,4:国人衆,1,3:海賊衆,2,3:母衣衆,3,3:雑賀衆,5,3:";
 	var SoldData = function ( sname, stype, sclass, nums) {
 		this.sname     = sname;		//名前 足軽、武士とか		
@@ -52,10 +78,18 @@ function count_main($) {
 		this.numdeck = numdeck;		//兵数
 	}
 
+	var StdbyData = function ( name, sname, numstdby) {
+		this.name     = name;		//武将名
+		this.sname    = sname;		//兵名
+		this.numstdby = numstdby;	//兵数
+	}
+
 	var soldiers = new Array (1);
 	var decksold = new Array (1);
+	var stdbysold = new Array(1);
 	var decksoldcount = 0;
 	var deckjobcount = 0;
+	var stdbysoldcount = 0;
 
 
 	function getTdTags(html) {
@@ -93,6 +127,10 @@ function count_main($) {
 		return;
 	}
 	
+	
+	//
+	//待機中の兵士、訓練中の兵士の数を数える
+	//
 	function unit_list_count() {
 		var ulUrl = 'http://' + window.location.host + '/facility/unit_list.php';
 		$.ajax({
@@ -160,13 +198,9 @@ function count_main($) {
 
 	}
 
-	
-	function getDoubleSpanTags(html, className){
-		var reg = new RegExp('<span class="'+ className + '">([^<]*)<span>(<img.*)</span>(.*)</span>', "ig");
-		return html.match(reg);
-	}
-
-
+	//
+	//デッキに配置したカードの兵を集計する
+	//
 	function unit_on_deck(n) {
 		var dkUrl = 'http://' + window.location.host + '/card/deck.php?ano=' + n;
 		//alert("dkUrl="+dkUrl);
@@ -191,23 +225,24 @@ function count_main($) {
 					decksold[decksoldcount] = new DeckData(leader, cost, sname, snum);
 					decksoldcount++;
 		
-					var reg = new RegExp('<span class="ig_deck_unitdata_subleader">([^<]*)<span><img[^>]*>([^<]*)</span><br[^<]*<img[^>]*alt="([^"]*)"[^>]*>([^<]*)人</span>', 'igm');
-					var kks = html.match(reg);
-					//alert(kks.length);
-					for (var i=0; i< kks.length; i++) {
-						kkk = kks[i].match(reg);
-						//alert(kkk);
-						var subleader = RegExp.$1;
-						cost   = RegExp.$2;
-						sname  = RegExp.$3;
-						snum   = RegExp.$4;
-						subleader = trim(subleader);
-						cost      = trim(cost);
-						sname     = trim(sname);
-						snum      = trim(snum);
-						//alert(subleader +"," +cost + "," + sname +"," + snum);
-						decksold[decksoldcount] = new DeckData(subleader, cost, sname, snum);
-						decksoldcount++;
+					var reg2 = new RegExp('<span class="ig_deck_unitdata_subleader">([^<]*)<span><img[^>]*>([^<]*)</span><br[^<]*<img[^>]*alt="([^"]*)"[^>]*>([^<]*)人</span>', 'igm');
+					var kks = html.match(reg2);
+					if (null != kks) {
+						for (var i=0; i< kks.length; i++) {
+							kkk = kks[i].match(reg2);
+							//alert(kkk);
+							var subleader = RegExp.$1;
+							cost   = RegExp.$2;
+							sname  = RegExp.$3;
+							snum   = RegExp.$4;
+							subleader = trim(subleader);
+							cost      = trim(cost);
+							sname     = trim(sname);
+							snum      = trim(snum);
+							//alert(subleader +"," +cost + "," + sname +"," + snum);
+							decksold[decksoldcount] = new DeckData(subleader, cost, sname, snum);
+							decksoldcount++;
+						}
 					}
 				}
 				deckjobcount++;
@@ -226,6 +261,101 @@ function count_main($) {
 			}
 		});	
 	}
+
+	//
+	//待機武将のカードに搭載された兵士を数える
+	//
+	function set_unit_list() {
+		var ulUrl = 'http://' + window.location.host + '/facility/set_unit_list.php?show_num=100';
+		$.ajax({
+			url: ulUrl, 
+			cache: false, 
+			dataType: "text",
+			success: function (html){
+				//GM_log("table:"+table);
+				var reg = new RegExp('<table class="common_table1 center mt10">','im');
+				//alert("1");
+				var tbl = html.match(reg);
+				var txt = RegExp.rightContext;
+				reg = new RegExp('</table>','im');
+				tbl = txt.match(reg);
+				txt = RegExp.leftContext;
+				var tds = getClassTags(txt,"td","");
+				//alert("3");
+				var pgs = html.match(/<li class="last">.*<\/li>/img);
+				//alert("4: pgs[0]="+pgs[0]);
+				var pg2 = null;
+				if (pgs.length != 0) {
+					pg2 = pgs[0].match(/show_num=100&amp;(_=[0-9]+&amp;)?p=2/);	//最初のページで101枚以上カードがあるかチェック
+				}
+				//alert("pg2="+pg2);
+				for (var i = 0; i < tds.length/7; i++) {
+					var name = getTagText( tds[i*7],"a","");
+					name = trim(name);
+					var s = tds[i*7 + 3];
+					var alt = getAlt(s);
+					var units = getIdTagText(s, "span", "now_unit_cnt_[0-9]+");
+					var leads = getIdTagText(s, "span", "lead_unit_[0-9]+");
+					//alert(alt + "\n" + units + "\n" + leads);
+					stdbysold[stdbysoldcount] = new StdbyData(name,alt,units);
+					stdbysoldcount++;
+				}
+				if (pg2 != null) {	//first pageで２ページ目がある場合
+					var ulUrl2 = ulUrl + '&p=2';
+					$.ajax({
+						url: ulUrl2, 
+						cache: false, 
+						dataType: "text",
+						success: function (html){
+							//GM_log("table:"+table);
+							var reg = new RegExp('<table class="common_table1 center mt10">','im');
+							//alert("1");
+							var tbl = html.match(reg);
+							var txt = RegExp.rightContext;
+							reg = new RegExp('</table>','im');
+							tbl = txt.match(reg);
+							txt = RegExp.leftContext;
+							var tds = getClassTags(txt,"td","");
+							for (var i = 0; i < tds.length/7; i++) {
+								var name = getTagText( tds[i*7],"a","");
+								name = trim(name);
+								var s = tds[i*7 + 3];
+								var alt = getAlt(s);
+								var units = getIdTagText(s, "span", "now_unit_cnt_[0-9]+");
+								var leads = getIdTagText(s, "span", "lead_unit_[0-9]+");
+								//alert(alt + "\n" + units + "\n" + leads);
+								stdbysold[stdbysoldcount] = new StdbyData(name,alt,units);
+								stdbysoldcount++;
+							}
+							var msg = "";
+							for (var i = 0; i < stdbysoldcount; i++) {
+								msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
+							}
+							alert("Msg:"+msg);
+						},
+						error: function (XMLHttpRequest, textStatus, errorThrown) {
+							alert('$.ajaxset_unit_list() pg2 error');
+							//console.log(textStatus);
+						}
+					});	
+
+				} else {
+					var msg = "";
+					for (var i = 0; i < stdbysoldcount; i++) {
+						msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
+					}
+					alert("Msg:"+msg);
+				}
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				alert('$.ajax set_unit_list() error');
+				//console.log(textStatus);
+			}
+		});	
+		
+		return;
+	}
+	
 
 	// Removes leading whitespaces
 	function LTrim( value ) {
@@ -387,6 +517,13 @@ function count_main($) {
 		return (ans && ans.length) ? RegExp.$1 : "";
 	}
 	
+	function getAlt(html) {
+		var src = '<img src="([^"]*)"(\\s|.)*?alt="([^"]*)"';	//フル
+		var ans = html.match(src,"ig");
+		return (ans && ans.length) ? RegExp.$3 : "";
+	}
+	
+
 	
 	function replaceAmp(s) {
 		return s.replace(/&amp;/g,'&');
@@ -396,26 +533,34 @@ function count_main($) {
 		return s.replace(/&nbsp;/g,' ');
 	}
 
+	//
+	//  ボタンの表示
+	//
+	function setbutton() {
+		var tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_countnos"><img src="' + gifdore + '" alt="NOS伯爵" style="position: relative; top: 0px; left: -10px"></a>';
+		$('div.ig_decksection_top').append(tmp);
+	}
+
 
 	//
 	// main
 	//
-	unit_list_count();
-
-	unit_on_deck(0);
-	unit_on_deck(1);
-	unit_on_deck(2);
-	unit_on_deck(3);
-	unit_on_deck(4);
+	setbutton();	//ボタンの表示
 	
+	$('#do_countnos').live('click',function() {
+		unit_list_count();		//待機中の兵士と訓練中の兵士を数える
 	
-
-//	var my_no = 2;
-//	function myselectAssignNo(){$("select_assign_no").value=my_no;$("deck_mode").value="nomal";document.forms.assign_form.submit();return true}
-//
-//	setTimeout(myselectAssignNo,100);
-
-
+		unit_on_deck(0);		//デッキの兵を数える
+		unit_on_deck(1);
+		unit_on_deck(2);
+		unit_on_deck(3);
+		unit_on_deck(4);
+	
+		set_unit_list();		//兵士編成100件x2頁で数える
+		//calc_dokochika();
+		//setTimeout(calc_dokochika, 10);
+	});
+	
 }
 
 bara_addJQuery(count_main);
