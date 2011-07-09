@@ -2,7 +2,7 @@
 // @name           Suppa
 // @version        1.0
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    Suppa(数把) version 1.0 20110708
+// @description    Suppa(数把) version 1.0 20110710
 // @include        http://w0*.sengokuixa.jp/facility/unit_list.php
 // @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
