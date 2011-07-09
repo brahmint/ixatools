@@ -1,8 +1,8 @@
 ﻿// ==UserScript==
-// @name           suppa
+// @name           Suppa
 // @version        1.0
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    suppa version 1.0 20110708
+// @description    Suppa(数把) version 1.0 20110708
 // @include        http://w0*.sengokuixa.jp/facility/unit_list.php
 // @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
@@ -10,7 +10,6 @@
 //
 // Mokoと同じjQuery初期化
 //
-
 
 function bara_addJQuery(callback) {
     if (typeof(unsafeWindow.tb_init)!='undefined') {
@@ -34,43 +33,272 @@ function bara_addJQuery(callback) {
 
 function count_main($) {
     // ここにメインの処理を書く
-	var gifdore = 'data:image/gif;base64,'+
-	'R0lGODlhNwAYAOYAAP/////2+f/w9f/s8v/l7v/i7P/D1/++1P+yzP+wyv+rx/+mxP+hwP+cve+c'+
-	'uP+Wuv+St++Us/+Os9+Wrv+Mre+MrN+NqP+Dre+Hqv9/qe+Cpv96ps+Hn/90o996m/9wn7+Cl+9y'+
-	'nP9rnN91mL97kc91k/9mme9kkr9zjK91id9kjc9pi+9gj69yh79tib9qhs9hht9Zhr9igp9rfL9Z'+
-	'fJ9jd79Veb9Sdq9Scb9OdI9Za59Qa39YZa9Ja39TYp9HZI9LYp9AX39KXI9BW39FWG9IVY89WW9E'+
-	'Un9AVX86UW85S38zTG81SF82RG8vRF8yQW8sQ18tPk8xOz8oL08hMD8gKj8aJy8eJC8aIS8UHR8V'+
-	'GB8RFh8PFB8MEw8HCQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5'+
-	'BAEHAAAALAAAAAA3ABgAAAf/gACCg4SFhoeIiYqECBcfJhAZJh0KCwwMDxcbFw+dDxkLCxAUGxsS'+
-	'DRKlEhChDQ0KDBIPkxcLB4YDFyIXCJMfIiIfCJYMC6kbEMmnDaESGR0ZnRfQp7DMqBImIh2lBYMC'+
-	'F7ofHx2aHR0mFArXCw2knA/s7ccUnRsZEhKhD6Ef6yYAPwwQZCybiQe7FMwKtiADBAcWin0ytYGf'+
-	'q32akEHQFO5avFMAASYQ1CBcNn3AVCRJEqSDjRZYvFhgxsADEiI0OLW7FGsFDnilMngQMqXEBVgA'+
-	'0QmSOE1EtgUvvnzpYSLLFyBfsCCARUJqhQwXIDTgyUFqlA1Dn3CR+sWLinW//wAK4ndJkoINHWRI'+
-	'pdFBhZcuQ4ZoWwBCaggJJWho4NdOh1QgNNhiUYLj3AYE6LQJAutqmjERkb+4OPejBzQRUKZ4kdqk'+
-	'ilQvMi5c83ElQtQqFFCVQtcgpAlBYTdQIKUAIIvHO1xnQSfCClu2W1hrOhVqQ2EvVbJnZ2KC1wYT'+
-	'CuYKf9eg1wUtz6WaCgmFrQ4GR75UWSUDyRIkKnKkl1oFYPFzS5UUDjcIGbHaF104sUIoCmwVw2pe'+
-	'lDCMD19McUEGQrAlgxFfUIEAD18QIRwwmjxD0iWfZJDBCc5VmMICFKSSzwUYWPWFFQchIMUXRSzw'+
-	'gAc3WGXDE18sIQKFQkBQiv8IFGTwwQPAySaKJkq0tQNjB5mAFwZYsIUjQM75wOAHru0gFQwfgCim'+
-	'BNNsUNJvAISjk4+PibDJBo+YgM8PUjlXBQRgfuFDBDMooIBrq23xSBKCosjmNB0IkspGFSlg1j14'+
-	'JmACCxMYysUPFE7RWwfOZdFFFRgU8ZwNFHSwhKDrMDORCAGa1IEEqrZVxRRVdBniBiLoCaIVjZhA'+
-	'BHREtiXVFlZU0Wx2XrTTzAYBGpMBAxlsoMMU+2FRQ0XfvfrlOjok8UMGLnwRhQc77iefPu24IkhF'+
-	'l8C4ya0PMFCSKeF0ckqwCUiSwSvOlAKEktGg8MILNqAggwwj3CMrlAAgINyPKwptoqIrroDFpgSV'+
-	'LNCdCQt84Eo+smgynCoSUNJyRSY1cAsAAjgDiigL3JOKbJc4M+MlDYwjsjYmrAKBvvdsNA45Cbgj'+
-	'S4oCDEJAPm520kAkbDrEcTgbndJBngDtYgpPSt4T0HADdvDAQIUcgAnP+rIZCdxKrsLm1wEtEM7F'+
-	'O7XKwC6P1mLAIoQXbngigQAAOw==';
+	var gifsuppa = 'data:image/gif;base64,'+
+	'R0lGODlhNwAYAOYAAAAAAJXc3GC/vztpacPr6xozM0yZmXfS0gwZGaTh4TFaWkB/f1uzs3W8vIPW'+
+	'1idMTPf8/K3k5G2kpEuNjRMmJnLQ0HupqUpubpze3ovY2AcMDGvOzll9feL19V+fnyM2NjpTU2SM'+
+	'jEVhYY/FxXzT02bMzK3e3lmdnbLl5Ud3d3Kamm2vr1KQkBkoKEaBgYC1tTNmZkRrazFQUO75+f//'+
+	'/wgNDVmHh1lycnClpVuoqCxDQ3vJyUOAgB40NL3p6WS2thAaGjlycmShoR8pKUJVVWi4uFKamnmo'+
+	'qE9vbyo4ODZcXEpjY1RxceX3936/v2iMjFyUlFCFhYy5uWGAgAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
+	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
+	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/'+
+	'C1hNUCBEYXRhWE1QPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRj'+
+	'emtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRv'+
+	'YmUgWE1QIENvcmUgNS4wLWMwNjAgNjEuMTM0Nzc3LCAyMDEwLzAyLzEyLTE3OjMyOjAwICAgICAg'+
+	'ICAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjIt'+
+	'cmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAg'+
+	'ICAgICAgICB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iPgogICAgICAg'+
+	'ICA8eG1wOkNyZWF0b3JUb29sPkFkb2JlIEZpcmV3b3JrcyBDUzUgMTEuMC4wLjQ4NCBXaW5kb3dz'+
+	'PC94bXA6Q3JlYXRvclRvb2w+CiAgICAgICAgIDx4bXA6Q3JlYXRlRGF0ZT4yMDExLTA2LTIxVDE4'+
+	'OjI3OjM2WjwveG1wOkNyZWF0ZURhdGU+CiAgICAgICAgIDx4bXA6TW9kaWZ5RGF0ZT4yMDExLTA3'+
+	'LTA5VDExOjIxOjI3WjwveG1wOk1vZGlmeURhdGU+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgog'+
+	'ICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczpkYz0i'+
+	'aHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iPgogICAgICAgICA8ZGM6Zm9ybWF0Pmlt'+
+	'YWdlL2dpZjwvZGM6Zm9ybWF0PgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRG'+
+	'Pgo8L3g6eG1wbWV0YT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'IAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAog'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAK'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'IAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAog'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAK'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'IAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg'+
+	'ICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKPD94cGFja2V0IGVuZD0idyI/PgH/'+
+	'/v38+/r5+Pf29fTz8vHw7+7t7Ovq6ejn5uXk4+Lh4N/e3dzb2tnY19bV1NPS0dDPzs3My8rJyMfG'+
+	'xcTDwsHAv769vLu6ubi3trW0s7KxsK+urayrqqmop6alpKOioaCfnp2cm5qZmJeWlZSTkpGQj46N'+
+	'jIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVU'+
+	'U1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08ADo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwb'+
+	'GhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEAACH5BAAHAP8ALAAAAAA3ABgAAAf/gDSCg4SFhoeI'+
+	'iYqDED4OFSUBJCUVEQmXAQ4kDgGdmZgZJCQZGBkHBxkBl6sJnZQOCT4QhTMOGw4olBUbvCisoSSe'+
+	'pBiXGY+cmRWjGJbECRkZJRvKJB2Dtba8FQ4HFZAZEcTOpsjOl6WiqZKjGZiXlRgl8hUzgq0B8gG3'+
+	'Efi8CcGsMo0CmMBZplOduDlwYLBUPHklIgjC4ABapATadlFyoUJEkiccRoT4oCQUpwQeOWAQ4uGE'+
+	'EBw4PBSpiAFDJkvzSthr9ahCtGckdjHQoAEIgBYAkoAAAILTpgBJABzBAKCqVQAxTh0IgAGeRp00'+
+	'VF2aFCGoA34HfvS4CmDCEKYe/zxIcOIBKQcLVZcCWXshkyZvJFBAkiZoYc1HrTZ04zeAreOqMR4f'+
+	'SRp5AKkAWks8lFdYEjQSESCSa8DCKAAEPBRUvVFVhJABRmU0BoC3BxMAN0R1ElUC14GIgjybxJDr'+
+	'bFALFNhqqMqj6rkPAIQEqPrgdAHcKEwGiBZRlz2KC5Xpm/ZvAQAgNQAQuZq8ha8Rb5E+hoECxfZR'+
+	'vDQFnVhzHYlpylwyQgw6AFADFFDIR10A61ll2gkQygAADBs0s84GoVQQQGEM8bRJfqrc5lgOVhlQ'+
+	'QhBWhZBAVQv11I0vxWSgDEVgVXTSPaJssEkRCABAgYQUGLBBjzXgIwAD1x0RQf9VwDigxASUwNgK'+
+	'ND0JEopAAYSDgSiikHjVFCRUVxUHlJRwnQEkVKWKjD3+4E9BxBy0wXcVydhOQiRg0EAUpgGgQY/n'+
+	'VaUEA0IkZ4QDrSGBhBJ+RoMMK0B99wwsophDggdWibBWVQsIkBwFUlj1AwkiOKZEPAlBE5AgBAH1'+
+	'SCoFOTCADTsgE8MIG5SAQgoMkIAEExJwc8AKEsSFwwupVACefnFuSAMKqDCD1kJ51rQlJ5xYkkBv'+
+	'JSSgbCnQCPQZO5UEIN5CXPkgyAzGkOCObpvUBNR27RTkzbbSRNJJQbr15A0KpXiyUD2CNPGZTVxl'+
+	'8hlXh2FLijcQSaOJWK1wOQ8plT0F0EQhjdjEkDjhGhbnKPRCTEkCC0W7iowYYbtQAgTMssjMNNd8'+
+	'SCAAOw==';
 
 	var sdata = "足軽,1,1:長槍足軽,1,2:武士,1,4:弓足軽,2,1:長弓兵,2,2:弓騎馬,2,4:騎馬兵,3,1:精鋭騎馬,3,2:赤備え,3,4:破城槌,4,1:攻城櫓,4,2:大筒兵,4,4:鉄砲足軽,5,2:騎馬鉄砲,5,4:国人衆,1,3:海賊衆,2,3:母衣衆,3,3:雑賀衆,5,3:";
 	var SoldData = function ( sname, stype, sclass, nums) {
 		this.sname     = sname;		//名前 足軽、武士とか		
 		this.stype     = Number(stype);		//兵種　槍1弓2馬3器4砲5
 		this.sclass    = Number(sclass);	//兵級　下級1中級2秘境3上級4
-		this.numwait   = Number(nums);			//待機兵数
-		this.numbuild  = 0;		//兵舎の兵数
+		this.numwait   = Number(nums);		//陣屋・長屋 待機兵数
+		this.numtrain  = 0;		//兵舎で訓練中の兵数
 		this.numdeck   = 0;		//デッキ搭載中の兵数
 		this.numstdby  = 0;		//カード搭載中の兵数
 	}
 	
+	//デッキ搭載中の兵数
 	var DeckData = function ( name, cost, sname, numdeck) {
 		this.name    = name;		//武将名
 		this.cost    = cost;		//コスト
@@ -78,60 +306,113 @@ function count_main($) {
 		this.numdeck = numdeck;		//兵数
 	}
 
+	//カード搭載中の兵数
 	var StdbyData = function ( name, sname, numstdby) {
 		this.name     = name;		//武将名
 		this.sname    = sname;		//兵名
 		this.numstdby = numstdby;	//兵数
 	}
 
-	var soldiers = new Array (1);
-	var decksold = new Array (1);
+	var soldiers  = new Array (1);
+	var decksold  = new Array (1);
 	var stdbysold = new Array(1);
-	var decksoldcount = 0;
-	var deckjobcount = 0;
+	var decksoldcount  = 0;
 	var stdbysoldcount = 0;
+	var rdysold    = false;
+	var rdydeck    = false;
+	var rdystdby   = false;
+	var deckjobs   = 0;
 
 
-	function getTdTags(html) {
-		var reg = new RegExp('<td width="70">([^<]*)</td>', "ig");
-		var tags = html.match(reg);
-		return tags;
-	}
-	function getTdText(html) {
-		var reg = new RegExp('<td width="70">([^<]*)</td>', "i");
-		var tag = html.match(reg);
-		return (tag) ? RegExp.$1 : "";
-	}
-
-	function addNumbuild(name,num) {
-		var sname = name.replace('鎚','槌');
+	//訓練中の兵をデータに集計
+	function addNumTrain(sname0,num) {
+		var sname = sname0.replace('鎚','槌');
 		for (var i = 0; i < soldiers.length; i++) {
 			if (soldiers[i].sname == sname) {
-				soldiers[i].numbuild += Number(num);
+				soldiers[i].numtrain += Number(num);
 				return;
 			}
 		}
-		soldiers[soldiers.length - 1].numbuild += Number(num);
+		soldiers[soldiers.length - 1].numtrain += Number(num);	//不明のものはここへ
 		return;
 	}
 
-	function addNumdeck(name,num) {
-		var sname = name.replace('鎚','槌');
+	//デッキの兵をデータに集計
+	function addNumDeck(sname0,num) {
+		var sname = sname0.replace('鎚','槌');
 		for (var i = 0; i < soldiers.length; i++) {
 			if (soldiers[i].sname == sname) {
 				soldiers[i].numdeck += Number(num);
 				return;
 			}
 		}
-		soldiers[soldiers.length - 1].numbuild += Number(num);
+		soldiers[soldiers.length - 1].numdeck += Number(num);	//不明のものはここへ
 		return;
 	}
 	
 	
+	//待機中の兵をデータに集計
+	function addNumStdby(sname0,num) {
+		var sname = sname0.replace('鎚','槌');
+		for (var i = 0; i < soldiers.length; i++) {
+			if (soldiers[i].sname == sname) {
+				soldiers[i].numstdby += Number(num);
+				return;
+			}
+		}
+		soldiers[soldiers.length - 1].numstdby += Number(num);		//不明のものはここへ
+		return;
+	}
+
+	function _numFormat(n) {
+		var s = "" + n;
+		s = s.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+		return s;
+	}
+	
+	function numFormat(n, digits) {
+		var s = _numFormat(n);
+		if (s.length < digits) {
+			s = ("            ").substr(0, digits - s.length) + s;
+		}
+		return s;
+	}
+	
+	function strFormat(s, width) {
+		if (s.length < width) {
+			s = s + ("　　　　　　　　　").substr(0, width - s.length);
+		}
+		return s;
+	}
+	
+
+	//
+	//
+	//
+	//
+	
+	function mergeAndShow() {
+		for (var i = 0; i < decksoldcount; i++) {
+			addNumDeck(decksold[i].sname, decksold[i].numdeck);
+		}
+		for (var i = 0; i < stdbysoldcount; i++) {
+			addNumDeck(stdbysold[i].sname, stdbysold[i].numstdby);
+		}
+				
+		var msg = "";
+		var total = 0;
+		for (var i = 0; i < soldiers.length; i++) {
+			msg += numFormat(i,2) + "：" + strFormat(soldiers[i].sname,4) + numFormat(soldiers[i].numwait + soldiers[i].numtrain + soldiers[i].numdeck + soldiers[i].numstdby,8) + "\n";
+			total += soldiers[i].numwait + soldiers[i].numtrain + soldiers[i].numdeck + soldiers[i].numstdby;
+		}
+		msg += "  "+"：" + "＊合計＊" + numFormat(total,8);
+		alert(msg);
+	}
+	
 	//
 	//待機中の兵士、訓練中の兵士の数を数える
 	//
-	function unit_list_count() {
+	function countWaitAndTrainin() {
 		var ulUrl = 'http://' + window.location.host + '/facility/unit_list.php';
 		$.ajax({
 			url: ulUrl, 
@@ -165,7 +446,7 @@ function count_main($) {
 						soldiers[i] = new SoldData(sname,RegExp.$1, RegExp.$2, tds[i]);
 					}
 				}
-				soldiers[soldiers.length] = new SoldData("不明","-1", "-1", "0");
+				soldiers[soldiers.length] = new SoldData("不明","-1", "-1", "0");		//最後に不明欄を加える
 
 				//
 				for(var j = 1; j < tbls.length; j++) {
@@ -176,22 +457,23 @@ function count_main($) {
 						tds = getTags(trs[i],"td","");
 						var nb = getTagText(tds[1],"td","");
 						trs[i].match(/alt="(.*)"/);
-						addNumbuild(RegExp.$1, nb);
+						addNumTrain(RegExp.$1, nb);
 					}
 				}
+				rdysold = true;		//準備完了
 				//				
 				
-				var msg = "";
-				for (var i = 0; i < soldiers.length; i++) {
-					msg += i + ":" + soldiers[i].sname + "[" + soldiers[i].stype + "," + soldiers[i].sclass + "]," + soldiers[i].numwait + "," + soldiers[i].numbuild + "\n";
-				}
-				alert(msg);
+				//var msg = "";
+				//for (var i = 0; i < soldiers.length; i++) {
+				//	msg += i + ":" + soldiers[i].sname + "[" + soldiers[i].stype + "," + soldiers[i].sclass + "]," + soldiers[i].numwait + "," + soldiers[i].numtrain + "," + soldiers[i].numdeck + "," + soldiers[i].numstdby + "\n";
+				//}
+				//alert(msg);
 				//alert('count='+thcount+ '\n'+ths);
 				//alert('count='+tdcount+ '\n'+tds);
 				//alert('tericount=' + tericount);
 			},
 			error: function (XMLHttpRequest, textStatus, errorThrown) {
-				alert('$.ajax unit_list_count() error');
+				alert('$.ajax countWaitAndTrainin() error');
 				//console.log(textStatus);
 			}
 		});	
@@ -201,7 +483,7 @@ function count_main($) {
 	//
 	//デッキに配置したカードの兵を集計する
 	//
-	function unit_on_deck(n) {
+	function countOnDeck(n) {
 		var dkUrl = 'http://' + window.location.host + '/card/deck.php?ano=' + n;
 		//alert("dkUrl="+dkUrl);
 		$.ajax({
@@ -245,18 +527,19 @@ function count_main($) {
 						}
 					}
 				}
-				deckjobcount++;
-				if (deckjobcount >= 5) {
-					var msg = "";
-					for (var i = 0; i < decksoldcount; i++) {
-						msg += "\n"+ decksold[i].name + "," + decksold[i].cost + "," + decksold[i].sname + "," + decksold[i].numdeck;
-					}
-					alert("Msg:"+msg);
+				deckjobs++;
+				if (deckjobs >= 5) {
+					rdydeck = true;		//準備完了
+					//var msg = "";
+					//for (var i = 0; i < decksoldcount; i++) {
+					//	msg += "\n"+ decksold[i].name + "," + decksold[i].cost + "," + decksold[i].sname + "," + decksold[i].numdeck;
+					//}
+					//alert("Msg:"+msg);
 				}
 
 			},
 			error: function (XMLHttpRequest, textStatus, errorThrown) {
-				alert('$.ajax unit_on_deck('+n+') error');
+				alert('$.ajax countOnDeck('+n+') error');
 				//console.log(textStatus);
 			}
 		});	
@@ -265,7 +548,7 @@ function count_main($) {
 	//
 	//待機武将のカードに搭載された兵士を数える
 	//
-	function set_unit_list() {
+	function countStdby() {
 		var ulUrl = 'http://' + window.location.host + '/facility/set_unit_list.php?show_num=100';
 		$.ajax({
 			url: ulUrl, 
@@ -327,36 +610,54 @@ function count_main($) {
 								stdbysold[stdbysoldcount] = new StdbyData(name,alt,units);
 								stdbysoldcount++;
 							}
-							var msg = "";
-							for (var i = 0; i < stdbysoldcount; i++) {
-								msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
-							}
-							alert("Msg:"+msg);
+							rdystdby = true;	//準備完了
+							//var msg = "";
+							//for (var i = 0; i < stdbysoldcount; i++) {
+							//	msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
+							//}
+							//alert("Msg:"+msg);
 						},
 						error: function (XMLHttpRequest, textStatus, errorThrown) {
-							alert('$.ajaxset_unit_list() pg2 error');
+							alert('$.ajaxcountStdby() pg2 error');
 							//console.log(textStatus);
 						}
 					});	
 
 				} else {
-					var msg = "";
-					for (var i = 0; i < stdbysoldcount; i++) {
-						msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
-					}
-					alert("Msg:"+msg);
+					rdystdby = true;	//準備完了
+					//var msg = "";
+					//for (var i = 0; i < stdbysoldcount; i++) {
+					//	msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
+					//}
+					//alert("Msg:"+msg);
 				}
 			},
 			error: function (XMLHttpRequest, textStatus, errorThrown) {
-				alert('$.ajax set_unit_list() error');
+				alert('$.ajax countStdby() error');
 				//console.log(textStatus);
 			}
 		});	
 		
 		return;
 	}
-	
 
+
+	//------------------------------
+	//
+	//
+	function getTdTags(html) {
+		var reg = new RegExp('<td width="70">([^<]*)</td>', "ig");
+		var tags = html.match(reg);
+		return tags;
+	}
+
+	function getTdText(html) {
+		var reg = new RegExp('<td width="70">([^<]*)</td>', "i");
+		var tag = html.match(reg);
+		return (tag) ? RegExp.$1 : "";
+	}
+
+	//------------------------------
 	// Removes leading whitespaces
 	function LTrim( value ) {
 		var re = /\s*((\S+\s*)*)/;
@@ -533,11 +834,22 @@ function count_main($) {
 		return s.replace(/&nbsp;/g,' ');
 	}
 
+	var viserId;
+	
+	function setViser(timeVise)
+	{
+		viserId = setInterval( function() { 
+									if ( rdysold && rdydeck && rdystdby ) {
+										clearInterval(viserId);
+										mergeAndShow();
+									}
+								}, timeVise);
+	}
 	//
 	//  ボタンの表示
 	//
 	function setbutton() {
-		var tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_countnos"><img src="' + gifdore + '" alt="NOS伯爵" style="position: relative; top: 0px; left: -10px"></a>';
+		var tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_suppa"><img src="' + gifsuppa + '" alt="数把" style="position: relative; top: 0px; left: -10px"></a>';
 		$('div.ig_decksection_top').append(tmp);
 	}
 
@@ -547,19 +859,32 @@ function count_main($) {
 	//
 	setbutton();	//ボタンの表示
 	
-	$('#do_countnos').live('click',function() {
-		unit_list_count();		//待機中の兵士と訓練中の兵士を数える
+	$('#do_suppa').live('click',function() {
+		rdysold   = false;		//
+		rdydeck   = false;
+		rdystdby  = false;
+		soldiers  = new Array (1);
+		decksold  = new Array (1);
+		stdbysold = new Array(1);
+		decksoldcount  = 0;
+		deckjobs   = 0;
+		stdbysoldcount = 0;
 	
-		unit_on_deck(0);		//デッキの兵を数える
-		unit_on_deck(1);
-		unit_on_deck(2);
-		unit_on_deck(3);
-		unit_on_deck(4);
+		countWaitAndTrainin();		//待機中の兵士と訓練中の兵士を数える
 	
-		set_unit_list();		//兵士編成100件x2頁で数える
+		countOnDeck(0);		//デッキの兵を数える
+		countOnDeck(1);
+		countOnDeck(2);
+		countOnDeck(3);
+		countOnDeck(4);
+	
+		countStdby();		//兵士編成100件x2頁で数える
+		
+		setViser(1000);
 		//calc_dokochika();
 		//setTimeout(calc_dokochika, 10);
 	});
+
 	
 }
 
