@@ -1,10 +1,10 @@
 ﻿// ==UserScript==
-// @name           Count NOS
+// @name           suppa
 // @version        1.0
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    ＮＯＳ伯爵 version 1.0 20110708
-// @include        http://w013.sengokuixa.jp/facility/unit_list.php
-// @copyright      2011+, brahmint@gmail.com
+// @description    suppa version 1.0 20110708
+// @include        http://w0*.sengokuixa.jp/facility/unit_list.php
+// @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 
 //
