@@ -3,8 +3,8 @@
 // @version        1.22
 // @namespace      https://sites.google.com/site/ixamukakin/
 // @description    どこ近 Ver. 1.22 20110714
-// @include        http://w*.sengokuixa.jp/land.php?*
-// @match          http://w*.sengokuixa.jp/land.php?*
+// @include        http://*.sengokuixa.jp/land.php?*
+// @match          http://*.sengokuixa.jp/land.php?*
 // @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 
