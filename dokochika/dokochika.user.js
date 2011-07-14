@@ -255,7 +255,7 @@ function chika_main($) {
 	//
 	function showAdvice() {
 		//alert("teridata.length="+teridata.length);
-		var s = ixaPos.dokochikaStr(teridata, 0);
+		var s = ixaPos.dokochikaStr(teridata, 1);
 		alert(s);
 	}
 
