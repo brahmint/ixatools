@@ -1,14 +1,17 @@
 // ==UserScript==
 // @name           Jintory
-// @version        1.42
+// @version        1.43
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    Jintory ver. 1.42 20110703
-// @include        http://w013.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=new
-// @include        http://w013.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=&p=1#ptop
-// @include        http://w013.sengokuixa.jp/bbs/res_view.php?p=1&thread_id=*
-// @include        http://w013.sengokuixa.jp/user/
-// @include        http://w013.sengokuixa.jp/user/#ptop
-// @copyright      2011+, brahmint@gmail.com
+// @description    Jintory ver. 1.43 20110714
+// @include        http://w213.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=new
+// @match          http://w213.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=new
+// @include        http://w213.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=&p=1#ptop
+// @match          http://w213.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=&p=1#ptop
+// @include        http://w213.sengokuixa.jp/bbs/res_view.php?p=1&thread_id=*
+// @match          http://w213.sengokuixa.jp/bbs/res_view.php?p=1&thread_id=*
+// @include        http://w213.sengokuixa.jp/user/
+// @include        http://w213.sengokuixa.jp/user/#ptop
+// @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 
 //新章13+14鯖 無課金同盟 陣取りかぶり防止用
@@ -27,15 +30,17 @@
 // 2011/07/01 1.4   GM_getValue(), GM_setValue() Chrome版との互換性実現
 // 2011/07/01 1.41  ライブラリが動かないので、try catch で実現
 //                  jQuery ライブラリ一部対応
-// 2011/07/03 1.42  メンバ名変更(name→lord)の確認ミス 
-
+// 2011/07/03 1.42  メンバ名変更(name→lord)の確認ミス
+// 2011/07/14 1.43  URL変更に対応 w013→w213
+//                  新規インストール時の略称名対応部分の修正=lordNameの取得ミス
+//                  Intervalタイマー 3000→1000
 
 //
 // main
 //
 
 // Mokoと同じjQuery初期化を使用
-function jintory_addJQuery(callback) {
+function bara_addJQuery(callback) {
     if (typeof(unsafeWindow.tb_init)!='undefined') {
         tb_init = unsafeWindow.tb_init;
     }
@@ -56,32 +61,29 @@ function jintory_addJQuery(callback) {
 }
 
 function jintory_main($) {
-	
-	var locationhost = "w013.sengokuixa.jp";		// w013専用
-	//var locationhost = window.location.host;
-	//alert(document.cookie);
-	
-	
-	var lordname = getIdTagText(document.body.innerHTML, "li", "lordName");
+
+	var locationhost = "w213.sengokuixa.jp";		// w213専用
+
+	var lordname = $('li#lordName').text();
 	var shortlord;
 	var jintorymode;
-	
+
 	try {
 		shortlord = GM_getValue('shortlord',null);
 	} catch (e) {
 		shortlord = window.localStorage.getItem('shortlord');
 	}
-	
+
 	try {
 		jintorymode = GM_getValue('jintorymode',null);
 	} catch (e) {
 		jintorymode = window.localStorage.getItem('jintorymode');
 	}
-	
-	//alert('shortlord='+shortlord+'\njintorymode='+jintorymode);
+
+	//alert('lordname='+lordname+'\n'+'shortlord='+shortlord+'\n'+'jintorymode='+jintorymode);
 	
 	var threadname = $('div.ig_decksection_top').text();
-	
+
 	var AttackPlace = function( placename, pos, lord, frompos, fromlord, fromname, time, ext ) {
 		this.placename = placename;	//場所名
 		this.pos       = pos;		//座標
@@ -94,10 +96,6 @@ function jintory_main($) {
 		this.newflag   = true;		//新規フラグ
 		this.double    = false;	//ダブり
 		this.newer     = true;		//新しいから残すフラグ
-		this.toString  = function() {
-			return this.placename + ",("+this.pos + ")," + 	this.lord + "," + "("+this.frompos + ")," + this.fromlord + "," + this.fromname + ","
-					+ this.time + "," + this.ext + "[" + this.newflag + ":" + this.double + ":" + this.newer + "]";
-		}
 	}
 	
 	var Place = function( pos, lord, time, ext ) {
@@ -108,19 +106,16 @@ function jintory_main($) {
 		this.newflag  = true;      //新規フラグ
 		this.double   = false;		//ダブり
 		this.newer    = true;      //新しいから残すフラグ
-		this.toString = function() {
-			return "("+this.pos + ")," + 	this.lord + "," + this.time + "," + this.ext 
-					+ "[" + this.newflag + ":" + this.double + ":" + this.newer + "]";
-		}
 	}
-	
+
 	var jintory    = true;			// 陣張りのみの場合 true;
 	if ('2' == jintorymode) {
 		jintory = false;
 	}
 	
 	//alert('jintory='+jintory);
-	
+	//jintory = false;	//test時使用
+
 	var kougekiDoneflag   = false;
 	var mycount    = 0;
 	var myplaces   = new Array(1);
@@ -145,17 +140,17 @@ function jintory_main($) {
 			//alert('陣張り');
 			if (document.body.innerHTML.match(/dmo=sortie/)) {		//攻撃中なら
 				pickKougekiData('http://' + locationhost + '/facility/unit_status.php?dmo=sortie');  	//攻撃中
-				setKougekiViser( 3000 );
+				setKougekiViser( 1000 );
 			}
 		}
 	}
-	
-	
+
+
 	// 陣のデータをチェックする
 	function checkJintory() {
 		if (0 < mycount) {
 			pickBoardData();		// 掲示板の最後の発言のデータを読み込む
-	
+
 			//陣張り予定時刻を調べ、陣張り終わったのは消す
 			for (var i = 0; i < placecount; i++) {
 				if ("" != places[i].pos) {
@@ -166,10 +161,10 @@ function jintory_main($) {
 					}
 				}
 			}
-	
+
 			//自分の陣張り予定位置をチェック
 			checkMyPos();
-	
+
 			var tmp = "";
 			if (dblcount > 0) {			//かぶり警告
 				for (var i = 0; i < mycount; i++) {
@@ -182,7 +177,7 @@ function jintory_main($) {
 				}
 				alert(tmp + "\nキャンセルしてください");
 			}
-		
+
 			for (var i = 0; i < mycount; i++) {
 				if (true == myplaces[i].newflag) {
 					outlines[outcount] = myplaces[i].pos + ' ' + myplaces[i].lord + ' ' + myplaces[i].time;
@@ -210,7 +205,7 @@ function jintory_main($) {
 						}
 					}
 				}
-			
+
 				tmp = "";
 				for (var i = 0; i < outcount; i++) {
 					if (0 != i) {
@@ -233,8 +228,8 @@ function jintory_main($) {
 			}
 		}
 	}
-	
-	
+
+
 	//自分の取得予定座標データを、掲示板のデータと突き合わせてチェックする
 	function checkMyPos() {
 		//var tmp = "";
@@ -263,7 +258,7 @@ function jintory_main($) {
 		}
 		//alert("checkMyPos()\n" + tmp);
 	}
-	
+
 	//掲示板の最初のレスからデータを拾う
 	// places にデータが入る
 	// msgno に掲示板のメッセージ番号
@@ -297,7 +292,7 @@ function jintory_main($) {
 		//alert(tmp);
 		//alert("tg="+tg+"\ns="+s+"\nlines="+lines);
 	}
-	
+
 	//前の掲示の行の確認
 	function checkLine(s) {
 		var ans = new Array(1);
@@ -351,7 +346,7 @@ function jintory_main($) {
 		//alert("checkLine\n" + ans[0] +" "+ ans[1] + " " + ans[2] + "#" + ans[3]);
 		return ans;
 	}
-	
+
 	// 時刻 hh:mm:ss → hh:mm へ
 	function checkTime(str) {
 		var e = str.match(/[0-9]+/g);
@@ -380,7 +375,7 @@ function jintory_main($) {
 		}
 		return (h+100).toString().substr(-2) +":" + (m+100).toString().substr(-2);
 	}
-	
+
 	//全角数字・記号を半角に
 	function zenToHan(s){
 		var wd = s;
@@ -394,7 +389,7 @@ function jintory_main($) {
 		}
 		return wd;
 	}
-	
+
 	//攻撃中の座標、獲得時刻データを得る
 	function pickKougekiData(kUrl) {
 		//alert('ajax');
@@ -440,8 +435,8 @@ function jintory_main($) {
 		});	
 		return;
 	}
-	
-	
+
+
 	//プロフィール頁でオプション値の変更があったら設定・保存する
 	function checkUsersProf() {
 		var ss = getClassTags(document.body.innerHTML,"p","info");		
@@ -456,7 +451,7 @@ function jintory_main($) {
 		if (s.match(/【Jintory】\s*(\S+)/)) {
 			newjintory = RegExp.$1;
 		}
-		
+
 		if ( newshortlord != shortlord || newjintory != jintorymode) {
 			var tmp = "*** Jintory オプション変更 ***";
 			if (newshortlord != shortlord) {
@@ -485,7 +480,7 @@ function jintory_main($) {
 			}
 			alert(tmp);
 		}
-		
+
 		return;
 	}
 	
@@ -519,55 +514,55 @@ function jintory_main($) {
 		alert(src + " ? " + dest + " = " + ans);
 		return ans;
 	}
-	
-	
+
+
 	// Removes leading whitespaces
 	function LTrim( value ) {
 		var re = /\s*((\S+\s*)*)/;
 		return value.replace(re, "$1");
 	}
-	
+
 	// Removes ending whitespaces
 	function RTrim( value ) {
 		var re = /((\s*\S+)*)\s*/;
 		return value.replace(re, "$1");
 	}
-	
+
 	// Removes leading and ending whitespaces
 	function trim( value ) {
 		return LTrim(RTrim(value));
 	}
-	
+
 	function trimRmv( value) {
 		var re = /(\S+)(\s+)(\S+)/;
 		return trim(value).replace(re,"$1$3");
 	}
-	
+
 	function rmvTabs( value ) {
 		var re = /(\t)\t+/mg;
 		return value.replace(re, "$1");
 	}
-	
+
 	function rmvComma( value ) {
 		var re = /,/mg;
 		return value.replace(re, "");
 	}
-	
-	
+
+
 	// innerHTML to URL
 	function inURL(s) {
 		var sub = s.split("href=\"");
 		var sub2 = sub[1].split("\">");
 		return sub2[0];
 	}
-	
+
 	// XML assist
-	
+
 	function getBody(html){
 	  var reg = new RegExp("<body((\\s|.)*)</body>", "ig");
 	  return html.match(reg);
 	}
-	
+
 	function getAttrTags(html, tagName, attrName, attrStr){
 		var cls = "";
 		if(attrName){
@@ -580,17 +575,17 @@ function jintory_main($) {
 		var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
 		return html.match(reg);
 	}
-	
+
 	function getAttrTag(html, tagName, attrName, attrStr){
 	  var tags = getClassTags(html, tagName, attrName, attrStr);
 	  return (tags && tags.length) ? tags[0] : "";
 	}
-	
+
 	function getAttrTagText(html, tagName, attrName, attrStr){
 	  return getAttrTag(html, tagName, attrName, attrStr) ? RegExp.$2 : "";
 	}
-	
-	
+
+
 	function getClassTags(html, tagName, className){
 	  var cls = "";
 	  if(className){
@@ -599,16 +594,16 @@ function jintory_main($) {
 	  var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
 	  return html.match(reg);
 	}
-	
+
 	function getClassTag(html, tagName, className){
 	  var tags = getClassTags(html, tagName, className);
 	  return (tags && tags.length) ? tags[0] : "";
 	}
-	
+
 	function getClassTagText(html, tagName, className){
 	  return getClassTag(html, tagName, className) ? RegExp.$2 : "";
 	}
-	
+
 	//function getTagText(html,tagName) {
 	//	var reg = new RegExp("<" + tagName + "(\\s|.)*?>([^<]*)</" + tagName + ">", "i");
 	//	var tag = html.match(reg);
@@ -621,7 +616,7 @@ function jintory_main($) {
 		var reg = new RegExp("<" + tagName + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
 		return html.match(reg);
 	}
-	
+
 	function getTagText(html,tagName) {
 		//var reg = new RegExp("<" + tagName + "(\\s|.)*?>([^<]*)</" + tagName + ">", "i");
 		var reg = new RegExp("<" + tagName + "(\\s|.)*?>((\\s|.)*?)</" + tagName + ">", "i");
@@ -638,8 +633,8 @@ function jintory_main($) {
 		}
 		return (tag) ? txt : "";
 	}
-	
-	
+
+
 	function getIdTags(html, tagName, idName){
 	  var ids = "";
 	  if(idName){
@@ -648,12 +643,12 @@ function jintory_main($) {
 	  var reg = new RegExp("<" + tagName + ids + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
 	  return html.match(reg);
 	}
-	
+
 	function getIdTag(html, tagName, idName){
 	  var tags = getIdTags(html, tagName, idName);
 	  return (tags && tags.length) ? tags[0] : "";
 	}
-	
+
 	function getIdTagText(html, tagName, idName){
 	  return getIdTag(html, tagName, idName) ? RegExp.$2 : "";
 	}
@@ -667,35 +662,35 @@ function jintory_main($) {
 		var ans = html.match(src,"ig");
 		return (ans && ans.length) ? RegExp.$2 : "";
 	}
-	
-	
+
+
 	function getHref(html) {
 		var src = '<a href="([^"]*)"';	//フル
 		var ans = html.match(src,"i");
 		return (ans && ans.length) ? RegExp.$1 : "";
 	}
-	
+
 	function getAlt(html) {
 		var src = '<img src="([^"]*)"(\\s|.)*?alt="([^"]*)"';	//フル
 		var ans = html.match(src,"i");
 		return (ans && ans.length) ? RegExp.$3 : "";
 	}
-	
-	
+
+
 	function replaceAmp(s) {
 		return s.replace(/&amp;/g,'&');
 	}
-	
+
 	function replaceBr(s) {
 		return (s.replace(/<br>/g,'')).replace(/<br \/>/g,'');
 	}
-	
+
 	function replaceWbr(s) {
 		return s.replace(/<wbr>/g,'');
 	}
-	
-	
-	
+
+
+
 	////////////////////////////////////////
 	//
 	//  ループ(forまたはwhile)を使ったウェイト関数
@@ -711,10 +706,10 @@ function jintory_main($) {
 		}
 		return;
 	}
-	
+
 	var kougekiTrcnt;
 	var kougekiViserId;
-	
+
 	function setKougekiViser(timeVise)
 	{
 		kougekiTrcnt = 0;
@@ -728,14 +723,14 @@ function jintory_main($) {
 									}
 								}, timeVise);
 	}
-	
+
 	//
 	// ixa-moko から一部拝借
 	//
 	function getUnixTime() {
 		return ~~(new Date/1000);
 	}
-	
+
 	function formatTime(sec) {
 		var h = Math.floor(sec / 3600);
 		var m = Math.floor((sec - h*3600 ) / 60 );
@@ -745,7 +740,7 @@ function jintory_main($) {
 				  (s+100).toString().substr(-2);
 		return tim;
 	}
-	
+
 	function formatIxaTime(sec) {
 		var h = Math.floor(sec / 3600);
 		var m = Math.floor((sec - h*3600 ) / 60 );
@@ -757,4 +752,4 @@ function jintory_main($) {
 
 }
 
-jintory_addJQuery(jintory_main);
+bara_addJQuery(jintory_main);
