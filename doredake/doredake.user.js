@@ -1,15 +1,16 @@
 // ==UserScript==
 // @name           Doredake
-// @version        1.0
+// @version        1.01
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    どれだけ Ver. 1.0
-// @description    Doredake
-// @include        http://w013.sengokuixa.jp/war/list.php*
-// @copyright      2011+, brahmint@gmail.com
+// @description    どれだけ Ver. 1.01	20110714
+// @include        http://w213.sengokuixa.jp/war/list.php*
+// @match          http://w213.sengokuixa.jp/war/list.php*
+// @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 
 // どれだけ被害？
-//
+// 2011/07/13 1.0  初版 FireFox + GreaseMonkey でのみ動作
+// 2011/07/14 1.01 IXAサーバホスト名変更に対応
 
 //
 // Mokoと同じjQuery初期化
