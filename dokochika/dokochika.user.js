@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Dokochika
-// @version        1.22
+// @version        1.23
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    どこ近 Ver. 1.22 20110714
+// @description    どこ近 Ver. 1.23 20110714
 // @include        http://*.sengokuixa.jp/land.php?*
 // @match          http://*.sengokuixa.jp/land.php?*
 // @copyright      2011, brahmint@gmail.com
@@ -20,6 +20,7 @@
 // 2011/07/14 1.22 IXAホスト名w013→w213へ変更に対応、Intervalでの読み込み待ちの部分を改訂
 //                 距離判定の部分 ixaPos オブジェクト化 他への流用も鑑みて
 //                 おまけに合戦報告書（拠点）へのリンク
+// 2011/07/14 1.23 最大３箇所まで表示
 
 //
 // Mokoと同じjQuery初期化
@@ -47,7 +48,7 @@ function bara_addJQuery(callback) {
 }
 
 
-function chika_main($) {
+function doko_main($) {
     // ここにメインの処理を書く
 
 	var gifdoko = 'data:image/gif;base64,'+
@@ -69,7 +70,7 @@ function chika_main($) {
 	var Territ = function ( ttype, tname, pos, population, cond, map) {
 		this.ttype      = ttype;		//種類 (本領/所領)
 		this.tname      = tname;		//名前
-		this.pos        = pos;			//座標
+		this.pos        = pos;			//座標 'x,y'
 		this.population = population;	//人口
 		this.condition  = cond;			//状態
 		this.map        = map;			//c
@@ -80,7 +81,7 @@ function chika_main($) {
 	ixaPos.txtLand  = "領地";
 	ixaPos.txtNorm  = "通常拠点";
 	ixaPos.txtFalen = "陥落拠点";
-	ixaPos.txtDist = "距離";
+	ixaPos.txtDist  = "距離";
 	ixaPos.txtE  = "東";
 	ixaPos.txtNE = "北東";
 	ixaPos.txtN  = "北";
@@ -94,6 +95,11 @@ function chika_main($) {
 	ixaPos.x = '0';		//x座標
 	ixaPos.y = '0';		//y座標
 	ixaPos.c = '12';	//領地
+	ixaPos.setPosition = function(x0, y0, c0) {
+		this.x = x0;
+		this.y = y0;
+		this.c = c0;
+	}
 	ixaPos.dokochikaStr = function(data, stype) {
 		function pos2str(x0,y0,x1,y1) {
 			// ２点の座標から、方向と距離を示す文字列を作成
@@ -155,39 +161,67 @@ function chika_main($) {
 		var px = -1;
 		for (var i = 0; i < data.length; i++) {
 			//alert("cn:"+cn + "  : "+ teridata[i].map);
-			//try {
-				if (cn == Number(data[i].map)) {	//同じマップの拠点であること
-					pos = data[i].pos.split(",");
-					x1 = parseFloat(pos[0]);
-					y1 = parseFloat(pos[1]);
-					d = Math.sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0));
-					//alert("x1="+x1+"\n"+ "y1="+y1+"\n" + "x0="+x0+"\n" + "y0="+y0+"\n"+ "d="+d);
-					//if (data[i].condition == this.txtFall) {
-					if (data[i].condition.indexOf(this.txtFall) == 0) {
-						//alert(txtFall +" "+ i);
-						if (d <= dfmin[0]) {
-							dfmin[2]=dfmin[1]; dfmin[1]=dfmin[0]; dfmin[0] = d;
-							dfall[2]=dfall[1]; dfall[1]=dfall[0]; dfall[0] = i;
-						}
-					//} else if (data[i].ttype == this.txtLand) {
-					} else if (data[i].ttype.indexOf(this.txtLand) == 0) {
-						//alert(txtLand +" "+ i);
-						if (d <= dlmin[0]) {
-							dlmin[2]=dlmin[1]; dlmin[1]=dlmin[0]; dlmin[0] = d;
-							dland[2]=dland[1]; dland[1]=dland[0]; dland[0] = i;
-						}
+			if (cn == Number(data[i].map)) {	//同じマップの拠点であること
+				pos = data[i].pos.split(",");
+				x1 = parseFloat(pos[0]);
+				y1 = parseFloat(pos[1]);
+				d = Math.sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0));
+				//alert("x1="+x1+"\n"+ "y1="+y1+"\n" + "x0="+x0+"\n" + "y0="+y0+"\n"+ "d="+d);
+				//if (data[i].condition == this.txtFall) {
+				if (data[i].condition.indexOf(this.txtFall) == 0) {		//陥落中
+					//alert(txtFall +" "+ i);
+					if (d <= dfmin[0]) {
+						//dfmin[2]=dfmin[1]; dfmin[1]=dfmin[0]; dfmin[0] = d;
+						dfmin.unshift(d); dfmin.pop();
+						//dfall[2]=dfall[1]; dfall[1]=dfall[0]; dfall[0] = i;
+						dfall.unshift(i); dfall.pop();
+					}
+				//} else if (data[i].ttype == this.txtLand) {
+				} else if (data[i].ttype.indexOf(this.txtLand) == 0) {	//領地
+					//alert(txtLand +" "+ i);
+					if (d <= dlmin[0]) {
+						//dlmin[2]=dlmin[1]; dlmin[1]=dlmin[0]; dlmin[0] = d;
+						dlmin.unshift(d); dlmin.pop();
+						//dland[2]=dland[1]; dland[1]=dland[0]; dland[0] = i;
+						dland.unshift(i); dland.pop();
+					}
+				} else {
+					//alert(txtNorm +" "+ i);
+					if (d <= dnmin[0]) {
+						//dnmin[2]=dnmin[1]; dnmin[1]=dnmin[0]; dnmin[0] = d;
+						dnmin.unshift(d); dnmin.pop();
+						//dnorm[2]=dnorm[1]; dnorm[1]=dnorm[0]; dnorm[0] = i;
+						dnorm.unshift(i); dnorm.pop();
 					} else {
-						//alert(txtNorm +" "+ i);
-						if (d <= dnmin[0]) {
-							dnmin[2]=dnmin[1]; dnmin[1]=dnmin[0]; dnmin[0] = d;
-							dnorm[2]=dnorm[1]; dnorm[1]=dnorm[0]; dnorm[0] = i;
+						if (dnmin[0] != 0.0) {
+							if ((d <= 10.0) || (d/dnmin[0] > 1.25)) {
+								if (d <= dnmin[1]) {
+									dnmin[2]=dnmin[1]; dnmin[1]=d;
+									dnorm[2]=dnorm[1]; dnorm[1]=i;
+								}
+							} else {
+								if ((d <= 10.0) || (d/dnmin[0] > 1.25)) {
+									dnmin[2]=d;
+									dnorm[2]=i;
+								}
+							}
 						}
 					}
-					
 				}
-			//} catch(e) {
+				
+			}
 			//	alert("error i="+i + "\nterridata.length="+teridata.length);
 			//}
+		}
+		//var pmsg = "";
+		//for (var i = 0; i < dnmin.length; i++) {
+		//	pmsg += "i:"+i+" "+num2diststr(dnmin[i])+","+dnorm[i]+"  "+num2diststr(dfmin[i])+","+dfall[i]+" "+num2diststr(dlmin[i])+","+dland[i]+"\n";
+		//}
+		//alert(pmsg);
+		for (var i=1; i < dnmin.length; i++) {
+			if (dnmin[i] > 10 && dnmin[i] > dnmin[0]*1.25) {
+				dnmin[i] = 999;
+			}
 		}
 		for (var i=0; i < dlmin.length; i++) { if (dnmin[0] <= dlmin[i]) dlmin[i] = 999; }
 		for (var i=0; i < dfmin.length; i++) { if (dnmin[0] <= dfmin[i]) dfmin[i] = 999; }
@@ -240,9 +274,7 @@ function chika_main($) {
 	}
 
 	var teridata = new Array();   //城主の拠点データ
-	//alert("teridata.length="+teridata.length);
-	var trcnt;
-	var tericount;
+
 	var profTeriDoneflag = false;	//拠点情報読み込み完了フラグ
 	var dokojob = false;			//実行中フラグ
 	
@@ -266,15 +298,11 @@ function chika_main($) {
 		if (dokojob) return;
 		dokojob = true;
 		if (document.URL.match(/(map|land)\.php\?x=(-?[0-9]+)&y=(-?[0-9]+)(&type=[123])?&c=([0-9]+)/) != null) {
-			ixaPos.x = RegExp.$2;
-			ixaPos.y = RegExp.$3;
-			ixaPos.c = RegExp.$5;
-			var utype = RegExp.$1;
+			ixaPos.setPosition(RegExp.$2, RegExp.$3, RegExp.$5);	//x,y,c
+			var utype = RegExp.$1;		// map || land
 
-			trcnt     = 0;
-			tericount = 0;
 			profTeriDoneflag = false;
-			pickJoshuProfData('http://' + window.location.host + '/user/');
+			pickJoshuProfData('http://' + window.location.host + '/user/', teridata);
 			//alert('teridata.length='+teridata.length);
 			dokocnt = 0;
 			dokoId = setInterval( function() { 
@@ -294,12 +322,12 @@ function chika_main($) {
 		}
 	}
 
-	// 城主プロフィール（自分の）から拠点データを収集する
-	// 結果は teridataに
-	// callback は alertで結果を出したい場合に指定
-	//    x,y,c は callbackする場合の攻撃先座標
 	//
-	function pickJoshuProfData(profUrl) {
+	// 城主プロフィール（自分の）から拠点データを収集する
+	// 結果は dataに　(teridataが参照されてる）
+	//
+	function pickJoshuProfData(profUrl, data) {
+		data.splice(0,data.length);		//データがあったらクリア
 		$.ajax({
 			url: profUrl, 
 			cache: false, 
@@ -308,13 +336,11 @@ function chika_main($) {
 				var tbltxt = getTags(html,"table","common_table1 center").toString();
 				//var mts =getIxaHrefs(tbltxt);
 				var trs = getClassTags(tbltxt,'tr','fs[0-9]+');
-				tericount = trs.length;
 				//alert('tericount=' + tericount);
 				var thisTr, s, re;
 				var territ0 = 0;
 				var ctp;
-				trcnt += tericount;
-				for (var i = 0; i < tericount; i++) {
+				for (var i = 0; i < trs.length; i++) {
 					thisTr = trim(rmvTabs(trs[i]));
 					var tds = getTags(thisTr,'td',null);
 					var ttype = getTagText(tds[0],'td');
@@ -329,7 +355,7 @@ function chika_main($) {
 					var tpopu = getTagText(tds[3],'td');
 					var tcond = trim(getTagText(tds[4],'span'));
 					ctp = ctype(mts);	//c=1～12
-					teridata[territ0+i] = new Territ(ttype, tname+textn, tpos, tpopu, tcond, ctp);
+					data[territ0+i] = new Territ(ttype, tname+textn, tpos, tpopu, tcond, ctp);
 				}
 				profTeriDoneflag = true;
 			},
@@ -548,4 +574,4 @@ function chika_main($) {
 
 }
 
-bara_addJQuery(chika_main);
+bara_addJQuery(doko_main);
