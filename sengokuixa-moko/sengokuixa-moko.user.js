@@ -942,7 +942,7 @@ function Moko_main($) {
                 $('div#status.clearfix').css('background','url(http://www.jj-midi.com/image/bg_status_red.jpg)');
                 */
                 $('div#status.clearfix').css('background','url(' + IMAGES.bg_status_red + ')');
-                $('span.sep').last().after('<span class="normal"><a href="'+href+'">敵襲</a></span>');
+                //$('span.sep').last().after('<span class="normal"><a href="'+href+'">敵襲</a></span>');
             }
         }
 
