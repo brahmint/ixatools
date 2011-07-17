@@ -3,8 +3,8 @@
 // @version        1.0
 // @namespace      https://sites.google.com/site/ixamukakin/
 // @description    Helpme ver. 1.0 20110626
-// @include        http://w013.sengokuixa.jp/village.php
-// @copyright      2011+, brahmint@gmail.com
+// @include        http://w213.sengokuixa.jp/facility/unit_status.php?dmo=enemy
+// @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 
 //新章13+14鯖 敵襲状況
@@ -34,8 +34,8 @@ function bara_addJQuery(callback) {
 }
 
 function helpme_main($) {
-	
-	var locationhost = "w013.sengokuixa.jp";		// w013専用
+
+	var locationhost = "w213.sengokuixa.jp";		// w213専用
 	//var locationhost = window.location.host;
 	//alert(document.cookie);
 	
@@ -56,10 +56,6 @@ function helpme_main($) {
 		this.newflag   = true;		//新規フラグ
 		this.double    = false;	//ダブり
 		this.newer     = true;		//新しいから残すフラグ
-		this.toString  = function() {
-			return this.placename + ",("+this.pos + ")," + 	this.lord + "," + "("+this.frompos + ")," + this.fromlord + "," + this.fromname + ","
-					+ this.time + "," + this.ext + "[" + this.newflag + ":" + this.double + ":" + this.newer + "]";
-		}
 	}
 		
 	//alert('jintory='+jintory);
@@ -71,10 +67,10 @@ function helpme_main($) {
 	var utm = getUnixTime();
 	var justnow = formatIxaTime(utm);
 
-	if (document.body.innerHTML.match(/dmo=sortie/)) {		//攻撃中なら
-		pickKougekiData('http://' + locationhost + '/facility/unit_status.php?dmo=enemy');  	//敵襲
-		setKougekiViser( 3000 );
-	}	
+//	if (document.body.innerHTML.match(/dmo=sortie/)) {		//攻撃中なら
+//		pickKougekiData('http://' + locationhost + '/facility/unit_status.php?dmo=enemy');  	//敵襲
+//		setKougekiViser( 1000 );
+//	}	
 	
 	
 	// 時刻 hh:mm:ss → hh:mm へ
@@ -398,6 +394,66 @@ function helpme_main($) {
 				  (m+100).toString().substr(-2);
 		return tim;
 	}
+
+	function job_helpme(){
+		//距離を示す文字列を作成（小数点以下２桁)
+		function num2diststr(d) {
+			var x = d * 100.0 + 1000000.5;
+			var s = String(parseInt(x));
+			s = s.substr(1);
+			var len = s.length;
+			s = s.substr(0,len-2) + "." + s.substr(len-2);
+			while (s.substr(0,1) == "0") s = s.substr(1);
+			if (s.substr(0,1) == ".") s = "0"+s;
+			return s;
+		}
+
+		var msg = "";
+		var statuses = $('div.ig_fight_statusarea');
+		if (statuses.length == 0) return;
+		//alert(statuses.length);
+		for (var i = 0; i < statuses.length; i++) {
+			var ename = statuses.eq(i).find("div.ig_fightunit_title2 h3 a").text();
+			var spans = statuses.eq(i).find("div.ig_fight_dotbox table tr td span");
+			var eplace = trim(rmvTabs(spans.eq(5).text()));
+			var mplace = trim(rmvTabs(spans.eq(6).text()));
+			var reg = eplace.match(/\((-?[0-9]+),(-?[0-9]+)\)/);
+			var x0 = Number(RegExp.$1);
+			var y0 = Number(RegExp.$2);
+			reg = mplace.match(/\((-?[0-9]+),(-?[0-9]+)\)/);
+			var x1 = Number(RegExp.$1);
+			var y1 = Number(RegExp.$2);
+			var dx = x1 - x0;
+			var dy = y1 - y0;
+			var d = Math.sqrt(dx*dx + dy*dy);
+			
+			var ttime = trim(rmvTabs(spans.eq(1).html())).match(/([0-9]+):([0-9]+:[0-9]+)/);
+			if ("00" == RegExp.$1) {
+				ttime = RegExp.$2;
+			} else {
+				ttime = RegExp.$1 + ":" + RegExp.$2;
+			}
+			msg += ename + " の " + trimRmv(eplace)+" から "+trimRmv(mplace)+" まで 距離["+num2diststr(d) +"] "+ttime+ "着弾\n";
+
+		}
+		
+		alert(msg);
+	}
+
+    function cmd_helpme() {
+		var tmp;
+		//tmp = '<div><a href="javascript:void(0);" onclick="return false;" id="do_attackinfo"><img src="' + gifdoko + '" alt="Inf_attack" style="position: relative; top: +0px; "></a></div>';
+		tmp = '　　　　<a><input type="button" name="string" value="inform" id="do_fightinfo" onclick="javascript:void(0);"></a>';
+	    $('div.ig_decksection_top').append(tmp);
+        $('#do_fightinfo').live('click',function() {
+			job_helpme();
+			//calc_dokochika();
+			//setTimeout(calc_dokochika, 10);
+			//alert('now clicked attackinfo');
+        });
+    }
+
+	cmd_helpme();
 
 }
 
