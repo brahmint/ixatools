@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name           doumei members
-// @version        1.2
+// @version        1.21
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    同盟メンバー拠点情報 ver. 1.2 20110707
-// @include        http://w0*.sengokuixa.jp/alliance/info.php*&m=*
-// @copyright  2011+, brahmint@gmail.com
+// @description    同盟メンバー拠点情報 ver. 1.21 20110716
+// @include        http://*.sengokuixa.jp/alliance/info.php*&m=*
+// @match          http://*.sengokuixa.jp/alliance/info.php*&m=*
+// @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 //
 // オプション：
@@ -12,9 +13,10 @@
 //   &m=2  攻撃側拠点
 //   &m=3  本拠地のみ
 //
-// 2011/05/21 1.1 戦功が表示されないのを修正
-//                &m=[123] オプションに対応
-// 2011/07/07 1.2 jQuery対応
+// 2011/05/21 1.1  戦功が表示されないのを修正
+//                 &m=[123] オプションに対応
+// 2011/07/07 1.2  jQuery対応
+// 2011/07/14 1.21 IXAサーバホスト名変更に対応
 //
 
 //
@@ -67,10 +69,6 @@ function members_main($) {
 		this.trnum     = trnum;		//拠点数
 		this.attl      = attl;		//役職
 		this.trptr     = trnow;		//拠点データの配列番号
-		this.toString = function() {
-			return this.rank + "," + 	this.lnk + "," + this.joshuname + "," + this.points + "," +
-					this.tribute + "," + this.level + "," + this.trnum + "," + this.attl;
-		}
 	}
 	
 	var HONRYO = "本領";        //本領
@@ -102,7 +100,7 @@ function members_main($) {
 			break;
 		}
 		getDoumeiMembersProf();
-		setViser( 3000 );
+		setViser( 1000 );
 	} else {
 		alert("URLの末尾にオプションが必要\n"
 			+ "&m=1  すべて\n"
