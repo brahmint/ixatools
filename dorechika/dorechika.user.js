@@ -1,24 +1,28 @@
 // ==UserScript==
 // @name           Dorechika
-// @version        1.0
+// @version        1.03
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    どれ近 Ver. 1.0
-// @include        http://w0*.sengokuixa.jp/user/?user_id=*
-// @include        http://w013.sengokuixa.jp/war/fight_history.php*
-// @copyright      2011+, brahmint@gmail.com
+// @description    どれ近 Ver. 1.03	20110717
+// @include        http://*.sengokuixa.jp/user/?user_id=*
+// @match          http://*.sengokuixa.jp/user/?user_id=*
+// @include        http://*.sengokuixa.jp/war/fight_history.php*
+// @match          http://*.sengokuixa.jp/war/fight_history.php*
+// @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 
 // 近い拠点はどれ？
 //
-// 2011/06/29 1.0 初版 
-//
+// 2011/06/29 1.0  初版 
+// 2011/07/14 1.01 IXAホスト名変更に対応
+// 2011/07/16 1.02 プロフィール画面のどれ近対応
+// 2011/07/17 1.03 敵襲状況のどれ近対応
 
 //
 // Mokoと同じjQuery初期化
 //
 
 
-function chika_addJQuery(callback) {
+function bara_addJQuery(callback) {
     if (typeof(unsafeWindow.tb_init)!='undefined') {
         tb_init = unsafeWindow.tb_init;
     }
@@ -39,7 +43,7 @@ function chika_addJQuery(callback) {
 }
 
 
-function chika_main($) {
+function dore_main($) {
     // ここにメインの処理を書く
 
 	var gifdore = 'data:image/gif;base64,'+
@@ -68,165 +72,299 @@ function chika_main($) {
 	'S4oCDEJAPm520kAkbDrEcTgbndJBngDtYgpPSt4T0HADdvDAQIUcgAnP+rIZCdxKrsLm1wEtEM7F'+
 	'O7XKwC6P1mLAIoQXbngigQAAOw==';
 
-	var gifdoko = 'data:image/gif;base64,'+
-	'R0lGODlhNwAYAMQAAP////n5+e7u7tfX18zMzMXFxb29vbW1ta2traWlpZmZmZSUlIyMjIWFhXp6'+
-	'enNzc2tra2ZmZlpaWlFRUUpKSkJCQjk5OTMzMykpKSEhIRgYGBMTEwkJCQAAAAAAAAAAACH5BAEH'+
-	'AAAALAAAAAA3ABgAAAX/ICCOZGmeaKqSBKIoh5sUdGEgCXLsMb0niYPhANzRDAbfQZErDEwCF4LA'+
-	'fL0ItQIxyEMiY7kdLpi02XYvYEJAQrjS44Ri6kXidELvGYgYFg9HNAo2VgpsAFpLMHMEBlYFeAlJ'+
-	'YESAdTd/d302X45WBCI3OjAFLwwTExIJDg0ZHH1fQTlJdQcMD5E5ChIYC3RpCqE2Y0sFDR0dEAoZ'+
-	'HREdGVhHOggMDA6SjsgVchIVG8gdHAyEViKANC4EQMcd1wwcGxISLwvg9h3jNhDIEQ7gGRQeqFFX'+
-	'DoAbOzOW+MMHJEIEIFYuXGAGzkKDTQYkZDhwDEOfLXI8vRChIweOUgrq/zWDgOGZHCtBKFLwRQlJ'+
-	'ATnhMOjUSYGRnALmTM6igkDDvQ5BCilgYEEBwh0NUE24dbQDhitMEoQSNcaRBA7INlTIVwALgwvz'+
-	'DmCZ5EYCuAZuLxBwpuqNGxxb7bhZ0LLDhXElxRyYEK4BjEY1ljxg5qBChwkK6IJ0A4PkJjAUwkE4'+
-	'5zTrjm8RlGYp1XJfB8POImjp6sIyLCTI5pm0UlIBMgijHmVpCXbDC8IRvMQYE3Q4IG1qElBhgIBG'+
-	'gm8cJNxyIGHChayEwTnAQVgCp9VytrqplJ3DToqqTIGt6stxuLA7d3Iwo0UrAOF9cEC4cDTDNSJL'+
-	'QUDBgA71MwcDHVSggIsFVVl1jhcikJHEXVw8ddAQnrQwB1sNbWFLAw04wACIWdUhgjqb2GDSa6LE'+
-	'cE4pLpTyBQ931UgEAR6OZ8AT5rjhw02yvOZiDF68gNILO3hRxBtANILHcCQI8EMnw+mol4sGvFQI'+
-	'Dnn4ocsLNQJhwCEs2FHLNEJyAUYhkNxRBw6OoNkcjyvUaeedJ4QAADs=';
-	
-	var gifdare = 'data:image/gif;base64,'+
-	'R0lGODlhNwAYAPcAAP////f/9+7/7uX/5fD66+z55uL12b3/vbL/sq3/raT/pJn/mZX/lcPrsIv/'+
-	'i4P/g77qqHz/fHL/crXmpWv/a7LlmWb/Zq3kkqvjj4XvhX/vf6bhiaThhXLvcpzee5XccZLbbp7U'+
-	'g3zffI/ZanXfdYvYZJfSeZTRdmTfZIPWWofPh4zOalnfWXzTUXrTTXHPcXfSSnLQQ2vOOXnIUpC6'+
-	'fHLGSGbMM4DAYHu/e4y5d23EQny+W4e3b2q/amK/YmTBNVe/V2+5SVK/Umu5Q4SscE6/ToKrbWS2'+
-	'O3upZFqvWnOmWmesRFKvUk2vTW2kUmGqPGufa2ShRmKgQ1SfVFmdN0ifSFWcMkyZJlmPWVSRNUuP'+
-	'SzmPOVl/WVx+S1N/U0+ENEqDLkp/SlZ8Q0B/QDp/OjV/NVhySlRxRlJwQkZvRj90JEtuOkRvREds'+
-	'NEVsMjhvODRvNEFrLSxvLEhiPDhnIDNmGT1fPTJfMi1fLTJbHjhSKjFPMTRQJSBPICk/KSNAFSA/'+
-	'ICFAEhk/GSk4ISM2GiI1GR40ExkyDR4vHhYvFiAqGxspFRgnEBQmCxAfEA8aCQwZBggPCAYMAwAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEHAAAALAAAAAA3ABgA'+
-	'AAj/AAEIHEiwoMGDCBMqJHgghQQbDFpYiJFggwIODFJESMEABIMRDzgoAOHARYQRC0pIcOEAhIIN'+
-	'CzwkwPhhYsgDBx/IeFBhogQZExFYFDkiQgsGHz7GvOjAIccPD2JEKLEAgwIPVx2MsCBjZQQDBB+U'+
-	'oBCD7AMYEmJYKJEAq1sHMB4kdasAQ8oILJOaLMFA5IeLEuzasGBDwkAFIxgM/kAhRYKaXTdEcCly'+
-	'Q8aTEf56WOD37OSMElI8cMvAgwMPhAknEOhBrGIGGyjIIEOnTOEYKsRE4sFZwY4xbnxwhCnS9BIm'+
-	'HEFEiLsjzKAXjjkQfijwJWgZDmwomDQpDwUbWyaN/1EUicZMHNxXbCx9cQEP7nhciFhz5xH3SZFQ'+
-	'2C07WOBfkRJdEIEO3IVBRyJ59DEJGX+wIIMCRnDXwQgvUKHBXzB1wZ0WVNzHyBtZpBVBBQ9xJdAD'+
-	'KcQUlR/3tQiIDlvoEIEMcgwSCXd6AMJdJMItABMaiJzQwySAUDWCBC08tMBg/QHAUQtNRTCHIJBw'+
-	'B0ccSQyx0kMUGNIid47geNZpL0UQYSSAGAIIIYDkYUEKCMBgAQYCRRRlihXIMYkfLqAwByD2TdID'+
-	'k3pyhwUHbBDJlxRj0DHGEUV8yR0gg13gk0AcLCCaSkc10p0CQew4iB85IIABC5JMIskLFSiAxiSE'+
-	'PP/QQhj3+aDGJIEgYMYkbUz1nawRxCBQbx8YFcEP3DHBQQJIaHDkCE1l4OkkgkBUwR6TpIHRDkJ4'+
-	'asUdk5QhgxeThKFcCxSUECwDAqVAJggPuJAEdzMwgIYdVygWbAaL3GdIaodMgsZFCcSg4xTcPSHB'+
-	'rgODJFVrNpxYglwXMaDHJIxQMAR3TQzmLhjcCUIkCISJ7IUJUFyQQCGqTvLIQ2RM4oVfTUVlGADq'+
-	'wntUCBu64AN3RKiGQQKPVHEGrEtKEHAjjhiSwRwtAqFSHQK35eN11bXGVwxjcHfDAzXc2OIYQKXA'+
-	'BbUVPGBD12DysSN3jwhCiCCFrBkJTBapiylnTSnr8EUig1wE6hhqEuIHGBFZQPUhqnmABR1VtDAk'+
-	'HjdgK+kkhThg0WYfCJTZVQqo61BimY6OIlKnfYeARC1U1dRKWpzLgBI9OCGEEj5EQUILEWCVlEAk'+
-	'UjX0B6EZFVNM63Fk1QZvWrCBBJtBm5hGJTjAe/UUHXmUaChBMBBILdTVl1ERjcbUURNn6sFPCgwG'+
-	'VGKake9QVzEgYFpi8KZQELQuLDBXRlECwfFEAy+UxKBE7otXXzgTkdBMp3ruOmDnDDIBBUAFK5ma'+
-	'WP56oxy+TOyAg4mBAkQDAzJhRSUcaExGUKSABizkhTCMYUICAgA7';
-
-	var giftomo = 'data:image/gif;base64,'+
-	'R0lGODlhNwAYAPcAAP////H8//H5/973/+b1/9T3/9/y/8/s/5Lp/4nn/3vl/5zX/3Pj/2vh/5PU'+
-	'/2Hf/4vR/1re/1Lc/0rb/33L/2TT70LZ/3PH/znX/2vE/zHW/2XH3ynU/2LA/yHT/z7L7xjR/1q9'+
-	'/xDP/1K6/wjO/zq+3wDM/0q3/1iz7y6830Kz/zmw/wTA7yC53zmxzzGt/02pvxG231efzymp/yWt'+
-	'zyGm/zqlvwCy3xij/1mXv0+crzGjvzqd3zWb3w2ozyihvxSh/yWgvxCf/wCmzxyevwic/0qMvRKd'+
-	'v0CMvwCZ/wmavwOavzqKvweS7yiMzzuLnzGGvxGN3yGJzxSQrwCP7yiCvxiGzyGGnwWNryWCv0B5'+
-	'nwCG3xqEnxl8vx55jw95vxt4jzdxfzptjzFwfxdyrzVrjwN0vydufz9mfz1lfyNtfwd0jxxrnwBy'+
-	'jxZqfzNhfxJpfxthjyldfwRnfzRXbyFZfwBfnxRdbxVdby9VbytUbytVXwlZjxVQXwhPfw5PXwxP'+
-	'XwBMfyFGTw5IbwNNXwVFbxdCXwBDbxk4PxA2PxsxPw81Pwg0PwIwTwAyPxAsPxcqLxEpLwgpPwgn'+
-	'LwAmPwAmLwkgLwQeLw0bHwYaHwAZHwQUHwYNDwcMDwEMDwEJDwAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+
-	'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEHAAAALAAAAAA3ABgA'+
-	'AAj/AAEIHEiwoMGDCBMqHCggwQoRRSbMMIGDQYYHGSS88PBCwgkJKjRkaHACQw0PKiSs8FADw4kG'+
-	'Fzsw6DBhhAkgIhEIKGhAgxAMFChCNCFEwcWRKjzMmPBRxYMOMC3MADHDowYcHFZEuBiiQQcLKoiC'+
-	'OHlgIAENK0gIIYFDQw0ROEysmNmgaweTGj5ChZpxZcsRE2pknTByBEwRF4uYSCLCgMAGKiYkMXGC'+
-	'xAsGNosg5vCyA0YJM1B66LyVpNvRGjliMNxBQggLNicnUSDw7grJhNXG8DPHDgghDUZsxfhARYs6'+
-	'RJxIiPkUg5QpHU+w1MDjzCMXlzssFpFE4OcXIoRY/0jSAAooUFiSkGhJAShdJOe5vJjg2bOM84Bq'+
-	'lJDTZ9N5UJ3EkEEEa00mUGcPTHSBBzgEcV4XIMRVBAhAEIUIHWOcF9kMLsH0gBjngdHFf5bcQYYI'+
-	'QHhAAQiTCSGQBi88EMJVkJEwIig24OBBFDcAwUERQ/wn5BkldXTRG5GgsAMojKwAklIsRiCbCQLN'+
-	'x+FGGSzGwnlxXCEJKJdwp1Ybg0ACCieKLNKFS25hwJcHOQDIiCSJPMLIICa8oEANJlwgEGgYbBRj'+
-	'UC9gIuR5M1hQRBugVEIJKHl4FcFGt2Xhhh9wRLHEoeclotgFN4FQ26RoUSVBEWt8cp4mhdCQAQMX'+
-	'KP+gCCiHVAKKGhTAgEIFTGAwwxn//cAHKI0okAYodXiQVhEazMABEH96dgIHoTXByHmK6JABBkmp'+
-	'EKganILyxHlaSNCDEpeA8kUfoMxRRBigjCHdDCSswIEQElTpJkkm4QGKJ2ws10ASEiThARBM+fDG'+
-	'eY46ssUeoCDyqhDXXnGeFSKgAcobkGGQ4ggaFCEQBitoYFhGXK7XLHcmJMqnZucxsRgJZpwHKwOP'+
-	'gKLqJtzBAUoYUBV5lQgCrVRSVRmc94dgbwVFxQav1gBCBpqAIghjSRCC6Ad6CHnECiD4sTEDIWwF'+
-	'mgciAyAjWhPggEEe53kiCSKPTHJesorNoMDCoGT/Qgkn5xWCgSHnAQ7KJo48knidnBzVwEqjbjtD'+
-	'gh6UgQinljxRA2iLmRBI1edFwocIM9gAyh88CBIuKI9YMJJnIwg02lOPcwRCSq1tFFJVI2AQAgmz'+
-	'TYS0VCx5Ma8ERuzAhBJIBFFFCs4a9pFAFCj7wAWYcUStBMKFwMF8842U5QsmZCBC2d6mRKmvyloA'+
-	'BAMqmPqCBipE4IBABOwOE2FKSWQyRlKZwArcJKPwDMwEionMCGTUP/AIAS4KCAG3rPICAgykAN6q'+
-	'wQNOMIEQSCRQnHkKqU5AvwgAgWWKEYJb6IMRiSgFgSIY4AswgAMRjGAABoHABn2HkQgMkIQviEDQ'+
-	'IJQlQBqyDDgzbIldHvCQDlhmAvObQQMWsJAqWvGKCQkIADs=';
+	var mapcs = Array ('  ','織田家','足利家','武田家','上杉家','徳川家','毛利家',
+							 '伊達家','北条家','長宗我部家','島津家','豊臣家','最上家');
 
 	var Territ = function ( ttype, tname, pos, population, cond, map) {
 		this.ttype      = ttype;		//種類 (本領/所領)
 		this.tname      = tname;		//名前
-		this.pos        = pos;			//座標
+		this.pos        = pos;			//座標 'x,y'
 		this.population = population;	//人口
 		this.condition  = cond;			//状態
 		this.map        = map;			//c
-		this.toString = function() {
-			return this.ttype + "," + 	this.tname + ",[" + this.pos + "]," + this.population + ","+ this.map;
-		}
 	}
-	
-	var txtFall  = "陥落中";
-	var txtLand  = "領地";
-	var txtNorm  = "通常拠点";
-	var txtFalen = "陥落拠点";
-	var txtDist  = "距離";
-	var txtE  = "東";
-	var txtNE = "北東";
-	var txtN  = "北";
-	var txtNW = "北西";
-	var txtW  = "西";
-	var txtSW = "南西";
-	var txtS  = "南";
-	var txtSE = "南東";
-	var txtTo   = "へ";
-	var txtFrom = "から";
-	var teridata = new Array(1);
-	var trcnt = 0;
-	var tericount = 0;
-	var profDoneflag = false;
-	var rowDispFlag = false;
-	
-	function calc_dokochika(){
-		if (document.URL.match(/(map|land)\.php\?x=(-?[0-9]+)&y=(-?[0-9]+)(&type=[123])?&c=([0-9]+)/) != null) {
-			var x = RegExp.$2;
-			var y = RegExp.$3;
-			var c = RegExp.$5;
-			var utype = RegExp.$1;
-//			if ('map' == utype) {
-//				var kw = 'x='+x.toString()+'&amp;y='+y.toString()+'&amp;c='+c.toString()+'" title="(.+)" alt="(.+)" onmouseover="(.+)"';
-//				var fd = window.document.body.innerHTML.match(kw);
-//				if (fd != null) {
-//					var ttl = RegExp.$1;
-//					var alt = RegExp.$2;
-//					var omo = RegExp.$3;
-//					kw = "rewrite\\('([^']+)', '([^']+)', '([^']+)', '([^']+)', '([^']+)'";
-//					var ra = omo.match(kw);
-//					if (ra != null) {
-//						var pname = RegExp.$1;  //領地名称
-//						var lname = RegExp.$2;  //城主
-//						var population = RegExp.$3;  //人口
-//						var pos = RegExp.$4;    //座標
-//						pos = pos.substring(1,pos.length-1);  //括弧を外す
-//						var alli = RegExp.$5;   //同盟名
-						pickJoshuProfData('http://' + window.location.host + '/user/',x,y,c);
-	
-//					} else {
-//						alert("cannot split");  //普通は起こらないはず
-//					}
-//				} else {
-//					alert("not match");  //普通は起こらないはず
-//				}
-//			} else {		// land.php
-//				
-//				alert("land");
-//			}
+
+	var ixaPos = new Object();
+	ixaPos.txtFall  = "陥落中";
+	ixaPos.txtLand  = "領地";
+	ixaPos.txtNorm  = "通常拠点";
+	ixaPos.txtFalen = "陥落拠点";
+	ixaPos.txtDist  = "距離";
+	ixaPos.txtE  = "東";
+	ixaPos.txtNE = "北東";
+	ixaPos.txtN  = "北";
+	ixaPos.txtNW = "北西";
+	ixaPos.txtW  = "西";
+	ixaPos.txtSW = "南西";
+	ixaPos.txtS  = "南";
+	ixaPos.txtSE = "南東";
+	ixaPos.txtTo   = "へ";
+	ixaPos.txtFrom = "から";
+	ixaPos.x = '0';		//x座標
+	ixaPos.y = '0';		//y座標
+	ixaPos.c = '12';	//領地
+	ixaPos.setPosition = function(x0, y0, c0) {
+		this.x = x0;
+		this.y = y0;
+		this.c = c0;
+	}
+	ixaPos.dokochikaStr = function(data, stype) {
+		function pos2str(x0,y0,x1,y1) {
+			// ２点の座標から、方向と距離を示す文字列を作成
+			// [方向] へ 距離 [n.nn]
+			var dx = x1 - x0;
+			var dy = y1 - y0;
+			var dist = Math.sqrt(dx*dx + dy*dy);
+			var sd;
+			var ss = null;
+			if (dx == 0.0 && dy == 0.0) {
+				ss = " " + ixaPos.txtDist + " " + num2diststr(dist);
+			} else if (dx == 0.0) {
+				if (dy > 0.0) sd = ixaPos.txtN;
+				else          sd = ixaPos.txtS;
+			} else if (dy == 0.0) {
+				if (dx > 0.0) sd = ixaPos.txtE;
+				else          sd = ixaPos.txtW;
+			} else {
+				var v = Math.atan2(dy,dx);
+				if (v < -Math.PI * 7/8) sd = ixaPos.txtSW;
+				else if (v <= -Math.PI * 5/8) sd = ixaPos.txtSW;
+				else if (v < -Math.PI * 3/8)  sd = ixaPos.txtS;
+				else if (v <= -Math.PI /8)    sd = ixaPos.txtSE;		
+				else if (v < Math.PI /8)      sd = ixaPos.txtE;
+				else if (v <= Math.PI*3/8)    sd = ixaPos.txtNE;		
+				else if (v < Math.PI * 5/8)   sd = ixaPos.txtN;
+				else if (v <= Math.PI*7/8)    sd = ixaPos.txtNW;
+				else sd = ixaPos.txtW;
+			}
+			if (ss == null) {
+				ss = " " + sd + " " + ixaPos.txtTo + " " + ixaPos.txtDist + " " + num2diststr(dist);
+			}
+			return ss;
+		}
+		//距離を示す文字列を作成（小数点以下２桁)
+		function num2diststr(d) {
+			var x = d * 100.0 + 1000000.5;
+			var s = String(parseInt(x));
+			s = s.substr(1);
+			var len = s.length;
+			s = s.substr(0,len-2) + "." + s.substr(len-2);
+			while (s.substr(0,1) == "0") s = s.substr(1);
+			if (s.substr(0,1) == ".") s = "0"+s;
+			return s;
+		}
+
+		var x0 = Number(this.x);
+		var y0 = Number(this.y);
+		var cn = Number(this.c);
+		var dnmin = new Array(999,999,999);	//通常拠点最短距離
+		var dlmin = new Array(999,999,999);	//領地最短距離
+		var dfmin = new Array(999,999,999);	//陥落拠点最短距離
+		var dpx   = -1;
+		var dnorm = new Array(-1,-1,-1);
+		var dland = new Array(-1,-1,-1);
+		var dfall = new Array(-1,-1,-1);
+		var x1,y1,d;
+		var pos;
+		var px = -1;
+		for (var i = 0; i < data.length; i++) {
+			//alert("cn:"+cn + "  : "+ teridata[i].map);
+			if (cn == Number(data[i].map)) {	//同じマップの拠点であること
+				pos = data[i].pos.split(",");
+				x1 = parseFloat(pos[0]);
+				y1 = parseFloat(pos[1]);
+				d = Math.sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0));
+				//alert("x1="+x1+"\n"+ "y1="+y1+"\n" + "x0="+x0+"\n" + "y0="+y0+"\n"+ "d="+d);
+				//if (data[i].condition == this.txtFall) {
+				if (data[i].condition.indexOf(this.txtFall) == 0) {		//陥落中
+					//alert(txtFall +" "+ i);
+					if (d <= dfmin[0]) {
+						//dfmin[2]=dfmin[1]; dfmin[1]=dfmin[0]; dfmin[0] = d;
+						dfmin.unshift(d); dfmin.pop();
+						//dfall[2]=dfall[1]; dfall[1]=dfall[0]; dfall[0] = i;
+						dfall.unshift(i); dfall.pop();
+					}
+				//} else if (data[i].ttype == this.txtLand) {
+				} else if (data[i].ttype.indexOf(this.txtLand) == 0) {	//領地
+					//alert(txtLand +" "+ i);
+					if (d <= dlmin[0]) {
+						//dlmin[2]=dlmin[1]; dlmin[1]=dlmin[0]; dlmin[0] = d;
+						dlmin.unshift(d); dlmin.pop();
+						//dland[2]=dland[1]; dland[1]=dland[0]; dland[0] = i;
+						dland.unshift(i); dland.pop();
+					}
+				} else {
+					//alert(txtNorm +" "+ i);
+					if (d <= dnmin[0]) {
+						//dnmin[2]=dnmin[1]; dnmin[1]=dnmin[0]; dnmin[0] = d;
+						dnmin.unshift(d); dnmin.pop();
+						//dnorm[2]=dnorm[1]; dnorm[1]=dnorm[0]; dnorm[0] = i;
+						dnorm.unshift(i); dnorm.pop();
+					} else {
+						if (dnmin[0] != 0.0) {
+							if ((d <= 10.0) || (d/dnmin[0] > 1.25)) {
+								if (d <= dnmin[1]) {
+									dnmin[2]=dnmin[1]; dnmin[1]=d;
+									dnorm[2]=dnorm[1]; dnorm[1]=i;
+								}
+							} else {
+								if ((d <= 10.0) || (d/dnmin[0] > 1.25)) {
+									dnmin[2]=d;
+									dnorm[2]=i;
+								}
+							}
+						}
+					}
+				}
+				
+			}
+			//	alert("error i="+i + "\nterridata.length="+teridata.length);
+			//}
+		}
+		//var pmsg = "";
+		//for (var i = 0; i < dnmin.length; i++) {
+		//	pmsg += "i:"+i+" "+num2diststr(dnmin[i])+","+dnorm[i]+"  "+num2diststr(dfmin[i])+","+dfall[i]+" "+num2diststr(dlmin[i])+","+dland[i]+"\n";
+		//}
+		//alert(pmsg);
+		for (var i=1; i < dnmin.length; i++) {
+			if (dnmin[i] > 10 && dnmin[i] > dnmin[0]*1.25) {
+				dnmin[i] = 999;
+			}
+		}
+		for (var i=0; i < dlmin.length; i++) { if (dnmin[0] <= dlmin[i]) dlmin[i] = 999; }
+		for (var i=0; i < dfmin.length; i++) { if (dnmin[0] <= dfmin[i]) dfmin[i] = 999; }
+		if (stype == 1) {
+			var s = "<<< ("+x0+","+y0+") への攻略検討 >>>";
+			for (var i=0; i < dnmin.length; i++) {
+				if (dnmin[i] < 999) {
+					pos = data[dnorm[i]].pos.split(",");
+					x1 = parseFloat(pos[0]);
+					y1 = parseFloat(pos[1]);
+					s += "\n" + data[dnorm[i]].tname + "("+ pos[0] + "," + pos[1] + ")"+this.txtFrom+pos2str(x1,y1,x0,y0);
+				}
+			}
+			for (var i=0; i < dfmin.length; i++) {
+				if (dfmin[i] < 999) {
+					pos = data[dfall[i]].pos.split(",");
+					x1 = parseFloat(pos[0]);
+					y1 = parseFloat(pos[1]);
+					s += "\n[" + this.txtFalen +"]" + data[dfall[i]].tname + "("+ pos[0] + "," + pos[1] + ")"+this.txtFrom+pos2str(x1,y1,x0,y0);
+				}
+			}
+			for (var i=0; i < dlmin.length; i++) {
+				if (dlmin[i] < 999) {
+					pos = data[dland[i]].pos.split(",");
+					x1 = parseFloat(pos[0]);
+					y1 = parseFloat(pos[1]);
+					s += "\n["+ this.txtLand +"]" + data[dland[i]].tname + "("+ pos[0] + "," + pos[1] + ")"+this.txtFrom+pos2str(x1,y1,x0,y0);
+				}
+			}
+			return s;
 		} else {
-			alert("ここはどこ？");
+			var s = "";
+			var ns = null;
+			if (dnmin[0] < 999) {
+				s += num2diststr(dnmin[0]);
+			} else {
+				s += "*";
+			}
+			if (dlmin[0] < 999) {
+				ns = num2diststr(dlmin[0]);
+			}
+			if (ns == null && dfmin[0] < 999) {
+				ns = num2diststr(dfmin[0]);
+			}
+			if (ns != null) {
+				s += '(' + ns + ')';
+			}
+			return s;
 		}
 	}
-	
-	
-	function pickJoshuProfData(profUrl,x,y,c) {
+
+	var teridata = new Array();   //城主の拠点データ
+
+	var profTeriDoneflag = false;	//拠点情報読み込み完了フラグ
+
+	var dorejob = false;			//実行中フラグ
+	var doreId;
+	var dorecnt;
+	//
+	//
+	//
+	var rowDispFlag = false;
+	var doreType = 0;	// 0:プロフィール 1:敵襲状況
+
+
+	//
+	//  どれ近のメイン処理
+	//
+	function calc_dorechika(dtype){
+		if (dorejob) return;
+		dorejob = true;
+		doreType = dtype;
+
+		profTeriDoneflag = false;
+		pickJoshuProfData('http://' + window.location.host + '/user/', teridata);
+
+		//alert('teridata.length='+teridata.length);
+		dorecnt = 0;
+		doreId = setInterval( function() { 
+									dorecnt++;
+									if (profTeriDoneflag) {
+										clearInterval(doreId);
+										if (doreType == 0) showDorechika_p();
+										else               showDorechika_f();
+										dorejob = false;
+									} else if ( dorecnt > 120 ) {
+										clearInterval(doreId);
+										dorejob = false;
+									}
+									dorecnt;
+								}, 500);
+	}
+
+	//
+	// 画面の表に距離を付け加える プロフィール
+	//
+	function showDorechika_p() {
+		var trs = $('div.common_box3bottom table tr.fs14');
+		for (var i = 0; i < trs.length; i++) {
+			var reg = trs.eq(i).find('a').eq(0).attr('href').match(/\?x=(-?[0-9]+)&y=(-?[0-9]+)&c=([0-9]+)/);
+			ixaPos.setPosition(RegExp.$1,RegExp.$2,RegExp.$3);
+			var s = ixaPos.dokochikaStr(teridata,0);		//近い所の距離を文字列化しものを得る
+			trs.eq(i).find('td:last').text(s);
+		}
+	}
+
+	//
+	// 画面の表に距離を付け加える 敵襲状況
+	//
+	function showDorechika_f() {
+		//$('table.ig_battle_table tr:nth-child(2)').find('td:last').text("aaa");
+		var atwar = $('div#ig_battle_report_top p').text().match(/　(.+家)/);
+		var warplace = RegExp.$1;
+		var c = mapcs.indexOf(warplace).toString();
+		var trs = $('div#ig_battle_report_mid table.ig_battle_table tr');
+		for (var i = 1; i < trs.length; i++) {
+			//var reg = trs.eq(i).find('td').eq(0).attr('href').match(/\((-?[0-9]+),(-?[0-9]+)\)$/);
+			//alert( trs.eq(i).find('td').eq(3).text());
+			var reg = trs.eq(i).find('td').eq(3).text().match(/\((-?[0-9]+),(-?[0-9]+)\)/);
+			var x = RegExp.$1;
+			var y = RegExp.$2;
+			ixaPos.setPosition(x,y,c);
+			var s = ixaPos.dokochikaStr(teridata,0);		//近い所の距離を文字列化しものを得る
+			//alert(" x="+x+"\n y="+y +"\n s="+s);
+			trs.eq(i).find('td:last').text(s);
+		}
+	}
+
+
+	//
+	// 城主プロフィール（自分の）から拠点データを収集する
+	// 結果は dataに　(teridataが参照されてる）
+	//
+	function pickJoshuProfData(profUrl, data) {
+		data.splice(0,data.length);		//データがあったらクリア
 		$.ajax({
 			url: profUrl, 
 			cache: false, 
@@ -235,13 +373,11 @@ function chika_main($) {
 				var tbltxt = getTags(html,"table","common_table1 center").toString();
 				//var mts =getIxaHrefs(tbltxt);
 				var trs = getClassTags(tbltxt,'tr','fs[0-9]+');
-				tericount = trs.length;
 				//alert('tericount=' + tericount);
 				var thisTr, s, re;
 				var territ0 = 0;
 				var ctp;
-				trcnt += tericount;
-				for (var i = 0; i < tericount; i++) {
+				for (var i = 0; i < trs.length; i++) {
 					thisTr = trim(rmvTabs(trs[i]));
 					var tds = getTags(thisTr,'td',null);
 					var ttype = getTagText(tds[0],'td');
@@ -256,130 +392,18 @@ function chika_main($) {
 					var tpopu = getTagText(tds[3],'td');
 					var tcond = trim(getTagText(tds[4],'span'));
 					ctp = ctype(mts);	//c=1～12
-					teridata[territ0+i] = new Territ(ttype, tname+textn, tpos, tpopu, tcond, ctp);
+					data[territ0+i] = new Territ(ttype, tname+textn, tpos, tpopu, tcond, ctp);
 				}
-				profDoneflag = true;
-				showAdvice(x,y,c);
+				profTeriDoneflag = true;
 			},
 			error: function (XMLHttpRequest, textStatus, errorThrown) {
-				alert('$.ajax error');
+				alert('$.ajax pickJoshuProfData("'+profUrl+'") error');
 				//console.log(textStatus);
 			}
 		});	
 		return;
 	}
-	
-	function showAdvice(x0,y0,c) {
-		var s = "<<< ("+x0+","+y0+") への攻略検討 >>>";
-		var cn = Number(c);
-		var dnmin = 999;	//通常拠点最短距離
-		var dlmin = 999;	//領地最短距離
-		var dfmin = 999;	//陥落拠点最短距離
-		var dpx = -1;
-		var dnorm = -1;
-		var dland = -1;
-		var dfall = -1;
-		var x,y,d;
-		var pos;
-		var px = -1;
-		for (var i = 0; i < teridata.length; i++) {
-			//alert("cn:"+cn + "  : "+ teridata[i].map);
-			//try {
-				if (cn == Number(teridata[i].map)) {	//同じマップの拠点であること
-					pos = teridata[i].pos.split(",");
-					x = parseFloat(pos[0]);
-					y = parseFloat(pos[1]);
-					d = Math.sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0));
-					if (teridata[i].condition == txtFall) {
-						//alert(txtFall +" "+ i);
-						if (d < dfmin) {
-							dfmin = d;
-							dfall = i;
-						}
-					} else if (teridata[i].ttype == txtLand) {
-						//alert(txtLand +" "+ i);
-						if (d < dlmin) {
-							dlmin = d;
-							dland = i;
-						}
-					} else {
-						//alert(txtNorm +" "+ i);
-						if (d < dnmin) {
-							dnmin = d;
-							dnorm = i;
-						}
-					}
-					
-				}
-			//} catch(e) {
-			//	alert("error i="+i + "\nterridata.length="+teridata.length);
-			//}
-		}
-		if (dnmin <= dlmin) dlmin = 999;
-		if (dnmin <= dfmin) dfmin = 999;
-		if (dnmin < 999) {
-			pos = teridata[dnorm].pos.split(",");
-			x = parseFloat(pos[0]);
-			y = parseFloat(pos[1]);
-			s = s + "\n" + teridata[dnorm].tname + "("+ pos[0] + "," + pos[1] + ")"+txtFrom+pos2str(x,y,x0,y0);
-		}
-		if (dfmin < 999) {
-			pos = teridata[dfall].pos.split(",");
-			x = parseFloat(pos[0]);
-			y = parseFloat(pos[1]);
-			s = s + "\n[" + txtFalen +"]" + teridata[dfall].tname + "("+ pos[0] + "," + pos[1] + ")"+txtFrom+pos2str(x,y,x0,y0);
-		}
-		if (dlmin < 999) {
-			pos = teridata[dland].pos.split(",");
-			x = parseFloat(pos[0]);
-			y = parseFloat(pos[1]);
-			s = s + "\n["+ txtLand +"]" + teridata[dland].tname + "("+ pos[0] + "," + pos[1] + ")"+txtFrom+pos2str(x,y,x0,y0);
-		}
-		alert(s);
-	}
-	
-	function pos2str(x0,y0,x1,y1) {
-		var x = x1 - x0;
-		var y = y1 - y0;
-		var d = Math.sqrt(x*x + y*y);
-		var s;
-		var ss = null;
-		if (x == 0.0 && y == 0.0) {
-			ss = " " + txtDist + " " + num2str(d);
-		} else if (x == 0.0) {
-			if (y > 0.0) s = txtN;
-			else         s = txtS;
-		} else if (y == 0.0) {
-			if (x > 0.0) s = txtE;
-			else         s = txtW;
-		} else {
-			var v = Math.atan2(y,x);
-			if (v < -Math.PI * 7/8) s = txtSW;
-			else if (v <= -Math.PI * 5/8) s = txtSW;
-			else if (v < -Math.PI * 3/8) s = txtS;
-			else if (v <= -Math.PI /8) s = txtSE;		
-			else if (v < Math.PI /8) s = txtE;
-			else if (v <= Math.PI*3/8) s = txtNE;		
-			else if (v < Math.PI * 5/8) s = txtN;
-			else if (v <= Math.PI*7/8) s = txtNW;
-			else s = txtW;
-		}
-		if (ss == null) {
-			ss = " " + s + " " + txtTo + " " + txtDist + " " + num2str(d);
-		}
-		return ss;
-	}
-	
-	function num2str(d) {
-		var x = d * 100.0 + 1000000.5;
-		var s = String(parseInt(x));
-		s = s.substr(1);
-		var len = s.length;
-		s = s.substr(0,len-2) + "." + s.substr(len-2);
-		while (s.substr(0,1) == "0") s = s.substr(1);
-		if (s.substr(0,1) == ".") s = "0"+s;
-		return s;
-	}
+
 
 	function ctype(urlstr) {
 		var reg = new RegExp("c=([0-9]+)$","i");
@@ -565,41 +589,39 @@ function chika_main($) {
     function cmd_dorechika() {
 		var tmp;
 		if (document.URL.match('fight_history\.php')) {
-			tmp = '　　　<a href="javascript:void(0);" onclick="return false;" id="do_dorechika"><img src="' + gifdore + '" alt="どれ近" style="position: relative; top: 0px; "></a>';
+			//tmp = '   <a href="javascript:void(0);" onclick="return false;" id="do_mukakin" style="color: #ff0000;">無課金同盟</a>':
+			tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_dorechika_f"><img src="' + gifdore + '" alt="どれ近" style="position: relative; top: 0px; right: 10px; float:right;"></a>';
 		    $('div#ig_battle_report_top p').append(tmp);
 		} else {
-			tmp = '<th><a href="javascript:void(0);" onclick="return false;" id="do_dorechika"><img src="' + gifdore + '" alt="どれ近" style="position: relative; top: 0px; ">どれ近</a></th>';
-		    $('table.common_table1 center').find('tr:first').find('th:last').after(tmp);
+			tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_dorechika_p"><img src="' + gifdore + '" alt="どれ近" style="position: relative; top: 0px; right: 10px;"></a>';
+		    $('div.ig_decksection_top').eq(1).append(tmp);
 		}
-		//         + '<a href="javascript:void(0);" onclick="return false;" id="do_tomochika"><img src="' + giftomo + '" alt="とも近" style="position: relative; top: +8px; "></a>'
-		//         + '<a href="javascript:void(0);" onclick="return false;" id="do_darechika"><img src="' + gifdare + '" alt="だれ近" style="position: relative; top: +8px; "></a>';
-        $('#do_dorechika').live('click',function() {
+        $('#do_dorechika_f').live('click',function() {
 			if (!rowDispFlag) {
 				var tmp = '<th class="w30">距離</th>';
 				$('table.ig_battle_table').find('tr:first').append(tmp);
-				tmp = '<td>*</td>';
+				tmp = '<td>-</td>';
 				$('table.ig_battle_table').find('tr td:last-child').after(tmp);
 				rowDispFlag = true;
 			}
-			$('table.ig_battle_table tr:nth-child(2)').find('td:last').text("aaa");
-			//calc_dokochika();
+			calc_dorechika(1);
 			//setTimeout(calc_dokochika, 10);
-			alert('now clicked dorechika');
         });
-		//$('#do_tomochika').live('click',function() {
-		//	//calc_dokochika();
-		//	alert('とも近は未実装');
-		//	//alert('now clicked dokochika');
-		//});
-		//$('#do_darechika').live('click',function() {
-		//	//calc_dokochika();
-		//	alert('だれ近は未実装');
-		//	//alert('now clicked dokochika');
-		//});
+        $('#do_dorechika_p').live('click',function() {
+			if (!rowDispFlag) {
+				var tmp = '<th class="w30">距離</th>';
+				$('div.common_box3bottom table').find('tr:first').append(tmp);
+				tmp = '<td>*</td>';
+				$('div.common_box3bottom table tr.fs14').find('td:last-child').after(tmp);
+				rowDispFlag = true;
+			}
+			//alert('now clicked dorechika p');
+			calc_dorechika(0);
+        });
     }
 
 	cmd_dorechika();
 
 }
 
-chika_addJQuery(chika_main);
+bara_addJQuery(dore_main);
