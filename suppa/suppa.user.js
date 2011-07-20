@@ -1,11 +1,14 @@
 // ==UserScript==
 // @name           Suppa
-// @version        1.01
+// @version        1.02
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    Suppa 1.01 20110715
+// @description    Suppa 1.02 20110720
 // @include        http://*.sengokuixa.jp/facility/unit_list.php
 // @match          http://*.sengokuixa.jp/facility/unit_list.php
 // ==/UserScript==
+//
+// 20110715 1.01	初版
+// 20110720 1.02	すべての武将がデッキのある時に集計されない問題対応
 
 //
 // Mokoと同じjQuery初期化
@@ -333,77 +336,83 @@ function suppa_main($) {
 				var reg = new RegExp('<table class="common_table1 center mt10">','im');
 				//alert("1");
 				var tbl = html.match(reg);
+				//alert("tbl.length="+tbl.length);
 				var txt = RegExp.rightContext;
 				reg = new RegExp('</table>','im');
 				tbl = txt.match(reg);
 				txt = RegExp.leftContext;
 				var tds = getClassTags(txt,"td","");
+				//alert("tds.length="+tds.length);
 				//alert("3");
-				var pgs = html.match(/<li class="last">.*<\/li>/img);
-				//alert("4: pgs[0]="+pgs[0]);
-				var pg2 = null;
-				if (pgs.length != 0) {
-					pg2 = pgs[0].match(/show_num=100&amp;(_=[0-9]+&amp;)?p=2/);	//最初のページで101枚以上カードがあるかチェック
-				}
-				//alert("pg2="+pg2);
-				for (var i = 0; i < tds.length/7; i++) {
-					var name = getTagText( tds[i*7],"a","");
-					name = trim(name);
-					var s = tds[i*7 + 3];
-					var alt = getAlt(s);
-					var units = getIdTagText(s, "span", "now_unit_cnt_[0-9]+");
-					var leads = getIdTagText(s, "span", "lead_unit_[0-9]+");
-					//alert(alt + "\n" + units + "\n" + leads);
-					stdbysold[stdbysoldcount] = new StdbyData(name,alt,units);
-					stdbysoldcount++;
-				}
-				if (pg2 != null) {	//first pageで２ページ目がある場合
-					var ulUrl2 = ulUrl + '&p=2';
-					$.ajax({
-						url: ulUrl2, 
-						cache: false, 
-						dataType: "text",
-						success: function (html){
-							//GM_log("table:"+table);
-							var reg = new RegExp('<table class="common_table1 center mt10">','im');
-							//alert("1");
-							var tbl = html.match(reg);
-							var txt = RegExp.rightContext;
-							reg = new RegExp('</table>','im');
-							tbl = txt.match(reg);
-							txt = RegExp.leftContext;
-							var tds = getClassTags(txt,"td","");
-							for (var i = 0; i < tds.length/7; i++) {
-								var name = getTagText( tds[i*7],"a","");
-								name = trim(name);
-								var s = tds[i*7 + 3];
-								var alt = getAlt(s);
-								var units = getIdTagText(s, "span", "now_unit_cnt_[0-9]+");
-								var leads = getIdTagText(s, "span", "lead_unit_[0-9]+");
-								//alert(alt + "\n" + units + "\n" + leads);
-								stdbysold[stdbysoldcount] = new StdbyData(name,alt,units);
-								stdbysoldcount++;
+				if (tds.length > 1) {
+					var pgs = html.match(/<li class="last">.*<\/li>/img);
+					//alert("4: pgs[0]="+pgs[0]);
+					var pg2 = null;
+					if (pgs.length != 0) {
+						pg2 = pgs[0].match(/show_num=100&amp;(_=[0-9]+&amp;)?p=2/);	//最初のページで101枚以上カードがあるかチェック
+					}
+					//alert("pg2="+pg2);
+					for (var i = 0; i < tds.length/7; i++) {
+						var name = getTagText( tds[i*7],"a","");
+						name = trim(name);
+						var s = tds[i*7 + 3];
+						var alt = getAlt(s);
+						var units = getIdTagText(s, "span", "now_unit_cnt_[0-9]+");
+						var leads = getIdTagText(s, "span", "lead_unit_[0-9]+");
+						//alert(alt + "\n" + units + "\n" + leads);
+						stdbysold[stdbysoldcount] = new StdbyData(name,alt,units);
+						stdbysoldcount++;
+					}
+					if (pg2 != null) {	//first pageで２ページ目がある場合
+						var ulUrl2 = ulUrl + '&p=2';
+						$.ajax({
+							url: ulUrl2, 
+							cache: false, 
+							dataType: "text",
+							success: function (html){
+								//GM_log("table:"+table);
+								var reg = new RegExp('<table class="common_table1 center mt10">','im');
+								//alert("1");
+								var tbl = html.match(reg);
+								var txt = RegExp.rightContext;
+								reg = new RegExp('</table>','im');
+								tbl = txt.match(reg);
+								txt = RegExp.leftContext;
+								var tds = getClassTags(txt,"td","");
+								for (var i = 0; i < tds.length/7; i++) {
+									var name = getTagText( tds[i*7],"a","");
+									name = trim(name);
+									var s = tds[i*7 + 3];
+									var alt = getAlt(s);
+									var units = getIdTagText(s, "span", "now_unit_cnt_[0-9]+");
+									var leads = getIdTagText(s, "span", "lead_unit_[0-9]+");
+									//alert(alt + "\n" + units + "\n" + leads);
+									stdbysold[stdbysoldcount] = new StdbyData(name,alt,units);
+									stdbysoldcount++;
+								}
+								rdystdby = true;	//準備完了
+								//var msg = "";
+								//for (var i = 0; i < stdbysoldcount; i++) {
+								//	msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
+								//}
+								//alert("Msg:"+msg);
+							},
+							error: function (XMLHttpRequest, textStatus, errorThrown) {
+								alert('$.ajaxcountStdby() pg2 error');
+								//console.log(textStatus);
 							}
-							rdystdby = true;	//準備完了
-							//var msg = "";
-							//for (var i = 0; i < stdbysoldcount; i++) {
-							//	msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
-							//}
-							//alert("Msg:"+msg);
-						},
-						error: function (XMLHttpRequest, textStatus, errorThrown) {
-							alert('$.ajaxcountStdby() pg2 error');
-							//console.log(textStatus);
-						}
-					});	
-
+						});	
+	
+					} else {
+						rdystdby = true;	//準備完了
+						//var msg = "";
+						//for (var i = 0; i < stdbysoldcount; i++) {
+						//	msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
+						//}
+						//alert("Msg:"+msg);
+					}
 				} else {
-					rdystdby = true;	//準備完了
-					//var msg = "";
-					//for (var i = 0; i < stdbysoldcount; i++) {
-					//	msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
-					//}
-					//alert("Msg:"+msg);
+					rdystdby = true;	//件数０で、準備完了
 				}
 			},
 			error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -655,14 +664,17 @@ function suppa_main($) {
 		stdbysoldcount = 0;
 
 		countWaitAndTrainin();		//待機中の兵士と訓練中の兵士を数える
+		//alert('countWaitAndTrainin() done');
 
 		countOnDeck(0);		//デッキの兵を数える
 		countOnDeck(1);
 		countOnDeck(2);
 		countOnDeck(3);
 		countOnDeck(4);
+		//alert('countOnDeck(n) done');
 
 		countStdby();		//兵士編成100件x2頁で数える
+		//alert('countStdby() done');
 
 		setViser(1000);
 		//calc_dokochika();
