@@ -3,7 +3,7 @@
 // @version        1.0
 // @namespace      https://sites.google.com/site/ixamukakin/
 // @description    Helpme ver. 1.0 20110626
-// @include        http://w213.sengokuixa.jp/facility/unit_status.php?dmo=enemy
+// @include        http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
 // @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 
@@ -34,11 +34,6 @@ function bara_addJQuery(callback) {
 }
 
 function helpme_main($) {
-
-	var locationhost = "w213.sengokuixa.jp";		// w213専用
-	//var locationhost = window.location.host;
-	//alert(document.cookie);
-	
 	
 	var lordname = getIdTagText(document.body.innerHTML, "li", "lordName");
 	
@@ -62,7 +57,8 @@ function helpme_main($) {
 	
 	var atkDoneflag   = false;
 	var mycount    = 0;
-	var myattacks  = new Array(1);
+	var myattacks  = new Array();
+	var showLinkFlag = false;
 
 	var utm = getUnixTime();
 	var justnow = formatIxaTime(utm);
@@ -440,18 +436,45 @@ function helpme_main($) {
 		alert(msg);
 	}
 
+	function showLinks() {
+		if (showLinkFlag == true) return;
+		var statuses = $('div.ig_fight_statusarea');
+		if (statuses.length == 0) return;
+		for (var i = 0; i < statuses.length; i++) {
+			var ename = statuses.eq(i).find("div.ig_fightunit_title2 h3 a").text();
+			var spans = statuses.eq(i).find("div.ig_fight_dotbox table tr td span");
+			var mplace = trim(rmvTabs(spans.eq(6).find('a').text()));
+			//alert('mplace='+mplace+"\n"+ ">div.sideBoxInner ul li:contains('"+ mplace + "') a<");
+			var aes = $("div.sideBoxInner ul li:contains('"+ mplace + "') a");
+			//alert('aes.eq(0)='+aes.eq(0).html());
+			//alert("aes.length="+aes.length)
+			if (aes.length != 0) {
+				var href = aes.eq(0).attr('href');
+				//alert('href='+href);
+				var ttl = aes.eq(0).attr('title');
+				var s = href.match(/(village_id=[0-9]+)&/);
+				var lnk = RegExp.leftContext + RegExp.$1 + '&amp;from=menu&amp;page=%2Ffacility%2Funit_status.php%3Fdmo%3Denemy';
+				var tmp = '<a href="' + lnk + '" title="'+ttl+'"> @ </a>';
+				spans.eq(6).append(tmp);
+				//alert(tmp);
+			}
+			//alert('aes.length = '+ aes.length);
+		}
+		showLinkFlag = true;
+	}
+
     function cmd_helpme() {
 		var tmp;
-		//tmp = '<div><a href="javascript:void(0);" onclick="return false;" id="do_attackinfo"><img src="' + gifdoko + '" alt="Inf_attack" style="position: relative; top: +0px; "></a></div>';
 		tmp = '　　　　<a><input type="button" name="string" value="inform" id="do_fightinfo" onclick="javascript:void(0);"></a>';
 	    $('div.ig_decksection_top').append(tmp);
+		showLinks();
         $('#do_fightinfo').live('click',function() {
 			job_helpme();
-			//calc_dokochika();
-			//setTimeout(calc_dokochika, 10);
 			//alert('now clicked attackinfo');
         });
     }
+	
+	showLinkFlag = false;
 
 	cmd_helpme();
 
