@@ -2,7 +2,7 @@
 // @name           sengokuixa-moko
 // @namespace      sengokuixa-ponpoko
 // @author         server1+2.nao****
-// @description    戦国IXA用ツール ver 1.8.6a 20110403
+// @description    戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110721
 // @include        http://*.sengokuixa.jp/*
 // @match          http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -37,7 +37,7 @@
 // 既知の問題点:
 // ・ Firefoxで動かない機能がある。
 // 　・お気に入り部隊をうまくデッキにセットできない
-// 　・「敵襲を枠内に表示」するとうまく動かない
+// 　・「敵襲を枠内に表示」するとうまく動かない  （とりあえず解決 婆羅門 20110721） 
 // ・ 全部隊解散時には全て解散出来る状態でないと正常に行うことが出来ない。
 //　　解散出来ない部隊があった時点で処理が終了する。
 // ・ 地図の右クリックメニューでの、
@@ -47,6 +47,9 @@
 //
 // TODO:
 // 1. 敵襲のサブウインドウ表示（距離、スピード予測）
+//
+// 婆羅門機能追加
+// ・地図の右クリックメニューへ拠点報告書を追加
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
