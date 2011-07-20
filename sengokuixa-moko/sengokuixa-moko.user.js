@@ -1198,12 +1198,25 @@ function Moko_main($) {
             map_move_ajax($(target));
         });
         list_id++;
+		//
+        // 拠点報告書
+        $('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">拠点報告書</li>');
+        $('#fUnit'+list_id).hover(function() {
+            $(this).css({color:'white', 'background-color':'blue'});
+        }, function() {
+            $(this).css({color:'', 'background-color':''});
+        }).click(function(e) {
+			var re = $(target).attr('href').match(/x=(-?[0-9]+)&y=(-?[0-9]+)&c=[0-9]+/);
+            location.href='/war/list.php?m=&s=1&name=lord&word=&coord=map&x='+RegExp.$1+'&y='+RegExp.$2;
+        });
+        list_id++;
 
         var onmouseover = $(target).attr('onmouseover').toString().match(/(?:[^'"]|\\.)*/g);
         var user_name = unescapeUnicode(onmouseover[6]);
         var alliance_name = unescapeUnicode(onmouseover[18]);
         if (user_name == "　") return;
 
+        //
         //
         // 城主報告書
         $('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">城主報告書</li>');
@@ -2970,7 +2983,7 @@ function Moko_main($) {
                      $(this).find('IMG:eq(3)').attr('src', IMAGES.mode_jinhari);
                  }
              }
-             if(($(this).find('IMG:eq(4)').attr('src').indexOf('icon_attack.png')!=-1)||($(this).find('IMG:eq(4)').attr('src').indexOf('mode_attack.png')!=-1)) {
+             if(($(this).find('IMG:eq(4)') != null) && ($(this).find('IMG:eq(4)').attr('src').indexOf('icon_attack.png')!=-1)||($(this).find('IMG:eq(4)').attr('src').indexOf('mode_attack.png')!=-1)) {
                  if($(this).find('TD:eq(2)').find('span').text()=='-'){
                      /*
                      $(this).find('IMG:eq(4)').attr('src','http://www.jj-midi.com/image/mode_jinhari.png');
