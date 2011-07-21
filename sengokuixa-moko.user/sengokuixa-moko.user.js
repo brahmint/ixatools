@@ -2,7 +2,7 @@
 // @name           sengokuixa-moko
 // @namespace      sengokuixa-ponpoko
 // @author         server1+2.nao****
-// @description    戦国IXA用ツール ver 1.8.6a 20110330
+// @description    戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110721
 // @include        http://*.sengokuixa.jp/*
 // @match          http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -39,6 +39,11 @@
 //
 // TODO:
 // 1. 敵襲のサブウインドウ表示（距離、スピード予測）
+//
+// 婆羅門機能追加
+// ・地図の右クリックメニューへ拠点報告書を追加
+// ・同じく、どこ近を追加
+
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -2827,7 +2832,7 @@ function Moko_main($) {
                      $(this).find('IMG:eq(3)').attr('src', IMAGES.mode_jinhari);
                  }
              }
-             if(($(this).find('IMG:eq(4)').attr('src').indexOf('icon_attack.png')!=-1)||($(this).find('IMG:eq(4)').attr('src').indexOf('mode_attack.png')!=-1)) {
+             if(($(this).find('IMG:eq(4)')!=null) && ($(this).find('IMG:eq(4)').attr('src').indexOf('icon_attack.png')!=-1)||($(this).find('IMG:eq(4)').attr('src').indexOf('mode_attack.png')!=-1)) {
                  if($(this).find('TD:eq(2)').find('span').text()=='-'){
                      /*
                      $(this).find('IMG:eq(4)').attr('src','http://www.jj-midi.com/image/mode_jinhari.png');
