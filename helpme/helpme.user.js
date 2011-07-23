@@ -1,16 +1,18 @@
 // ==UserScript==
 // @name           Helpme
-// @version        1.0
+// @version        1.01
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    Helpme ver. 1.0 20110626
+// @description    Helpme ver. 1.01 20110723
 // @include        http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
+// @match          http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
 // @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 
 //新章13+14鯖 敵襲状況
 //   
 //
-// 2011/06/04 1.0 初版リリース
+// 2011/06/14 1.0  初版リリース
+// 2011/07/23 1.01 chrome対応のためヘッダー部修正
 
 // Mokoと同じjQuery初期化を使用
 function bara_addJQuery(callback) {
