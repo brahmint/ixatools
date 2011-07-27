@@ -1,11 +1,13 @@
 // ==UserScript==
-// @name           Helpme
-// @version        1.01
-// @namespace      https://sites.google.com/site/ixamukakin/
-// @description    Helpme ver. 1.01 20110723
-// @include        http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
-// @match          http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
-// @copyright      2011, brahmint@gmail.com
+// @name		Helpme
+// @version		1.02
+// @namespace	https://sites.google.com/site/ixamukakin/
+// @description	Helpme ver. 1.02 20110727
+// @include		http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
+// @match		http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
+// @include		http://*.sengokuixa.jp/card/deck.php*
+// @match		http://*.sengokuixa.jp/card/deck.php*
+// @copyright	2011, brahmint@gmail.com
 // ==/UserScript==
 
 //新章13+14鯖 敵襲状況
@@ -13,6 +15,7 @@
 //
 // 2011/06/14 1.0  初版リリース
 // 2011/07/23 1.01 chrome対応のためヘッダー部修正
+// 2011/07/27 1.02 deck.php の拠点選択リンク
 
 // Mokoと同じjQuery初期化を使用
 function bara_addJQuery(callback) {
@@ -311,8 +314,7 @@ function helpme_main($) {
 		}
 		return (tag) ? txt : "";
 	}
-	
-	
+
 	function getIdTags(html, tagName, idName){
 	  var ids = "";
 	  if(idName){
@@ -438,8 +440,9 @@ function helpme_main($) {
 		alert(msg);
 	}
 
-	function showLinks() {
+	function showLinksAtStatus() {
 		if (showLinkFlag == true) return;
+		if(location.pathname != "/facility/unit_status.php") return;
 		var statuses = $('div.ig_fight_statusarea');
 		if (statuses.length == 0) return;
 		for (var i = 0; i < statuses.length; i++) {
@@ -459,9 +462,61 @@ function helpme_main($) {
 				var tmp = '<a href="' + lnk + '" title="'+ttl+'"> @ </a>';
 				spans.eq(6).append(tmp);
 				//alert(tmp);
+			} else {
+				if ($("div.sideBoxInner ul li.on span").text() == mplace) {
+					var tmp = '<a> * </a>';
+					spans.eq(6).append(tmp);
+				}
 			}
 			//alert('aes.length = '+ aes.length);
 		}
+		showLinkFlag = true;
+	}
+
+	function showLinksAtDeck(lname) {
+		function ulno() {
+			var lis = $('ul#ig_unitchoice li');
+			//var tmp = "";
+			for (var i=0; i < lis.length; i++) {
+				var re = lis.eq(i).text().match(/\[([^\]]+)\]部隊/);
+				if (re != null) {
+					if (RegExp.$1 == lname) return i;
+				}
+			}
+			return -1;
+		}
+
+		if (showLinkFlag == true) return;
+		if(location.pathname != "/card/deck.php") return;
+		if ( $('div.ig_deck_unitdata_assign.deck_wide_select select#select_village').length != 0) return;
+		var re = $('div#ig_deck_unititle p').text().match(/\[([^\]]+)\]部隊/);
+		var lname = RegExp.$1;
+		var ano = ulno(lname);
+		//alert('lname='+lname+ "\n" + "ano="+ ano +"\n");
+		var mplace = trim(rmvTabs($('div.ig_deck_unitdata_assign.deck_wide_select').text()));
+		//alert(mplace);
+		//alert('mplace='+mplace+"\n"+ ">div.sideBoxInner ul li:contains('"+ mplace + "') a<");
+		var aes = $("div.sideBoxInner ul li:contains('"+ mplace + "') a");
+		//alert('aes.eq(0)='+aes.eq(0).html());
+		//alert("aes.length="+aes.length)
+		if (aes.length != 0) {
+			var href = aes.eq(0).attr('href');
+			//alert('href='+href);
+			var ttl = aes.eq(0).attr('title');
+			var s = href.match(/(village_id=[0-9]+)&/);
+			var lnk = RegExp.leftContext + RegExp.$1 +'&amp;from=menu&amp;page=%2Fcard%2Fdeck.php';
+			if (ano > 0) lnk += '?ano='+ano;
+			var tmp = '<a href="' + lnk + '" title="'+ttl+'" style="float:right; position: relative; top: 5px; right: 10px;"> @ </a>';
+			$('div.deck_select_lead p').append(tmp);
+			//alert(tmp);
+		} else {
+			//alert($("div.sideBoxInner ul li.on span").text());
+			if ($("div.sideBoxInner ul li.on span").text() == mplace) {
+				var tmp = '<a style="float:right; position: relative; top: 5px; right: 10px;"> * </a>';
+				$('div.deck_select_lead p').append(tmp);
+			}
+		}
+		//alert('aes.length = '+ aes.length);
 		showLinkFlag = true;
 	}
 
@@ -469,7 +524,8 @@ function helpme_main($) {
 		var tmp;
 		tmp = '　　　　<a><input type="button" name="string" value="inform" id="do_fightinfo" onclick="javascript:void(0);"></a>';
 	    $('div.ig_decksection_top').append(tmp);
-		showLinks();
+		showLinksAtStatus();
+		showLinksAtDeck();
         $('#do_fightinfo').live('click',function() {
 			job_helpme();
 			//alert('now clicked attackinfo');
