@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110721
+// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110813
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -51,6 +51,7 @@
 // 婆羅門機能追加
 // ・地図の右クリックメニューへ拠点報告書を追加
 // ・同じく、どこ近を追加
+// ・同じく、@を追加（マップ右クリックメニューとデッキ）
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -630,6 +631,7 @@ function Moko_main($) {
 		localStorage.setItem(OPTION_PREFIX+'starttime', getCookie('im_st'));
 		document.cookie = 'im_st=0; expires=Fri, 31-Dec-1999 23:59:59 GMT; domain=.sengokuixa.jp; path=/;';
 	}
+	showLinksAtDeck();
 	allpage_check();
 	non_cardview();
 	chat_check();
@@ -1227,6 +1229,50 @@ function Moko_main($) {
 			calc_dokochika($(target).attr('href'));
 		});
 		list_id++;
+
+		var onmouseover = $(target).attr('onmouseover').toString().match(/(?:[^'"]|\\.)*/g);
+		var user_name = unescapeUnicode(onmouseover[6]);
+		var alliance_name = unescapeUnicode(onmouseover[18]);
+		var place_name = unescapeUnicode(onmouseover[2]);
+
+		if (!(user_name == "　")) {
+			//
+			// @
+			var posSign = null;
+			var lnk = null;
+			var aes = $("div.sideBoxInner ul li:contains('"+ place_name + "') a");
+			//alert('aes.eq(0)='+aes.eq(0).html());
+			//alert("aes.length="+aes.length)
+			if (aes.length != 0) {
+				var href = aes.eq(0).attr('href');
+				//alert('href='+href);
+				var ttl = aes.eq(0).attr('title');
+				if (ttl.indexOf(place_name+' ') > -1) {
+					var s = href.match(/(village_id=[0-9]+)&/);
+					lnk = RegExp.leftContext + RegExp.$1 + '&from=menu&page=/map.php';
+					posSign = "@ ここを表示拠点にする";
+				}
+				//alert(tmp);
+			} else {
+				//alert("aes.length="+aes.length);
+				if ($("div.sideBoxInner ul li.on span").text() == place_name) {
+					lnk = document.URL;
+					posSign = "* 現在の表示拠点";
+				}
+			}
+			if (posSign != null) {
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="text-align:center; color:black; padding:0px 10px; cursor:default">'+ posSign + '</li>');
+				$('#fUnit'+list_id).hover(function() {
+					$(this).css({color:'white', 'background-color':'blue'});
+				}, function() {
+					$(this).css({color:'', 'background-color':''});
+				}).click(function(e) {
+					location.href = lnk;
+				});
+				list_id++;
+			}
+		}
+
 		// 拠点報告書
 		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">拠点報告書</li>');
 		$('#fUnit'+list_id).hover(function() {
@@ -1239,9 +1285,6 @@ function Moko_main($) {
 		});
 		list_id++;
 
-		var onmouseover = $(target).attr('onmouseover').toString().match(/(?:[^'"]|\\.)*/g);
-		var user_name = unescapeUnicode(onmouseover[6]);
-		var alliance_name = unescapeUnicode(onmouseover[18]);
 		if (user_name == "　") return;
 
 		//
@@ -4620,6 +4663,56 @@ function Moko_main($) {
 	'cE4pLpTyBQ931UgEAR6OZ8AT5rjhw02yvOZiDF68gNILO3hRxBtANILHcCQI8EMnw+mol4sGvFQI'+
 	'Dnn4ocsLNQJhwCEs2FHLNEJyAUYhkNxRBw6OoNkcjyvUaeedJ4QAADs=';
 
+	var showLinkFlag = false;
+
+	function showLinksAtDeck() {
+		function ulno(lname) {
+			var lis = $('ul#ig_unitchoice li');
+			//var tmp = "";
+			for (var i=0; i < lis.length; i++) {
+				var re = lis.eq(i).text().match(/\[([^\]]+)\]部隊/);
+				if (re != null) {
+					if (RegExp.$1 == lname) return i;
+				}
+			}
+			return -1;
+		}
+
+		if (showLinkFlag == true) return;
+		if(location.pathname != "/card/deck.php") return;
+		if ( $('div.ig_deck_unitdata_assign.deck_wide_select select#select_village').length != 0) return;
+		var re = $('div#ig_deck_unititle p').text().match(/\[([^\]]+)\]部隊/);
+		var lname = RegExp.$1;
+		var ano = ulno(lname);
+		//alert('lname='+lname+ "\n" + "ano="+ ano +"\n");
+		var mplace = trim(rmvTabs($('div.ig_deck_unitdata_assign.deck_wide_select').text()));
+		//alert(mplace);
+		//alert('mplace='+mplace+"\n"+ ">div.sideBoxInner ul li:contains('"+ mplace + "') a<");
+		if ($("div.sideBoxInner ul li.on span").text() == mplace) {
+			var tmp = '<span><a style="float:right; position: relative; top: 5px; right: 10px;"> * </a></span>';
+			$('div.deck_select_lead p').append(tmp);
+		} else {
+			var aes = $("div.sideBoxInner ul li:contains('"+ mplace + "') a");
+			//alert('aes.eq(0)='+aes.eq(0).html());
+			for (var i = 0; i < aes.length; i++) {
+				var href = aes.eq(i).attr('href');
+				//alert('href='+href);
+				var ttl = aes.eq(i).attr('title');
+				if (ttl.indexOf(mplace+' ') == 0) {
+					var s = href.match(/(village_id=[0-9]+)&/);
+					var lnk = RegExp.leftContext + RegExp.$1 +'&amp;from=menu&amp;page=%2Fcard%2Fdeck.php';
+					if (ano > 0) lnk += '?ano='+ano;
+					var tmp = '<span><a href="' + lnk + '" title="'+ttl+'" style="float:right; position: relative; top: 5px; right: 10px;"> @ </a></span>';
+					$('div.deck_select_lead p').append(tmp);
+				}
+			}
+				//alert(tmp);
+		}
+		//alert('aes.length = '+ aes.length);
+		showLinkFlag = true;
+	}
+
+
 	var Territ = function ( ttype, tname, pos, population, cond, map) {
 		this.ttype	  = ttype;		//種類 (本領/所領)
 		this.tname	  = tname;		//名前
@@ -4863,12 +4956,12 @@ function Moko_main($) {
 											clearInterval(dokoId);
 											showAdvice();
 											dokojob = false;
-										} else if ( dokocnt > 30 ) {
+										} else if ( dokocnt > 60 ) {
 											clearInterval(dokoId);
 											dokojob = false;
 										}
 										dokocnt;
-									}, 1000);
+									}, 500);
 		} else {
 			alert("ここはどこ？");
 		}
