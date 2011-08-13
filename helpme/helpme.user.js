@@ -1,21 +1,22 @@
 // ==UserScript==
 // @name		Helpme
-// @version		1.02
+// @version		1.03
 // @namespace	https://sites.google.com/site/ixamukakin/
-// @description	Helpme ver. 1.02 20110727
+// @description	Helpme ver. 1.03 20110813
 // @include		http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
 // @match		http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
-// @include		http://*.sengokuixa.jp/card/deck.php*
-// @match		http://*.sengokuixa.jp/card/deck.php*
 // @copyright	2011, brahmint@gmail.com
 // ==/UserScript==
 
 //新章13+14鯖 敵襲状況
 //   
 //
-// 2011/06/14 1.0  初版リリース
-// 2011/07/23 1.01 chrome対応のためヘッダー部修正
-// 2011/07/27 1.02 deck.php の拠点選択リンク
+// 2011/06/14 1.0	初版リリース
+// 2011/07/23 1.01	chrome対応のためヘッダー部修正
+// 2011/07/27 1.02	deck.php の拠点選択リンク
+// 2011/08/13 1.03	拠点名が他の拠点名の一部の時に正しく@*が表示されない点を修正
+//					deck.php の表示をしない様に(Chromeで問題あるため）
+//					距離1.0の移動時間出力
 
 // Mokoと同じjQuery初期化を使用
 function bara_addJQuery(callback) {
@@ -417,6 +418,11 @@ function helpme_main($) {
 			var spans = statuses.eq(i).find("div.ig_fight_dotbox table tr td span");
 			var eplace = trim(rmvTabs(spans.eq(5).text()));
 			var mplace = trim(rmvTabs(spans.eq(6).text()));
+			//alert(mplace);
+			var mpz = mplace.match(/\s+[@*]$/);
+			if (mpz != null) {
+				mplace = RegExp.leftContext;
+			}
 			var reg = eplace.match(/\((-?[0-9]+),(-?[0-9]+)\)/);
 			var x0 = Number(RegExp.$1);
 			var y0 = Number(RegExp.$2);
@@ -427,13 +433,21 @@ function helpme_main($) {
 			var dy = y1 - y0;
 			var d = Math.sqrt(dx*dx + dy*dy);
 			
-			var ttime = trim(rmvTabs(spans.eq(1).html())).match(/([0-9]+):([0-9]+:[0-9]+)/);
-			if ("00" == RegExp.$1) {
-				ttime = RegExp.$2;
+			var ttime = trim(rmvTabs(spans.eq(1).html())).match(/([0-9]+):([0-9]+):([0-9]+)/);
+			var hh = RegExp.$1;
+			var mm = RegExp.$2;
+			var ss = RegExp.$3;
+			if ("00" == hh) {
+				ttime = mm + ":" + ss;
 			} else {
-				ttime = RegExp.$1 + ":" + RegExp.$2;
+				ttime = hh + ":" + mm + ":" + ss;
 			}
-			msg += ename + " の " + trimRmv(eplace)+" から "+trimRmv(mplace)+" まで 距離["+num2diststr(d) +"] "+ttime+ "着弾\n";
+			var tt = Number(hh)*3600 + Number(mm)*60 + Number(ss);
+			//alert("tt="+tt);
+			var v = parseInt(tt/d);
+			var vm = Math.floor(v / 60);
+			var vs = v % 60;
+			msg += ename + " の " + trimRmv(eplace)+" から "+trimRmv(mplace)+" まで 距離["+num2diststr(d) +"] "+ttime+ "着弾\n移動時間(距離1.0)="+vm+":"+vs;
 
 		}
 		
@@ -450,22 +464,26 @@ function helpme_main($) {
 			var spans = statuses.eq(i).find("div.ig_fight_dotbox table tr td span");
 			var mplace = trim(rmvTabs(spans.eq(6).find('a').text()));
 			//alert('mplace='+mplace+"\n"+ ">div.sideBoxInner ul li:contains('"+ mplace + "') a<");
-			var aes = $("div.sideBoxInner ul li:contains('"+ mplace + "') a");
-			//alert('aes.eq(0)='+aes.eq(0).html());
-			//alert("aes.length="+aes.length)
-			if (aes.length != 0) {
-				var href = aes.eq(0).attr('href');
-				//alert('href='+href);
-				var ttl = aes.eq(0).attr('title');
-				var s = href.match(/(village_id=[0-9]+)&/);
-				var lnk = RegExp.leftContext + RegExp.$1 + '&amp;from=menu&amp;page=%2Ffacility%2Funit_status.php%3Fdmo%3Denemy';
-				var tmp = '<a href="' + lnk + '" title="'+ttl+'"> @ </a>';
+			if ($("div.sideBoxInner ul li.on span").text() == mplace) {
+				var tmp = '<span><a> * </a></span>';
 				spans.eq(6).append(tmp);
-				//alert(tmp);
 			} else {
-				if ($("div.sideBoxInner ul li.on span").text() == mplace) {
-					var tmp = '<a> * </a>';
-					spans.eq(6).append(tmp);
+				var aes = $("div.sideBoxInner ul li:contains('"+ mplace + "') a");
+				//alert('aes.eq(0)='+aes.eq(0).html());
+				//alert("aes.length="+aes.length)
+				for (var i = 0; i < aes.length; i++) {
+					if (aes.length != 0) {
+						var href = aes.eq(0).attr('href');
+						//alert('href='+href);
+						var ttl = aes.eq(0).attr('title');
+						if (ttl.indexOf(mplace+' ') == 0) {
+							var s = href.match(/(village_id=[0-9]+)&/);
+							var lnk = RegExp.leftContext + RegExp.$1 + '&amp;from=menu&amp;page=%2Ffacility%2Funit_status.php%3Fdmo%3Denemy';
+							var tmp = '<span><a href="' + lnk + '" title="'+ttl+'"> @ </a></span>';
+							spans.eq(6).append(tmp);
+						}
+						//alert(tmp);
+					}
 				}
 			}
 			//alert('aes.length = '+ aes.length);
@@ -473,59 +491,11 @@ function helpme_main($) {
 		showLinkFlag = true;
 	}
 
-	function showLinksAtDeck(lname) {
-		function ulno() {
-			var lis = $('ul#ig_unitchoice li');
-			//var tmp = "";
-			for (var i=0; i < lis.length; i++) {
-				var re = lis.eq(i).text().match(/\[([^\]]+)\]部隊/);
-				if (re != null) {
-					if (RegExp.$1 == lname) return i;
-				}
-			}
-			return -1;
-		}
-
-		if (showLinkFlag == true) return;
-		if(location.pathname != "/card/deck.php") return;
-		if ( $('div.ig_deck_unitdata_assign.deck_wide_select select#select_village').length != 0) return;
-		var re = $('div#ig_deck_unititle p').text().match(/\[([^\]]+)\]部隊/);
-		var lname = RegExp.$1;
-		var ano = ulno(lname);
-		//alert('lname='+lname+ "\n" + "ano="+ ano +"\n");
-		var mplace = trim(rmvTabs($('div.ig_deck_unitdata_assign.deck_wide_select').text()));
-		//alert(mplace);
-		//alert('mplace='+mplace+"\n"+ ">div.sideBoxInner ul li:contains('"+ mplace + "') a<");
-		var aes = $("div.sideBoxInner ul li:contains('"+ mplace + "') a");
-		//alert('aes.eq(0)='+aes.eq(0).html());
-		//alert("aes.length="+aes.length)
-		if (aes.length != 0) {
-			var href = aes.eq(0).attr('href');
-			//alert('href='+href);
-			var ttl = aes.eq(0).attr('title');
-			var s = href.match(/(village_id=[0-9]+)&/);
-			var lnk = RegExp.leftContext + RegExp.$1 +'&amp;from=menu&amp;page=%2Fcard%2Fdeck.php';
-			if (ano > 0) lnk += '?ano='+ano;
-			var tmp = '<a href="' + lnk + '" title="'+ttl+'" style="float:right; position: relative; top: 5px; right: 10px;"> @ </a>';
-			$('div.deck_select_lead p').append(tmp);
-			//alert(tmp);
-		} else {
-			//alert($("div.sideBoxInner ul li.on span").text());
-			if ($("div.sideBoxInner ul li.on span").text() == mplace) {
-				var tmp = '<a style="float:right; position: relative; top: 5px; right: 10px;"> * </a>';
-				$('div.deck_select_lead p').append(tmp);
-			}
-		}
-		//alert('aes.length = '+ aes.length);
-		showLinkFlag = true;
-	}
-
     function cmd_helpme() {
 		var tmp;
-		tmp = '　　　　<a><input type="button" name="string" value="inform" id="do_fightinfo" onclick="javascript:void(0);"></a>';
+		tmp = '　　　　<a><input type="button" name="string" value="inform" id="do_fightinfo" onclick="javascript:void(0); return false;"></a>';
 	    $('div.ig_decksection_top').append(tmp);
 		showLinksAtStatus();
-		showLinksAtDeck();
         $('#do_fightinfo').live('click',function() {
 			job_helpme();
 			//alert('now clicked attackinfo');
