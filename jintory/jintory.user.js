@@ -1,43 +1,44 @@
 // ==UserScript==
-// @name           Jintory
-// @version        1.43
-// @namespace      https://sites.google.com/site/ixamukakin/
-// @description    Jintory ver. 1.43 20110714
-// @include        http://w213.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=new
-// @match          http://w213.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=new
-// @include        http://w213.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=&p=1#ptop
-// @match          http://w213.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=&p=1#ptop
-// @include        http://w213.sengokuixa.jp/bbs/res_view.php?p=1&thread_id=*
-// @match          http://w213.sengokuixa.jp/bbs/res_view.php?p=1&thread_id=*
-// @include        http://w213.sengokuixa.jp/user/
-// @include        http://w213.sengokuixa.jp/user/#ptop
-// @copyright      2011, brahmint@gmail.com
+// @name		Jintory
+// @version		1.44
+// @namespace	https://sites.google.com/site/ixamukakin/
+// @description	Jintory ver. 1.44 20110814
+// @include		http://*.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=new
+// @match		http://*.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=new
+// @include		http://*.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=&p=1#ptop
+// @match		http://*.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=&p=1#ptop
+// @include		http://*.sengokuixa.jp/bbs/res_view.php?p=*&thread_id=*
+// @match		http://*.sengokuixa.jp/bbs/res_view.php?p=1&thread_id=*
+// @include		http://*.sengokuixa.jp/user/
+// @include		http://*.sengokuixa.jp/user/#ptop
+// @match		http://*.sengokuixa.jp/user/
+// @match		http://*.sengokuixa.jp/user/#ptop
+// @copyright	2011, brahmint@gmail.com
 // ==/UserScript==
 
 //新章13+14鯖 無課金同盟 陣取りかぶり防止用
 //   陣張り・領地獲得宣言スレ書き込み支援ツール
 //
-// 2011/06/04 1.0 初版リリース
-// 2011/06/10 1.1 textarea に投稿コメントを自動表示
-//                jintory 変数で、陣張りのみ、領地取り含むを選べる
-// 2011/06/16 1.11 thread_id 8 → 11 に暫定対応
-// 2011/06/20 1.2  【城主名略称】
-//                 【Jintory】2     に対応
-// 2011/06/22 1.21 【城主名略称】等オプションの凍結
-// 2011/06/26 1.3   全体を (function() {})(); 宣言にしてグローバル領域に影響を与えないようにした
-//                  オプションはプロファイル画面だけで完結させるようにした
-//                  GM_getValue(), GM_setValue() でオプション値を保持・参照するようにした
-// 2011/07/01 1.4   GM_getValue(), GM_setValue() Chrome版との互換性実現
-// 2011/07/01 1.41  ライブラリが動かないので、try catch で実現
-//                  jQuery ライブラリ一部対応
-// 2011/07/03 1.42  メンバ名変更(name→lord)の確認ミス
-// 2011/07/14 1.43  URL変更に対応 w013→w213
-//                  新規インストール時の略称名対応部分の修正=lordNameの取得ミス
-//                  Intervalタイマー 3000→1000
-
-//
-// main
-//
+// 2011/06/04 1.0	初版リリース
+// 2011/06/10 1.1	textarea に投稿コメントを自動表示
+//					jintory 変数で、陣張りのみ、領地取り含むを選べる
+// 2011/06/16 1.11	thread_id 8 → 11 に暫定対応
+// 2011/06/20 1.2	【城主名略称】
+//					【Jintory】2     に対応
+// 2011/06/22 1.21	【城主名略称】等オプションの凍結
+// 2011/06/26 1.3	全体を (function() {})(); 宣言にしてグローバル領域に影響を与えないようにした
+//					オプションはプロファイル画面だけで完結させるようにした
+//					GM_getValue(), GM_setValue() でオプション値を保持・参照するようにした
+// 2011/07/01 1.4	GM_getValue(), GM_setValue() Chrome版との互換性実現
+// 2011/07/01 1.41	ライブラリが動かないので、try catch で実現
+//					jQuery ライブラリ一部対応
+// 2011/07/03 1.42	メンバ名変更(name→lord)の確認ミス
+// 2011/07/14 1.43	URL変更に対応 w013→w213
+//					新規インストール時の略称名対応部分の修正=lordNameの取得ミス
+//					Intervalタイマー 3000→1000
+// 2011/07/03 1.44	メンバ名変更(name→lord)の確認ミス
+//					プロフィール設定値をプロフィールから消した時の処理
+//					w213以外の鯖にも対応
 
 // Mokoと同じjQuery初期化を使用
 function bara_addJQuery(callback) {
@@ -60,6 +61,10 @@ function bara_addJQuery(callback) {
     }
 }
 
+//
+// main
+//
+
 function jintory_main($) {
 
 	var locationhost = "w213.sengokuixa.jp";		// w213専用
@@ -73,18 +78,20 @@ function jintory_main($) {
 	} catch (e) {
 		shortlord = window.localStorage.getItem('shortlord');
 	}
+	if (shortlord == null) shortlord = "";
 
 	try {
 		jintorymode = GM_getValue('jintorymode',null);
 	} catch (e) {
 		jintorymode = window.localStorage.getItem('jintorymode');
 	}
+	if (jintorymode == null) jintorymode = "";
 
 	//alert('lordname='+lordname+'\n'+'shortlord='+shortlord+'\n'+'jintorymode='+jintorymode);
 	
 	var threadname = $('div.ig_decksection_top').text();
 
-	var AttackPlace = function( placename, pos, lord, frompos, fromlord, fromname, time, ext ) {
+	var JintoryData = function( placename, pos, lord, frompos, fromlord, fromname, time, ext ) {
 		this.placename = placename;	//場所名
 		this.pos       = pos;		//座標
 		this.lord      = lord;		//城主名
@@ -98,7 +105,7 @@ function jintory_main($) {
 		this.newer     = true;		//新しいから残すフラグ
 	}
 	
-	var Place = function( pos, lord, time, ext ) {
+	var BoardData = function( pos, lord, time, ext ) {
 		this.pos      = pos;		//座標
 		this.lord     = lord;		//城主名
 		this.time     = time;		//時刻
@@ -118,12 +125,12 @@ function jintory_main($) {
 
 	var kougekiDoneflag   = false;
 	var mycount    = 0;
-	var myplaces   = new Array(1);
+	var myplaces   = new Array();
 	var placecount = 0;
-	var places     = new Array(1);
+	var places     = new Array();
 	var dblcount   = 0;
 	var outcount   = 0;
-	var outlines   = new Array(1);
+	var outlines   = new Array();		//出力用
 	var msgno      = -1;
 	
 	// プロフィールから略称取得
@@ -133,14 +140,14 @@ function jintory_main($) {
 	
 	if (document.URL.match(/\/user\/(#ptop)?$/)) {    //プロフィール頁なら
 		// プロフィール頁からオプション取得・設定
-		checkUsersProf();
+		checkUsersProfile();
 	} else {
 		//alert('threadname='+threadname);
 		if (threadname.match("^陣張り")) {
 			//alert('陣張り');
 			if (document.body.innerHTML.match(/dmo=sortie/)) {		//攻撃中なら
 				pickKougekiData('http://' + locationhost + '/facility/unit_status.php?dmo=sortie');  	//攻撃中
-				setKougekiViser( 1000 );
+				setKougekiViser( 100 );
 			}
 		}
 	}
@@ -149,7 +156,7 @@ function jintory_main($) {
 	// 陣のデータをチェックする
 	function checkJintory() {
 		if (0 < mycount) {
-			pickBoardData();		// 掲示板の最後の発言のデータを読み込む
+			pickBoardDatas();		// 掲示板の最後の発言のデータを読み込む
 
 			//陣張り予定時刻を調べ、陣張り終わったのは消す
 			for (var i = 0; i < placecount; i++) {
@@ -237,7 +244,7 @@ function jintory_main($) {
 			for (var j = 0; j < placecount; j++) {
 				if (true == places[j].newer) {
 					if (places[j].pos == myplaces[i].pos) {
-						if ((places[j].lord == lordname) || ((null != shortlord) && (places[j].lord == shortlord))) {
+						if ((places[j].lord == lordname) || (("" != shortlord) && (places[j].lord == shortlord))) {
 							myplaces[i].newflag = false;	    //自分のが登録済みだったら 新しくないものとする
 							places[j].time = myplaces[i].time;	//再取得もありうるので、取得予定時刻は入れ替えておく
 							//tmp += "already "+myplaces[i].pos + "\n";
@@ -262,7 +269,9 @@ function jintory_main($) {
 	//掲示板の最初のレスからデータを拾う
 	// places にデータが入る
 	// msgno に掲示板のメッセージ番号
-	function pickBoardData() {
+	function pickBoardDatas() {
+		//var tds = $('div.chat_spacebottom table.chat_spacetable tr td');
+		//var tdcount = tds.length / 4 - 1;
 		var tbls = getClassTags(document.body.innerHTML,"table","chat_spacetable");
 		var found = -1;
 		for (var i = 1; i < tbls.length; i++) {
@@ -278,7 +287,7 @@ function jintory_main($) {
 					if (sd[3].match(/\s*▼[0-9]+$/)) {
 						sd[3] = RegExp.leftContext;
 					}
-					places[j] = new Place(sd[0],sd[1],sd[2],sd[3]);
+					places[j] = new BoardData(sd[0],sd[1],sd[2],sd[3]);
 					//alert('j='+j+':places[j]='+places[j].toString());
 					//tmp += places[j].toString() +"\n";
 				}
@@ -413,10 +422,10 @@ function jintory_main($) {
 							var fpz = RegExp.$1;
 							var tps = ss[1].match(/\s+\((\-*[0-9]+,\-*[0-9]+)\)/);
 							var tpz = RegExp.$1;
-							if (null == shortlord) { 
-								myplaces[mycount] = new AttackPlace(placenm, tpz, lordname, fpz, lordname, "", dt, "");
+							if ("" == shortlord) { 
+								myplaces[mycount] = new JintoryData(placenm, tpz, lordname, fpz, lordname, "", dt, "");
 							} else {
-								myplaces[mycount] = new AttackPlace(placenm, tpz, shortlord, fpz, shortlord, "", dt, "");
+								myplaces[mycount] = new JintoryData(placenm, tpz, shortlord, fpz, shortlord, "", dt, "");
 							}
 							//alert(myplaces[mycount].toString());
 							mycount++;
@@ -438,7 +447,7 @@ function jintory_main($) {
 
 
 	//プロフィール頁でオプション値の変更があったら設定・保存する
-	function checkUsersProf() {
+	function checkUsersProfile() {
 		var ss = getClassTags(document.body.innerHTML,"p","info");		
 		//alert(ss);
 		var s = getClassTagText(replaceWbr(replaceBr(ss[0])),"p","info");
@@ -447,9 +456,13 @@ function jintory_main($) {
 		var newjintory = jintorymode;
 		if (s.match(/【城主名略称】\s*(\S+)/)) {
 			newshortlord = RegExp.$1;
+		} else {
+			newshortlord = "";
 		}
 		if (s.match(/【Jintory】\s*(\S+)/)) {
 			newjintory = RegExp.$1;
+		} else {
+			newjintory = "";
 		}
 
 		if ( newshortlord != shortlord || newjintory != jintorymode) {
@@ -718,7 +731,7 @@ function jintory_main($) {
 									if (kougekiDoneflag) {
 										clearInterval(kougekiViserId);
 										checkJintory();
-									} else if ( kougekiTrcnt > 30 ) {
+									} else if ( kougekiTrcnt > 300 ) {
 										clearInterval(kougekiViserId);
 									}
 								}, timeVise);
