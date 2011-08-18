@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110813
+// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110818
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -44,6 +44,7 @@
 // ・地図の右クリックメニューへ拠点報告書を追加
 // ・同じく、どこ近を追加
 // ・同じく、@を追加（マップ右クリックメニューとデッキ）
+// ・JQueryライブラリを使用してソースをコンパクトに
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -4977,29 +4978,24 @@ function Moko_main($) {
 			cache: false, 
 			dataType: "text",
 			success: function (html){
-				var tbltxt = getTags(html,"table","common_table1 center").toString();
+				var tbls = $(html).find("table.common_table1.center");
 				//var mts =getIxaHrefs(tbltxt);
-				var trs = getClassTags(tbltxt,'tr','fs[0-9]+');
+				var trs = tbls.find('tr.fs14');
 				//alert('tericount=' + tericount);
-				var thisTr, s, re;
+				var s, re;
 				var territ0 = 0;
 				var ctp;
 				for (var i = 0; i < trs.length; i++) {
-					thisTr = trim(rmvTabs(trs[i]));
-					var tds = getTags(thisTr,'td',null);
-					var ttype = getTagText(tds[0],'td');
-					var tss1 = getTaggedContent(tds[1],'td',null);
-					var tvill = getTag(tss1,'a',null);
-					var textn = trim(tss1.substring(tvill.length));
-					var tname = trim(getTagText(tss1,'a'));
-					var tss2 = getTag(tds[2],'td',null);
-					var mts =getHref(tss2);
-					var tpos  = getTagText(tss2,'a');
-					var thref = getHref(tds[1]);
-					var tpopu = getTagText(tds[3],'td');
-					var tcond = trim(getTagText(tds[4],'span'));
-					ctp = ctype(mts);	//c=1～12
-					data[territ0+i] = new Territ(ttype, tname+textn, tpos, tpopu, tcond, ctp);
+					var tds = trs.eq(i).find('td');
+					var ttype = tds.eq(0).text();		//本領・所領 など
+					var tname = trim(tds.eq(1).find('a').text());
+					var tpos  = tds.eq(2).find('a').text();
+					var tland = tds.eq(2).find('a').attr('href');
+					var tpopu = tds.eq(3).text();
+					var tcond = tds.eq(4).find('span').text();
+					if (tcond == undefined ) tcond = "";
+					ctp = ctype(tland);	//c=1～12
+					data[territ0+i] = new Territ(ttype, tname, tpos, tpopu, tcond, ctp);
 				}
 				profTeriDoneflag = true;
 			},
@@ -5044,148 +5040,6 @@ function Moko_main($) {
 	function rmvTabs( value ) {
 		var re = /(\t)\t+/mg;
 		return value.replace(re, "$1");
-	}
-
-	// innerHTML to URL
-	function inURL(s) {
-		var sub = s.split("href=\"");
-		var sub2 = sub[1].split("\">");
-		return sub2[0];
-	}
-
-
-	// XML assist
-	function getTags(html, tagName, className){
-	  var cls = "";
-	  if(className){
-		cls = "[^>]*?class=\"" + className + "\"";
-	  }
-	  var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
-	  return html.match(reg);
-	}
-
-	function getTag(html, tagName, className){
-	  var cls = "";
-	  if(className){
-		cls = "[^>]*?class=\"" + className + "\"";
-	  }
-	  var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "i");
-	  var tags = html.match(reg);
-	  return (tags && tags.length) ? tags[0] : "";
-	}
-
-	function getTaggedContent(html, tagName, className){
-	  var cls = "";
-	  if(className){
-		cls = "[^>]*?class=\"" + className + "\"";
-	  }
-	  var reg = new RegExp("(<" + tagName + cls + "(\\s|[^>])*?>)((\\s|.)*)(</" + tagName + ">)", "i");
-	  var tags = html.match(reg);
-	  return (tags && tags.length) ? trim(RegExp.$3) : "";
-	}
-
-	function getBody(html){
-	  var reg = new RegExp("<body((\\s|.)*)</body>", "i");
-	  return html.match(reg);
-	}
-
-	function getAttrTags(html, tagName, attrName, attrStr){
-		var cls = "";
-		if(attrName){
-			if (attrStr) {
-				cls = '[^>]*?' + attrName + '="' + attrStr + '"';
-			} else {
-				cls = '[^>]*?' + attrName + '="[^"]*"';
-			}
-		}
-		var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
-		return html.match(reg);
-	}
-
-	function getAttrTag(html, tagName, attrName, attrStr){
-	  var tags = getClassTags(html, tagName, attrName, attrStr);
-	  return (tags && tags.length) ? tags[0] : "";
-	}
-
-	function getAttrTagText(html, tagName, attrName, attrStr){
-	  return getAttrTag(html, tagName, attrName, attrStr) ? RegExp.$2 : "";
-	}
-
-	function getClassTags(html, tagName, className){
-	  var cls = "";
-	  if(className){
-		cls = '[^>]*?class="' + className + '"';
-	  }
-	  var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
-	  return html.match(reg);
-	}
-
-	function getClassTag(html, tagName, className){
-	  var tags = getClassTags(html, tagName, className);
-	  return (tags && tags.length) ? tags[0] : "";
-	}
-
-	function getClassTagText(html, tagName, className){
-	  return getClassTag(html, tagName, className) ? RegExp.$2 : "";
-	}
-
-
-	function getTagText(html,tagName) {
-		var reg = new RegExp("<" + tagName + "(\\s|.)*?>([^<]*)</" + tagName + ">", "i");
-		var tag = html.match(reg);
-		return (tag) ? RegExp.$2 : "";
-	}
-
-	function getIdTags(html, tagName, idName){
-	  var ids = "";
-	  if(idName){
-		ids = '[^>]*?id="' + idName + '"';
-	  }
-	  var reg = new RegExp("<" + tagName + ids + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
-	  return html.match(reg);
-	}
-
-	function getIdTag(html, tagName, idName){
-	  var tags = getIdTags(html, tagName, idName);
-	  return (tags && tags.length) ? tags[0] : "";
-	}
-
-	function getIdTagText(html, tagName, idName){
-	  return getIdTag(html, tagName, idName) ? RegExp.$2 : "";
-	}
-
-	function getSrc(html, flg) {
-		if (flg == 0) {
-			var src = '<img src="([^"]*)/([^"/]+)"';
-		} else {
-			var src = '<(img src=)"([^"]*)"';	//フル
-		}
-		var ans = html.match(src,"ig");
-		return (ans && ans.length) ? RegExp.$2 : "";
-	}
-
-	function getIxaHrefs(html) {
-		var src = '<a href="([^"]*)(?=")';	//フル
-		var ans = html.match(src,"ig");
-		for (var i= 0; i < ans.length; i++) {
-			ans[i] = ans[i].substring(9);
-		}
-		return ans;
-	}
-
-	function getHref(html) {
-		var src = '<a href="([^"]*)"';	//フル
-		var ans = html.match(src,"i");
-		return (ans && ans.length) ? RegExp.$1 : "";
-	}
-
-
-	function replaceAmp(s) {
-		return s.replace(/&amp;/g,'&');
-	}
-
-	function replaceNbsp(s) {
-		return s.replace(/&nbsp;/g,' ');
 	}
 
 //---------------------------
