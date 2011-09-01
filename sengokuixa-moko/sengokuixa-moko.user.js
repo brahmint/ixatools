@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110818
+// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110901
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -53,6 +53,7 @@
 // ・同じく、どこ近を追加
 // ・同じく、@を追加（マップ右クリックメニューとデッキ）
 // ・JQueryライブラリを使用してソースをコンパクトに
+// ・部隊編成画面で部隊スキル窓移動 20110901
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -3055,14 +3056,17 @@ function Moko_main($) {
 					 $(this).find('IMG:eq(3)').attr('src', IMAGES.mode_jinhari);
 				 }
 			 }
-			 if(($(this).find('IMG:eq(4)') != null) && ($(this).find('IMG:eq(4)').attr('src').indexOf('icon_attack.png')!=-1)||($(this).find('IMG:eq(4)').attr('src').indexOf('mode_attack.png')!=-1)) {
-				 if($(this).find('TD:eq(2)').find('span').text()=='-'){
-					 /*
-					 $(this).find('IMG:eq(4)').attr('src','http://www.jj-midi.com/image/mode_jinhari.png');
-					 */
-					 $(this).find('IMG:eq(4)').attr('src', IMAGES.mode_jinhari);
-				 }
-			 }
+			 //alert($(this).find('IMG:eq(4)').attr('src'));
+			if ($(this).find('IMG:eq(4)').attr('src') != undefined) {
+			 	if (($(this).find('IMG:eq(4)').attr('src').indexOf('icon_attack.png')!=-1)||($(this).find('IMG:eq(4)').attr('src').indexOf('mode_attack.png')!=-1)) {
+					if($(this).find('TD:eq(2)').find('span').text()=='-'){
+						 /*
+						$(this).find('IMG:eq(4)').attr('src','http://www.jj-midi.com/image/mode_jinhari.png');
+						*/
+						$(this).find('IMG:eq(4)').attr('src', IMAGES.mode_jinhari);
+					}
+				}
+			}
 		});
 	}
 
@@ -3682,6 +3686,11 @@ function Moko_main($) {
 		*/
 		var tmp = '<li><a href="javascript:void(0);" onclick="return false;" id="deck_dissolution"><img src="' + IMAGES.btn_all_breakup + '" alt="全部隊解散" style="position: relative; top: -4px; "></a></li>';
 		$('ul#ig_unitchoice').find('li:last').before(tmp);
+
+		// 部隊スキルウィンドウを移動
+		$('div[id="deck_skill_display"]').css('margin-top', '100px');
+		$('div[id="ig_deckunitdetail"]').css('height', '460px');
+
 		$('#deck_dissolution').live('click',function() {
 			if(!confirm("全部隊を解散しますか？\n(解散すると武将は、HPが減った状態でファイルに戻されます)")) return;
 			$("#deck_dissolution").remove();
