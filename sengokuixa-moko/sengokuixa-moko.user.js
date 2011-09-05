@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110901
+// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110905
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -54,6 +54,7 @@
 // ・同じく、@を追加（マップ右クリックメニューとデッキ）
 // ・JQueryライブラリを使用してソースをコンパクトに
 // ・部隊編成画面で部隊スキル窓移動 20110901
+// ・マークした敵の拠点を地図上で表示 20110905
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -284,6 +285,157 @@ function Moko_main($) {
 	} else {
 		localStorage.setItem('ixamoko_init_groups_img', ArraytoJSON(groups_img));
 	}
+
+	//
+	// 婆羅門追加 top
+	//
+	var targetEnemy;		//ターゲット相手
+	var targetAlli;			//ターゲット同盟
+
+	try {
+		targetEnemy = GM_getValue('targetenemy',null);
+	} catch (e) {
+		targetEnemy = window.localStorage.getItem('targetenemy');
+	}
+	if (targetEnemy == null) targetEnemy = "";
+	
+	try {
+		targetAlli = GM_getValue('targetalli',null);
+	} catch (e) {
+		targetAlli = window.localStorage.getItem('targetalli');
+	}
+	if (targetAlli == null) targetAlli = "";
+
+	function saveTargeties() {
+		try {
+			setTimeout(function() { GM_setValue('targetenemy',targetEnemy); }, 0);
+		} catch (e) {
+			try {
+				window.localStorage.setItem('targetenemy',targetEnemy);   // Chrome用
+			} catch (e) {
+				alert("cannot setItem('targetenemy,'"+ targetEnemy + ")");   
+			}
+		}
+		try {
+			setTimeout(function() { GM_setValue('targetalli',targetAlli); }, 0);
+		} catch (e) {
+			try {
+				window.localStorage.setItem('targetalli',targetAlli);    // Chrome用
+			} catch (e) {
+				alert("cannot setItem('targetalli,'"+ targetAlli + ")");
+			}
+		}
+	}
+
+	var mapPoz = new Object();
+	mapPoz.mapContainer = $('#ig_mapbox_container');
+	mapPoz.imghost = 'https://sites.google.com/site/ixamukakin/home/images/';
+	mapPoz.orghost = null;
+	mapPoz.areas;
+	mapPoz.size;	//11 | 15 | 20
+	mapPoz.mapsAll;
+	mapPoz.topleft;
+	mapPoz.xtl;
+	mapPoz.ytl;
+	mapPoz.btmright;
+	mapPoz.x = 0;
+	mapPoz.y = 0;
+	mapPoz.imgfile;
+	mapPoz.imgclass;
+	mapPoz.user_name;
+	mapPoz.alliance_name;
+	mapPoz.place_name;
+	mapPoz.isEnemy = false;
+	mapPoz.mid;
+	mapPoz.init = function() {
+		this.areas = mapPoz.mapContainer.find('map#mapOverlayMap area');
+		if (this.areas.length == 121) {			//10x10
+			this.size = 11;
+		} else if (this.areas.length == 225) {	//15x15
+			this.size = 15;
+		} else {									//20x20
+			this.size = 20;
+		}
+		this.mapsAll = mapPoz.mapContainer.find('div#ig_mapsAll');
+		var tlurl = this.areas.eq(0).attr('href');
+		var re0 = tlurl.match(/x=(-?[0-9]+)&y=(-?[0-9]+)&c=([0-9]+)/);
+		this.xtl = Number(RegExp.$1);
+		this.ytl = Number(RegExp.$2);
+		this.topleft = RegExp.$1 + ',' + RegExp.$2;
+		var brurl = this.areas.eq(this.areas.length-1).attr('href');
+		re0 = brurl.match(/x=(-?[0-9]+)&y=(-?[0-9]+)&c=([0-9]+)/);
+		var xrb = Number(RegExp.$1);
+		var yrb = Number(RegExp.$2);
+		this.btmright = RegExp.$1 + ',' + RegExp.$2;
+	}
+	mapPoz.setTarget = function(target) {			//target は areaを指定
+		var onmouseover = $(target).attr('onmouseover').toString().match(/(?:[^'"]|\\.)*/g);
+		this.user_name = unescapeUnicode(onmouseover[6]);
+		this.alliance_name = unescapeUnicode(onmouseover[18]);
+		this.place_name = unescapeUnicode(onmouseover[2]);
+		var trg = $(target).attr('href');
+		re0 = trg.match(/x=(-?[0-9]+)&y=(-?[0-9]+)&c=([0-9]+)/);
+		var xt = Number(RegExp.$1);
+		var yt = Number(RegExp.$2);
+		this.x = xt;
+		this.y = yt;			
+		var xd = xt-this.xtl;
+		var yd = -(yt-this.ytl);
+		var mastr;
+		var ma = xd*this.size + yd + 1;
+		if (ma < 10) {
+			mastr = '0'+ma;
+		} else {
+			mastr = ma.toString();
+		}
+		this.imgclass = 'mapAll' + mastr;
+		var src = this.mapsAll.find('img.'+this.imgclass).attr('src');
+		var re1 = src.match(/\/([^\/]+)$/);
+		if (this.orghost == null) {
+			this.orghost = RegExp.leftContext + '/';
+			//alert(this.orghost);
+		}
+		this.imgfile = RegExp.$1;
+		var re2 = this.imgfile.match(/(_r_|_t_|_v_)/);
+		if (re2 != null) {
+			this.isEnemy = true;
+			this.mid = re2[0];
+		} else {
+			this.isEnemy = false;
+		}
+	}
+	mapPoz.replaceFile = function(mid) {
+		if (this.isEnemy) {
+			if (mid == '_r_') {
+				if (mapPoz.mid != mid) {
+					var destfname = this.orghost + this.imgfile.replace(mapPoz.mid,mid);
+					this.mapsAll.find('img.'+this.imgclass).attr('src',destfname);
+				}
+			} else {
+				if (mapPoz.mid != mid) {
+					var destfname = this.imghost + this.imgfile.replace(mapPoz.mid,mid);
+					this.mapsAll.find('img.'+this.imgclass).attr('src',destfname);
+				}
+			}
+		}
+	}
+	mapPoz.repTargets = function() {		//mapのターゲット拠点の画像置換え
+		for (var x = 0;  x < mapPoz.size; x++) {
+			for (var y = 0; y < mapPoz.size; y++) {
+				mapPoz.setTarget(mapPoz.areas.eq(x*mapPoz.size + y));
+				if (mapPoz.user_name == targetEnemy) {
+					mapPoz.replaceFile('_t_');
+				} else if (mapPoz.alliance_name == targetAlli) {
+					mapPoz.replaceFile('_v_');
+				} else {
+					mapPoz.replaceFile('_r_');
+				}
+			}
+		}
+	}
+	//
+	// 婆羅門追加 end
+	//
 
 	/*
 	var setting_dialog_str = '<div id="nowLoadingContent" style="position:absolute;width:220px;height:20px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;しばらくお待ちください<br><img src="http://www.jj-midi.com/image/rel_interstitial_loading.gif"></div><DIV id="ixamoko_boxes"><DIV id="ixamoko_dialog" style="position:absolute;width:400px;height:360px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window"><B>'+TOOL_NAME+'設定</B> | <A style="color:#000;" href="#" class="close">[ 設定する ]</A><DIV style="border-top:1px solid #000;padding-top:10px;line-height:1.5em;">';
@@ -1014,6 +1166,7 @@ function Moko_main($) {
 		$('div#sideboxTop').find('div.sideBox').find('h3.sidebox_cardbg').parent().parent().remove();
 	}
 
+
 	//////////////////////
 	//地図: ★１と２だけリスト表示
 	//////////////////////
@@ -1182,6 +1335,12 @@ function Moko_main($) {
 	//////////////////////
 	function map_rightclick() {
 		if (location.pathname!="/map.php") return;
+		//
+		// ターゲット対象の敵拠点のイメージを置き換え
+		//
+		mapPoz.init();
+		mapPoz.repTargets();
+
 		if (!options['map_rightclick']) return true;
 		if (options['map_rightclick_type'] == '0') { // 地図移動
 			$('AREA[href^="/land.php"]').live('contextmenu', function(e) {
@@ -1193,12 +1352,12 @@ function Moko_main($) {
 			$(document.body).append(tmp);
 			$("#tooltip").hide().css({ position: "absolute", backgroundColor: "white", border: "solid 1px darkgray", padding: "3px", zIndex: 999});
 			$('AREA[href^="/land.php"]').live('contextmenu', function(e) {
-				openToolForMap(this, e.pageX, e.pageY);
+				openToolForMap(this, e.pageX, e.pageY, mapPoz);
 				return false;
 			});
 		}
 	}
-	function openToolForMap(target, x, y) {
+	function openToolForMap(target, x, y, mapPoz) {
 		$("#tooltip").css({ left: x + "px", top: y + "px"}).show();
 		$(document).unbind("click").one("click", function(){$("#tooltip").hide();});
 		/*
@@ -1232,14 +1391,16 @@ function Moko_main($) {
 		});
 		list_id++;
 
-		var onmouseover = $(target).attr('onmouseover').toString().match(/(?:[^'"]|\\.)*/g);
-		var user_name = unescapeUnicode(onmouseover[6]);
-		var alliance_name = unescapeUnicode(onmouseover[18]);
-		var place_name = unescapeUnicode(onmouseover[2]);
+		mapPoz.setTarget(target);
 
+		var user_name = mapPoz.user_name;
+		var alliance_name = mapPoz.alliance_name;
+		var place_name = mapPoz.place_name;
+
+		//
+		// @ 表示拠点変更
+		//
 		if (!(user_name == "　")) {
-			//
-			// @
 			var posSign = null;
 			var lnk = null;
 			var aes = $("div.sideBoxInner ul li:contains('"+ place_name + "') a");
@@ -1272,6 +1433,39 @@ function Moko_main($) {
 					location.href = lnk;
 				});
 				list_id++;
+			}
+		}
+
+		//
+		// Targetize
+		//
+		if (mapPoz.isEnemy == true) {		//敵拠点なら
+			if (mapPoz.user_name == targetEnemy) {
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵のマークをやめる</li>');
+				$('#fUnit'+list_id).hover(function() {
+					$(this).css({color:'white', 'background-color':'blue'});
+				}, function() {
+					$(this).css({color:'', 'background-color':''});
+				}).click(function(e) {
+					targetEnemy = "";
+					targetAlli  = "";
+					saveTargeties();
+					mapPoz.repTargets();
+				});
+				list_id++;				
+			} else {
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵をマークする</li>');
+				$('#fUnit'+list_id).hover(function() {
+					$(this).css({color:'white', 'background-color':'blue'});
+				}, function() {
+					$(this).css({color:'', 'background-color':''});
+				}).click(function(e) {
+					targetEnemy = mapPoz.user_name;
+					targetAlli  = mapPoz.alliance_name;
+					saveTargeties();
+					mapPoz.repTargets();
+				});
+				list_id++;				
 			}
 		}
 
@@ -1386,6 +1580,13 @@ function Moko_main($) {
 
 				delete html;
 				delete $new_map;
+				//
+				// Targetize : ターゲット対象の敵拠点のイメージを置き換え
+				//
+				mapPoz.mapContainer = $('#ig_mapbox_container');
+				mapPoz.init();
+				mapPoz.repTargets();
+
 				var basedata = $('.basename').find('LI.on > SPAN').attr('title');
 				var tmp = basedata.match(/^([^(]+)\((-?\d+),(-?\d+)\)$/);
 				if (tmp===null) {
@@ -4657,6 +4858,7 @@ function Moko_main($) {
 //---------------------------
 // 婆羅門機能追加分 ここから
 //---------------------------
+
 	var gifdoko = 'data:image/gif;base64,'+
 	'R0lGODlhNwAYAMQAAP////n5+e7u7tfX18zMzMXFxb29vbW1ta2traWlpZmZmZSUlIyMjIWFhXp6'+
 	'enNzc2tra2ZmZlpaWlFRUUpKSkJCQjk5OTMzMykpKSEhIRgYGBMTEwkJCQAAAAAAAAAAACH5BAEH'+
@@ -4932,6 +5134,7 @@ function Moko_main($) {
 	var dokoId;
 	var dokocnt;
 
+	//
 
 	//
 	// 自分の拠点のデータを元に、ixaPosの地点までのどこ近を表示します
@@ -5046,7 +5249,6 @@ function Moko_main($) {
 		var re = /(\t)\t+/mg;
 		return value.replace(re, "$1");
 	}
-
 
 //---------------------------
 // 婆羅門機能追加分 ここまで
