@@ -292,7 +292,7 @@ function Moko_main($) {
 
 	var mapPoz = new Object();
 	mapPoz.mapContainer = $('#ig_mapbox_container');
-	mapPoz.imghost = 'https://sites.google.com/site/ixamukakin/home/images/';
+	mapPoz.imghost = 'https://sites.google.com/site/ixatools/home/images/';
 	mapPoz.orghost = null;
 	mapPoz.areas;
 	mapPoz.size;	//11 | 15 | 20
