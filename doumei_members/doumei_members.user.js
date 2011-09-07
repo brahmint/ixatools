@@ -294,7 +294,8 @@ function members_main($) {
 			hrow.appendChild(hcell);
 		}
 		tblBody.appendChild(hrow);
-		
+
+		var tmp = "";
 		// creating all cells
 		for (var j = 0; j < lordarray.length; j++) {
 			// creates a table row
@@ -306,6 +307,7 @@ function members_main($) {
 					//	// node the contents of the <td>, and put the <td> at
 					//	// the end of the table row
 						var itemText = getLordItem(i, lno, lordarray[j]);
+						tmp += i + ":" + lno + ":" + j + ":"+ itemText + "\n";
 						var cellText = document.createTextNode(itemText);
 						var cell = document.createElement("td");
 						cell.appendChild(cellText);		//td要素
@@ -317,6 +319,7 @@ function members_main($) {
 				}
 			}
 		}
+		alert(tmp);
 		// put the <tbody> in the <table>
 		tbl.appendChild(tblBody);		//table要素
 	
