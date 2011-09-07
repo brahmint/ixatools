@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name		Helpme
-// @version		1.03
+// @version		1.04
 // @namespace	https://sites.google.com/site/ixamukakin/
 // @description	Helpme ver. 1.03 20110813
 // @include		http://*.sengokuixa.jp/facility/unit_status.php?dmo=enemy
@@ -17,6 +17,7 @@
 // 2011/08/13 1.03	拠点名が他の拠点名の一部の時に正しく@*が表示されない点を修正
 //					deck.php の表示をしない様に(Chromeで問題あるため）
 //					距離1.0の移動時間出力
+// 2011/09/04 1.04  複数の敵襲があったとき、異常に重くなる問題の修正
 
 // Mokoと同じjQuery初期化を使用
 function bara_addJQuery(callback) {
@@ -464,14 +465,14 @@ function helpme_main($) {
 			var spans = statuses.eq(i).find("div.ig_fight_dotbox table tr td span");
 			var mplace = trim(rmvTabs(spans.eq(6).find('a').text()));
 			//alert('mplace='+mplace+"\n"+ ">div.sideBoxInner ul li:contains('"+ mplace + "') a<");
-			if ($("div.sideBoxInner ul li.on span").text() == mplace) {
+			if ($("div.sideBoxInner.basename ul li.on span").text() == mplace) {
 				var tmp = '<span><a> * </a></span>';
 				spans.eq(6).append(tmp);
 			} else {
-				var aes = $("div.sideBoxInner ul li:contains('"+ mplace + "') a");
+				var aes = $("div.sideBoxInner.basename ul li:contains('"+ mplace + "') a");
 				//alert('aes.eq(0)='+aes.eq(0).html());
 				//alert("aes.length="+aes.length)
-				for (var i = 0; i < aes.length; i++) {
+				for (var j = 0; j < aes.length; j++) {
 					if (aes.length != 0) {
 						var href = aes.eq(0).attr('href');
 						//alert('href='+href);
@@ -482,7 +483,6 @@ function helpme_main($) {
 							var tmp = '<span><a href="' + lnk + '" title="'+ttl+'"> @ </a></span>';
 							spans.eq(6).append(tmp);
 						}
-						//alert(tmp);
 					}
 				}
 			}
