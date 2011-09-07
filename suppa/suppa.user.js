@@ -15,28 +15,61 @@
 //
 
 
-function bara_addJQuery(callback) {
-    if (typeof(unsafeWindow.tb_init)!='undefined') {
-        tb_init = unsafeWindow.tb_init;
-    }
-    
-    if (typeof(unsafeWindow.jQuery)!='undefined') {
-        jQuery = unsafeWindow.jQuery;
-        callback(unsafeWindow.jQuery);
-    } else {
-        var script = document.createElement("script");
-        script.setAttribute("src", "http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js");
-        script.addEventListener('load', function() {
-            var script = document.createElement("script");
-            script.textContent = "(" + callback.toString() + ")(jQuery);";
-            document.body.appendChild(script);
-        }, false);
-        document.body.appendChild(script);
-    }
-}
+//function bara_addJQuery(callback) {
+//    if (typeof(unsafeWindow.tb_init)!='undefined') {
+//        tb_init = unsafeWindow.tb_init;
+//    }
+//    
+//    if (typeof(unsafeWindow.jQuery)!='undefined') {
+//		var links = document.createElement('link');
+//		links.rel = 'stylesheet';
+//		links.href = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/themes/base/jquery-ui.css';
+//		document.getElementsByTagName('head')[0].appendChild(links);
+//        var script = document.createElement("script");
+//        script.setAttribute("src", "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js");
+//        document.body.appendChild(script);
+//
+//        jQuery = unsafeWindow.jQuery;
+//        callback(unsafeWindow.jQuery);
+//    } else {
+//        var script = document.createElement("script");
+//        script.setAttribute("src", "http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js");
+//        script.addEventListener('load', function() {
+//            var script = document.createElement("script");
+//            script.textContent = "(" + callback.toString() + ")(jQuery);";
+//            document.body.appendChild(script);
+//        }, false);
+//        document.body.appendChild(script);
+//    }
+//}
+//
 
 
-function suppa_main($) {
+(function (d, func) {
+    var h = d.getElementsByTagName('head')[0];
+	var links = d.createElement('link');
+	links.setAttribute("rel", "stylesheet");
+	links.setAttribute("type", "text/css");
+	links.setAttribute("href", "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/themes/base/jquery-ui.css");
+	var ui = d.createElement("script");
+	ui.setAttribute("src", "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.js");
+    var s1 = d.createElement("script");
+    s1.setAttribute("src", "http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js");
+    s1.addEventListener('load', function() {
+        var s2 = d.createElement("script");
+        s2.textContent = "jQuery.noConflict();(" + func.toString() + ")(jQuery);";
+        h.appendChild(s2);
+    }, false);
+	h.appendChild(s1);
+    h.appendChild(links);
+	h.appendChild(ui);
+})(document, function($) {
+    // ここにメインの処理を書く
+//    $('#button').click(function(){
+//        alert('clicked!');
+//    });
+
+//function suppa_main($) {
 
 	var gifsuppa = 'data:image/gif;base64,'+
 	'R0lGODlhNwAYAOYAAP////f8/O75+eX39+L19cPr673p6bLl5a3k5KTh4Zze3pXc3IvY2IPW1nzT'+
@@ -398,7 +431,7 @@ function suppa_main($) {
 								//alert("Msg:"+msg);
 							},
 							error: function (XMLHttpRequest, textStatus, errorThrown) {
-								alert('$.ajaxcountStdby() pg2 error');
+								alert('$.ajax countStdby() pg2 error');
 								//console.log(textStatus);
 							}
 						});	
@@ -641,6 +674,7 @@ function suppa_main($) {
 	function setbutton() {
 		var tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_suppa"><img src="' + gifsuppa + '" alt="数把" style="position: relative; top: 0px; left: -10px"></a>';
 		$('div.ig_decksection_top').append(tmp);
+		
 	}
 
 
@@ -650,8 +684,9 @@ function suppa_main($) {
 
 	setbutton();	//ボタンの表示
 
+
 	$('#do_suppa').live('click',function() {
-		if (suppajob) return;		//実行中はなにもしない
+		if (suppajob) return false;		//実行中はなにもしない
 		suppajob  = true;
 		rdysold   = false;		//
 		rdydeck   = false;
@@ -676,12 +711,13 @@ function suppa_main($) {
 		countStdby();		//兵士編成100件x2頁で数える
 		//alert('countStdby() done');
 
-		setViser(1000);
+		setViser(250);
 		//calc_dokochika();
 		//setTimeout(calc_dokochika, 10);
+		return false;
 	});
 
-}
+});
 
 
-bara_addJQuery(suppa_main);
+//bara_addJQuery(suppa_main);
