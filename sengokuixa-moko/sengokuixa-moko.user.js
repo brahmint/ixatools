@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110905
+// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110912
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -55,6 +55,8 @@
 // ・JQueryライブラリを使用してソースをコンパクトに
 // ・部隊編成画面で部隊スキル窓移動 20110901
 // ・マークした敵の拠点を地図上で表示 20110905
+// ・永劫の秘境の全部隊出発対応 20110912
+// ・右クリックメニューへプロフィール・同盟情報・出撃追加
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -292,38 +294,22 @@ function Moko_main($) {
 	var targetEnemy;		//ターゲット相手
 	var targetAlli;			//ターゲット同盟
 
-	try {
-		targetEnemy = GM_getValue('targetenemy',null);
-	} catch (e) {
-		targetEnemy = window.localStorage.getItem('targetenemy');
-	}
+	targetEnemy = window.localStorage.getItem('targetenemy');
 	if (targetEnemy == null) targetEnemy = "";
 	
-	try {
-		targetAlli = GM_getValue('targetalli',null);
-	} catch (e) {
-		targetAlli = window.localStorage.getItem('targetalli');
-	}
+	targetAlli = window.localStorage.getItem('targetalli');
 	if (targetAlli == null) targetAlli = "";
 
 	function saveTargeties() {
 		try {
-			setTimeout(function() { GM_setValue('targetenemy',targetEnemy); }, 0);
+			window.localStorage.setItem('targetenemy',targetEnemy);
 		} catch (e) {
-			try {
-				window.localStorage.setItem('targetenemy',targetEnemy);   // Chrome用
-			} catch (e) {
-				alert("cannot setItem('targetenemy,'"+ targetEnemy + ")");   
-			}
+			alert("cannot setItem('targetenemy,'"+ targetEnemy + ")");   
 		}
 		try {
-			setTimeout(function() { GM_setValue('targetalli',targetAlli); }, 0);
+			window.localStorage.setItem('targetalli',targetAlli);
 		} catch (e) {
-			try {
-				window.localStorage.setItem('targetalli',targetAlli);    // Chrome用
-			} catch (e) {
-				alert("cannot setItem('targetalli,'"+ targetAlli + ")");
-			}
+			alert("cannot setItem('targetalli,'"+ targetAlli + ")");
 		}
 	}
 
@@ -1166,7 +1152,6 @@ function Moko_main($) {
 		$('div#sideboxTop').find('div.sideBox').find('h3.sidebox_cardbg').parent().parent().remove();
 	}
 
-
 	//////////////////////
 	//地図: ★１と２だけリスト表示
 	//////////////////////
@@ -1350,7 +1335,7 @@ function Moko_main($) {
 		} else if (options['map_rightclick_type'] == '1') {  // コンテキストメニュー
 			var tmp = '<div id="tooltip"><ul id="cm_mapItem" style="text-align:left"></ul></div>';
 			$(document.body).append(tmp);
-			$("#tooltip").hide().css({ position: "absolute", backgroundColor: "white", border: "solid 1px darkgray", padding: "3px", zIndex: 999});
+			$("#tooltip").hide().css({ position: "absolute", backgroundColor: "white", border: "solid 1px darkgray", padding: "3px", zIndex: 1001});
 			$('AREA[href^="/land.php"]').live('contextmenu', function(e) {
 				openToolForMap(this, e.pageX, e.pageY, mapPoz);
 				return false;
@@ -1436,41 +1421,24 @@ function Moko_main($) {
 			}
 		}
 
-		//
-		// Targetize
-		//
-		if (mapPoz.isEnemy == true) {		//敵拠点なら
-			if (mapPoz.user_name == targetEnemy) {
-				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵のマークをやめる</li>');
-				$('#fUnit'+list_id).hover(function() {
-					$(this).css({color:'white', 'background-color':'blue'});
-				}, function() {
-					$(this).css({color:'', 'background-color':''});
-				}).click(function(e) {
-					targetEnemy = "";
-					targetAlli  = "";
-					saveTargeties();
-					mapPoz.repTargets();
-				});
-				list_id++;				
-			} else {
-				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵をマークする</li>');
-				$('#fUnit'+list_id).hover(function() {
-					$(this).css({color:'white', 'background-color':'blue'});
-				}, function() {
-					$(this).css({color:'', 'background-color':''});
-				}).click(function(e) {
-					targetEnemy = mapPoz.user_name;
-					targetAlli  = mapPoz.alliance_name;
-					saveTargeties();
-					mapPoz.repTargets();
-				});
-				list_id++;				
-			}
-		}
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+		list_id++;
+		// 部隊出陣
+		var posStr=$(target).attr('href').replace(/\/land\.php\?/,'');
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="出陣" style="color:black; padding:0px 10px; cursor:default">ここへ部隊出陣</li>');
+        $('#fUnit'+list_id).hover(function() {
+            $(this).css({color:'white', 'background-color':'blue'});
+        }, function() {
+            $(this).css({color:'', 'background-color':''});
+        }).click(function(e) {
+            location.href='/facility/send_troop.php?'+posStr;
+        });
+		list_id++;
 
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+		list_id++;
 		// 拠点報告書
-		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">拠点報告書</li>');
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="拠点報告書" style="color:black; padding:0px 10px; cursor:default">拠点報告書</li>');
 		$('#fUnit'+list_id).hover(function() {
 			$(this).css({color:'white', 'background-color':'blue'});
 		}, function() {
@@ -1481,8 +1449,7 @@ function Moko_main($) {
 		});
 		list_id++;
 
-		if (user_name == "　") return;
-
+		if (user_name == "　") return;		//空き地ならここまで、以下は拠点
 		//
 		//
 		// 城主報告書
@@ -1504,6 +1471,9 @@ function Moko_main($) {
 		}).click(function(e) {
 			location.href='/war/list.php?m=&s=1&name=alliance&word='+$(this).attr('name')+'&coord=map&x=&y=';
 		});
+		list_id++;
+		//
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
 		list_id++;
 		// 城主合戦格付
 		// 敵国の格付はそのままではでない。攻撃国、防御国、援軍国ボタンを押す…
@@ -1552,6 +1522,90 @@ function Moko_main($) {
 			location.href='/alliance/list.php?m=&find_rank=&find_name=' + $(this).attr('name') + '&c=0';
 		});
 		list_id++;
+		if ($('li#lordName').text() != user_name) {
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+			list_id++;
+			// プロフィール
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="プロフィール" style="color:black; padding:0px 10px; cursor:default">プロフィール</li>');
+			$('#fUnit'+list_id).hover(function() {
+				$(this).css({color:'white', 'background-color':'blue'});
+			}, function() {
+				$(this).css({color:'', 'background-color':''});
+			}).click(function(e) {
+				//location.href=profUrl($(target).attr('href'));
+				$.ajax({
+					type: "POST",
+					url: $(target).attr('href'),
+					cache: false, 
+					dataType: "text",
+					success: function (html){
+						var profUrl = $(html).find('div.ig_mappanel_dataarea a').eq(0).attr('href');
+						location.href=profUrl;
+					},
+					error: function (XMLHttpRequest, textStatus, errorThrown) {
+						//console.log(textStatus);
+					}
+				});
+			});
+			list_id++;
+			// 同盟情報
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="プロフィール" style="color:black; padding:0px 10px; cursor:default">同盟情報</li>');
+			$('#fUnit'+list_id).hover(function() {
+				$(this).css({color:'white', 'background-color':'blue'});
+			}, function() {
+				$(this).css({color:'', 'background-color':''});
+			}).click(function(e) {
+				//location.href=profUrl($(target).attr('href'));
+				$.ajax({
+					type: "POST",
+					url: $(target).attr('href'),
+					cache: false, 
+					dataType: "text",
+					success: function (html){
+						var alliUrl = $(html).find('div.ig_mappanel_dataarea a').eq(1).attr('href');
+						location.href=alliUrl;
+					},
+					error: function (XMLHttpRequest, textStatus, errorThrown) {
+						//console.log(textStatus);
+					}
+				});
+			});
+			list_id++;
+		}
+		//
+		// Targetize
+		//
+		if (mapPoz.isEnemy == true) {		//敵拠点なら
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">----------</li>');
+			list_id++;
+			if (mapPoz.user_name == targetEnemy) {
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵のマークをやめる</li>');
+				$('#fUnit'+list_id).hover(function() {
+					$(this).css({color:'white', 'background-color':'blue'});
+				}, function() {
+					$(this).css({color:'', 'background-color':''});
+				}).click(function(e) {
+					targetEnemy = "";
+					targetAlli  = "";
+					saveTargeties();
+					mapPoz.repTargets();
+				});
+				list_id++;				
+			} else {
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵をマークする</li>');
+				$('#fUnit'+list_id).hover(function() {
+					$(this).css({color:'white', 'background-color':'blue'});
+				}, function() {
+					$(this).css({color:'', 'background-color':''});
+				}).click(function(e) {
+					targetEnemy = mapPoz.user_name;
+					targetAlli  = mapPoz.alliance_name;
+					saveTargeties();
+					mapPoz.repTargets();
+				});
+				list_id++;				
+			}
+		}
 	}
 
 	function map_move_ajax(area) {
@@ -2562,7 +2616,14 @@ function Moko_main($) {
 	//秘境探索：デフォでチェックが入っている、出発ボタンを上にも
 	//////////////////////
 	function dungeon_check() {
-		if(location.pathname != "/facility/dungeon.php") return;
+		var dungeonNo;
+		if(location.pathname == "/facility/dungeon.php") {
+			dungeonNo = 1;
+		} else if (location.pathname == "/facility/dungeon02.php") {
+			dungeonNo = 2;
+		} else {
+			return;
+		}
 		
 		if (options['hikyou']) {
 			var tmp = $('INPUT[name="unit_select"]:first').attr('checked', true);
@@ -2571,19 +2632,31 @@ function Moko_main($) {
 				$('#dungeon_list_body').after(dungeon_btn);
 			}
 		}
-		// change start 探索選択先の記録/復元
-//		$('INPUT[name="dungeon_select"][value="'+options['hikyou_where']+'"]').attr('checked', true);
 		var idx = localStorage.getItem(location.hostname + 'dungeon_idx');
+		var realidx;
 
 		if (idx!=null) {
-			$('INPUT[name="dungeon_select"][value="'+idx+'"]').attr('checked', true);
+			if (dungeonNo == 1) {
+				realidx = Number(idx) % 100;
+			} else {
+				realidx = Number(idx) - (Number(idx) % 100);
+			}
+			$('INPUT[name="dungeon_select"][value="'+realidx+'"]').attr('checked', true);
 		}
 		$('INPUT[name="dungeon_select"]').change(
 			function() {
-				localStorage.setItem(location.hostname + 'dungeon_idx', $('INPUT[name="dungeon_select"]:checked').val());
+				var nowval = Number($('INPUT[name="dungeon_select"]:checked').val());
+				var savedidx = localStorage.getItem(location.hostname + 'dungeon_idx');
+				if (savedidx!=null) {
+					if (nowval < 100) {
+						nowval += Number(savedidx) - (Number(savedidx) % 100);
+					} else {
+						nowval += Number(savedidx) % 100;
+					}
+					
+				}
+				localStorage.setItem(location.hostname + 'dungeon_idx', nowval.toString());
 			}, false);
-		// change end
-
 		if (options['hikyou_all']) {
 			/*
 			var tmp = '<a href="javascript:void(0)" onclick="return false;" id="send_all"><img src="http://www.jj-midi.com/image/btn_all_departure.png" alt="全部隊出発"></a>';
@@ -2598,16 +2671,22 @@ function Moko_main($) {
 					unit_array[i] = $(this).attr('value');
 					i++;
 				});
-				send_all_hikyo(unit_array,0,$('INPUT[name="dungeon_select"]:checked').val());
+				send_all_hikyo(unit_array,0,$('INPUT[name="dungeon_select"]:checked').val(),dungeonNo);
 				$('.btnarea').remove();
 				$('.center').remove();
 			});
 		}
 	}
 
-	function send_all_hikyo(unit_array,i,d_select) {
+	function send_all_hikyo(unit_array,i,d_select, dungeonType) {
+		var dungeonUrl;
+		if (dungeonType == 1) {
+			dungeonUrl = '/facility/dungeon.php';
+		} else {
+			dungeonUrl = '/facility/dungeon02.php';
+		}
 		if(unit_array.length <= i) {
-			location.href='/facility/dungeon.php';
+			location.href=dungeonUrl;
 			return;
 		}
 		var dungeon_select = d_select
@@ -2615,12 +2694,12 @@ function Moko_main($) {
 		var data = {dungeon_select:dungeon_select,unit_select:unit_select,btn_send:true};
 		$.ajax({
 				type: "POST",
-				url: '/facility/dungeon.php',
+				url: dungeonUrl,
 				data:data,
 				cache: false,
 				success: function (html){
 					i++;
-					send_all_hikyo(unit_array,i,d_select);
+					send_all_hikyo(unit_array,i,d_select, dungeonType);
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
 					//console.log(textStatus);
