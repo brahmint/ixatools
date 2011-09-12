@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110905
+// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110912
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -48,6 +48,8 @@
 // ・移動中の時の表示拠点並び替えがされない問題の修正
 // ・部隊編成画面で部隊スキル窓移動 20110901
 // ・マークした敵の拠点を地図上で表示 20110905
+// ・永劫の秘境の全部隊出発対応 20110912
+// ・右クリックメニューへプロフィール・同盟情報・出撃追加
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -121,8 +123,8 @@ function Moko_main($) {
 		//hikyou_where:   {tag: 'dungeon', caption: '秘境の自動選択'},  //del
 		map_starx: {tag: 'map', caption: '☆リスト表示'},
 		map_reg: {tag: 'map', caption: '座標記録リスト表示'},
-		map_rightclick: {tag: 'map', caption: '右クリックで地図移動'},
-		map_rightclick_type: {tag: 'map', caption: '地図上での右クリック挙動のタイプ'},	//110813追加
+		map_rightclick: {tag: 'map', caption: '地図上での右クリック挙動'},
+		map_rightclick_type: {tag: 'map', caption: '地図上での右クリック挙動のタイプ'},
 		map_butai_status: {tag: 'map', caption: '部隊行動状況を表示'},
 		all_map_status: {tag: 'map', caption: '戦況マップを表示'},
 		map_rightdblclick: {tag: 'map', caption: 'ダブルクリックで対象の合戦報告書を表示'},
@@ -279,12 +281,12 @@ function Moko_main($) {
 
 	function saveTargeties() {
 		try {
-			window.localStorage.setItem('targetenemy',targetEnemy);   // Chrome用
+			window.localStorage.setItem('targetenemy',targetEnemy);
 		} catch (e) {
 			alert("cannot setItem('targetenemy,'"+ targetEnemy + ")");   
 		}
 		try {
-			window.localStorage.setItem('targetalli',targetAlli);    // Chrome用
+			window.localStorage.setItem('targetalli',targetAlli);
 		} catch (e) {
 			alert("cannot setItem('targetalli,'"+ targetAlli + ")");
 		}
@@ -449,7 +451,7 @@ function Moko_main($) {
 					} else if (key=='pulldown_menu') {
 						options[key] = false;
 					// change end
-					} else if (key=='map_rightclick_type') {		//110813追加
+					} else if (key=='map_rightclick_type') {
 						options[key] = 1;
 					} else if (key=='map_starx') {
 						options[key] = 2;
@@ -1291,27 +1293,6 @@ function Moko_main($) {
 						   });
 	}
 
-//	 //////////////////////
-//	 //地図: 右クリックで移動
-//	 //////////////////////
-//	function map_rightclick() {
-//		if (typeof(this.ajflag)=='undeifned') {
-//			this.ajflag = true;
-//		}
-//		if (location.pathname!="/map.php") return;
-//		$('AREA[href^="/land.php"]').live('contextmenu', function(e) {
-//			if (map_rightclick.ajflag) {
-//				return false;
-//			}
-//			if (!options['map_rightclick']) return true;
-//			map_rightclick.ajflag  = true;
-//			
-//			var $this = $(this);
-//			var tmp = $this.attr('href').match(/land\.php\?(.+)$/);
-//			if (tmp===null) {
-//				map_rightclick.ajflag = false;
-//				return true;
-//			}
 	//////////////////////
 	//地図: 右クリック挙動設定
 	//////////////////////
@@ -1332,7 +1313,7 @@ function Moko_main($) {
 		} else if (options['map_rightclick_type'] == '1') {  // コンテキストメニュー
 			var tmp = '<div id="tooltip"><ul id="cm_mapItem" style="text-align:left"></ul></div>';
 			$(document.body).append(tmp);
-			$("#tooltip").hide().css({ position: "absolute", backgroundColor: "white", border: "solid 1px darkgray", padding: "3px", zIndex: 999});
+			$("#tooltip").hide().css({ position: "absolute", backgroundColor: "white", border: "solid 1px darkgray", padding: "3px", zIndex: 1001});
 			$('AREA[href^="/land.php"]').live('contextmenu', function(e) {
 				openToolForMap(this, e.pageX, e.pageY, mapPoz);
 				return false;
@@ -1379,9 +1360,10 @@ function Moko_main($) {
 		var alliance_name = mapPoz.alliance_name;
 		var place_name = mapPoz.place_name;
 
+		//
+		// @ 表示拠点変更
+		//
 		if (!(user_name == "　")) {
-			//
-			// @
 			var posSign = null;
 			var lnk = null;
 			var aes = $("div.sideBoxInner ul li:contains('"+ place_name + "') a");
@@ -1405,7 +1387,7 @@ function Moko_main($) {
 				}
 			}
 			if (posSign != null) {
-				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">'+ posSign + '</li>');
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="text-align:center; color:black; padding:0px 10px; cursor:default">'+ posSign + '</li>');
 				$('#fUnit'+list_id).hover(function() {
 					$(this).css({color:'white', 'background-color':'blue'});
 				}, function() {
@@ -1417,41 +1399,24 @@ function Moko_main($) {
 			}
 		}
 
-		//
-		// Targetize
-		//
-		if (mapPoz.isEnemy == true) {		//敵拠点なら
-			if (mapPoz.user_name == targetEnemy) {
-				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵のマークをやめる</li>');
-				$('#fUnit'+list_id).hover(function() {
-					$(this).css({color:'white', 'background-color':'blue'});
-				}, function() {
-					$(this).css({color:'', 'background-color':''});
-				}).click(function(e) {
-					targetEnemy = "";
-					targetAlli  = "";
-					saveTargeties();
-					mapPoz.repTargets();
-				});
-				list_id++;				
-			} else {
-				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵をマークする</li>');
-				$('#fUnit'+list_id).hover(function() {
-					$(this).css({color:'white', 'background-color':'blue'});
-				}, function() {
-					$(this).css({color:'', 'background-color':''});
-				}).click(function(e) {
-					targetEnemy = mapPoz.user_name;
-					targetAlli  = mapPoz.alliance_name;
-					saveTargeties();
-					mapPoz.repTargets();
-				});
-				list_id++;				
-			}
-		}
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+		list_id++;
+		// 部隊出陣
+		var posStr=$(target).attr('href').replace(/\/land\.php\?/,'');
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="出陣" style="color:black; padding:0px 10px; cursor:default">ここへ部隊出陣</li>');
+        $('#fUnit'+list_id).hover(function() {
+            $(this).css({color:'white', 'background-color':'blue'});
+        }, function() {
+            $(this).css({color:'', 'background-color':''});
+        }).click(function(e) {
+            location.href='/facility/send_troop.php?'+posStr;
+        });
+		list_id++;
 
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+		list_id++;
 		// 拠点報告書
-		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">拠点報告書</li>');
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="拠点報告書" style="color:black; padding:0px 10px; cursor:default">拠点報告書</li>');
 		$('#fUnit'+list_id).hover(function() {
 			$(this).css({color:'white', 'background-color':'blue'});
 		}, function() {
@@ -1462,8 +1427,7 @@ function Moko_main($) {
 		});
 		list_id++;
 
-		if (user_name == "　") return;
-
+		if (user_name == "　") return;		//空き地ならここまで、以下は拠点
 		//
 		//
 		// 城主報告書
@@ -1485,6 +1449,9 @@ function Moko_main($) {
 		}).click(function(e) {
 			location.href='/war/list.php?m=&s=1&name=alliance&word='+$(this).attr('name')+'&coord=map&x=&y=';
 		});
+		list_id++;
+		//
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
 		list_id++;
 		// 城主合戦格付
 		// 敵国の格付はそのままではでない。攻撃国、防御国、援軍国ボタンを押す…
@@ -1533,6 +1500,90 @@ function Moko_main($) {
 			location.href='/alliance/list.php?m=&find_rank=&find_name=' + $(this).attr('name') + '&c=0';
 		});
 		list_id++;
+		if ($('li#lordName').text() != user_name) {
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+			list_id++;
+			// プロフィール
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="プロフィール" style="color:black; padding:0px 10px; cursor:default">プロフィール</li>');
+			$('#fUnit'+list_id).hover(function() {
+				$(this).css({color:'white', 'background-color':'blue'});
+			}, function() {
+				$(this).css({color:'', 'background-color':''});
+			}).click(function(e) {
+				//location.href=profUrl($(target).attr('href'));
+				$.ajax({
+					type: "POST",
+					url: $(target).attr('href'),
+					cache: false, 
+					dataType: "text",
+					success: function (html){
+						var profUrl = $(html).find('div.ig_mappanel_dataarea a').eq(0).attr('href');
+						location.href=profUrl;
+					},
+					error: function (XMLHttpRequest, textStatus, errorThrown) {
+						//console.log(textStatus);
+					}
+				});
+			});
+			list_id++;
+			// 同盟情報
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="プロフィール" style="color:black; padding:0px 10px; cursor:default">同盟情報</li>');
+			$('#fUnit'+list_id).hover(function() {
+				$(this).css({color:'white', 'background-color':'blue'});
+			}, function() {
+				$(this).css({color:'', 'background-color':''});
+			}).click(function(e) {
+				//location.href=profUrl($(target).attr('href'));
+				$.ajax({
+					type: "POST",
+					url: $(target).attr('href'),
+					cache: false, 
+					dataType: "text",
+					success: function (html){
+						var alliUrl = $(html).find('div.ig_mappanel_dataarea a').eq(1).attr('href');
+						location.href=alliUrl;
+					},
+					error: function (XMLHttpRequest, textStatus, errorThrown) {
+						//console.log(textStatus);
+					}
+				});
+			});
+			list_id++;
+		}
+		//
+		// Targetize
+		//
+		if (mapPoz.isEnemy == true) {		//敵拠点なら
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+			list_id++;
+			if (mapPoz.user_name == targetEnemy) {
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵のマークをやめる</li>');
+				$('#fUnit'+list_id).hover(function() {
+					$(this).css({color:'white', 'background-color':'blue'});
+				}, function() {
+					$(this).css({color:'', 'background-color':''});
+				}).click(function(e) {
+					targetEnemy = "";
+					targetAlli  = "";
+					saveTargeties();
+					mapPoz.repTargets();
+				});
+				list_id++;				
+			} else {
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵をマークする</li>');
+				$('#fUnit'+list_id).hover(function() {
+					$(this).css({color:'white', 'background-color':'blue'});
+				}, function() {
+					$(this).css({color:'', 'background-color':''});
+				}).click(function(e) {
+					targetEnemy = mapPoz.user_name;
+					targetAlli  = mapPoz.alliance_name;
+					saveTargeties();
+					mapPoz.repTargets();
+				});
+				list_id++;				
+			}
+		}
 	}
 
 	function map_move_ajax(area) {
@@ -1551,56 +1602,50 @@ function Moko_main($) {
 			return true;
 		}
 
-			$.ajax({
-				url: '/map.php?'+tmp[1], 
-				cache: false, 
-				dataType: "text",
-				success: function (html){
-					var $new_map = $(html).find('#ig_mapbox_container');
-					$('#ig_mapbox_container').replaceWith($new_map);
-					
-					delete html;
-					delete $new_map;
-					//
-					// Targetize : ターゲット対象の敵拠点のイメージを置き換え
-					//
-					mapPoz.mapContainer = $('#ig_mapbox_container');
-					mapPoz.init();
-					mapPoz.repTargets();
+		$.ajax({
+			url: '/map.php?'+tmp[1], 
+			cache: false, 
+			dataType: "text",
+			success: function (html){
+				var $new_map = $(html).find('#ig_mapbox_container');
+				$('#ig_mapbox_container').replaceWith($new_map);
+				
+				delete html;
+				delete $new_map;
+				//
+				// Targetize : ターゲット対象の敵拠点のイメージを置き換え
+				//
+				mapPoz.mapContainer = $('#ig_mapbox_container');
+				mapPoz.init();
+				mapPoz.repTargets();
 
-					var basedata = $('.basename').find('LI.on > SPAN').attr('title');
-					var tmp = basedata.match(/^([^(]+)\((-?\d+),(-?\d+)\)$/);
-					if (tmp===null) {
-						//map_rightclick.ajflag = false;
-						map_move_ajax.ajflag = false;
-						return;
-					}
-					var base_name = tmp[0];
-					var base_x = parseInt(tmp[2]);
-					var base_y = parseInt(tmp[3]);
-					if (options['map_starx']) {
-						map_list2(base_x, base_y, base_name);
-					}
-					//map_rightclick.ajflag = false;
-					map_rightdblclick();
-					if (options['prohibitionArea']) {
-						prohibitionArea();
-					}
-					if(options['zoomMap']) {
-						zoomMap();
-					}
+				var basedata = $('.basename').find('LI.on > SPAN').attr('title');
+				var tmp = basedata.match(/^([^(]+)\((-?\d+),(-?\d+)\)$/);
+				if (tmp===null) {
 					map_move_ajax.ajflag = false;
-				},
-				error: function (XMLHttpRequest, textStatus, errorThrown) {
-					//map_rightclick.ajflag = false;
-					map_move_ajax.ajflag = false;
-					//console.log(textStatus);
+					return;
 				}
-			});
-			//return false;
-			this.ajflag = false;
-		//});
-		//map_rightclick.ajflag = false;
+				var base_name = tmp[0];
+				var base_x = parseInt(tmp[2]);
+				var base_y = parseInt(tmp[3]);
+				if (options['map_starx']) {
+					map_list2(base_x, base_y, base_name);
+				}
+				map_rightdblclick();
+				if (options['prohibitionArea']) {
+					prohibitionArea();
+				}
+				if(options['zoomMap']) {
+					zoomMap();
+				}
+				map_move_ajax.ajflag = false;
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				map_move_ajax.ajflag = false;
+				//console.log(textStatus);
+			}
+		});
+		this.ajflag = false;
 	}
 
 	function get_map_status(k,i,x,y) {
@@ -2170,7 +2215,7 @@ function Moko_main($) {
 			facility_list = secureEvalJSON(localStorage.getItem("facility_list"));
 		}
 
-		var moko_tmp = ''
+		var moko_tmp = '';
 		for (var code in facility_list) {
 			var mname = facility_list[code];
 			var tmp = code.match(/(\d+)\(([-]*\d+),([-]*\d+)\)/);
@@ -2546,7 +2591,14 @@ function Moko_main($) {
 	//秘境探索：デフォでチェックが入っている、出発ボタンを上にも
 	//////////////////////
 	function dungeon_check() {
-		if(location.pathname != "/facility/dungeon.php") return;
+		var dungeonNo;
+		if(location.pathname == "/facility/dungeon.php") {
+			dungeonNo = 1;
+		} else if (location.pathname == "/facility/dungeon02.php") {
+			dungeonNo = 2;
+		} else {
+			return;
+		}
 		
 		if (options['hikyou']) {
 			var tmp = $('INPUT[name="unit_select"]:first').attr('checked', true);
@@ -2555,19 +2607,31 @@ function Moko_main($) {
 				$('#dungeon_list_body').after(dungeon_btn);
 			}
 		}
-		// change start 探索選択先の記録/復元
-//		$('INPUT[name="dungeon_select"][value="'+options['hikyou_where']+'"]').attr('checked', true);
 		var idx = localStorage.getItem(location.hostname + 'dungeon_idx');
+		var realidx;
 
 		if (idx!=null) {
-			$('INPUT[name="dungeon_select"][value="'+idx+'"]').attr('checked', true);
+			if (dungeonNo == 1) {
+				realidx = Number(idx) % 100;
+			} else {
+				realidx = Number(idx) - (Number(idx) % 100);
+			}
+			$('INPUT[name="dungeon_select"][value="'+realidx+'"]').attr('checked', true);
 		}
 		$('INPUT[name="dungeon_select"]').change(
 			function() {
-				localStorage.setItem(location.hostname + 'dungeon_idx', $('INPUT[name="dungeon_select"]:checked').val());
+				var nowval = Number($('INPUT[name="dungeon_select"]:checked').val());
+				var savedidx = localStorage.getItem(location.hostname + 'dungeon_idx');
+				if (savedidx!=null) {
+					if (nowval < 100) {
+						nowval += Number(savedidx) - (Number(savedidx) % 100);
+					} else {
+						nowval += Number(savedidx) % 100;
+					}
+					
+				}
+				localStorage.setItem(location.hostname + 'dungeon_idx', nowval.toString());
 			}, false);
-		// change end
-
 		if (options['hikyou_all']) {
 			/*
 			var tmp = '<a href="javascript:void(0)" onclick="return false;" id="send_all"><img src="http://www.jj-midi.com/image/btn_all_departure.png" alt="全部隊出発"></a>';
@@ -2582,16 +2646,22 @@ function Moko_main($) {
 					unit_array[i] = $(this).attr('value');
 					i++;
 				});
-				send_all_hikyo(unit_array,0,$('INPUT[name="dungeon_select"]:checked').val());
+				send_all_hikyo(unit_array,0,$('INPUT[name="dungeon_select"]:checked').val(),dungeonNo);
 				$('.btnarea').remove();
 				$('.center').remove();
 			});
 		}
 	}
 
-	function send_all_hikyo(unit_array,i,d_select) {
+	function send_all_hikyo(unit_array,i,d_select, dungeonType) {
+		var dungeonUrl;
+		if (dungeonType == 1) {
+			dungeonUrl = '/facility/dungeon.php';
+		} else {
+			dungeonUrl = '/facility/dungeon02.php';
+		}
 		if(unit_array.length <= i) {
-			location.href='/facility/dungeon.php';
+			location.href=dungeonUrl;
 			return;
 		}
 		var dungeon_select = d_select
@@ -2599,12 +2669,12 @@ function Moko_main($) {
 		var data = {dungeon_select:dungeon_select,unit_select:unit_select,btn_send:true};
 		$.ajax({
 				type: "POST",
-				url: '/facility/dungeon.php',
+				url: dungeonUrl,
 				data:data,
 				cache: false,
 				success: function (html){
 					i++;
-					send_all_hikyo(unit_array,i,d_select);
+					send_all_hikyo(unit_array,i,d_select, dungeonType);
 				},
 				error: function (XMLHttpRequest, textStatus, errorThrown) {
 					//console.log(textStatus);
@@ -5051,11 +5121,6 @@ function Moko_main($) {
 			//	alert("error i="+i + "\nterridata.length="+teridata.length);
 			//}
 		}
-		//var pmsg = "";
-		//for (var i = 0; i < dnmin.length; i++) {
-		//	pmsg += "i:"+i+" "+num2diststr(dnmin[i])+","+dnorm[i]+"  "+num2diststr(dfmin[i])+","+dfall[i]+" "+num2diststr(dlmin[i])+","+dland[i]+"\n";
-		//}
-		//alert(pmsg);
 		for (var i=1; i < dnmin.length; i++) {
 			if (dnmin[i] > 10 && dnmin[i] > dnmin[0]*1.25) {
 				dnmin[i] = 999;
@@ -5148,12 +5213,12 @@ function Moko_main($) {
 											clearInterval(dokoId);
 											showAdvice();
 											dokojob = false;
-										} else if ( dokocnt > 30 ) {
+										} else if ( dokocnt > 60 ) {
 											clearInterval(dokoId);
 											dokojob = false;
 										}
 										dokocnt;
-									}, 1000);
+									}, 500);
 		} else {
 			alert("ここはどこ？");
 		}
