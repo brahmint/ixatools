@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name		Jintory
-// @version		1.5
-// @namespace	https://sites.google.com/site/ixamukakin/
-// @description	Jintory ver. 1.5 20110815
+// @version		1.45
+// @namespace	https://sites.google.com/site/ixatools/
+// @description	Jintory ver. 1.45 20110914
 // @include		http://*.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=new
 // @match		http://*.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=new
 // @include		http://*.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=&p=1#ptop
 // @match		http://*.sengokuixa.jp/bbs/res_view.php?thread_id=*&m=&p=1#ptop
-// @include		http://*.sengokuixa.jp/bbs/res_view.php?p=*&thread_id=*
+// @include		http://*.sengokuixa.jp/bbs/res_view.php?p=1&thread_id=*
 // @match		http://*.sengokuixa.jp/bbs/res_view.php?p=1&thread_id=*
 // @include		http://*.sengokuixa.jp/user/
 // @include		http://*.sengokuixa.jp/user/#ptop
@@ -38,9 +38,7 @@
 //					Intervalタイマー 3000→1000
 // 2011/07/03 1.44	メンバ名変更(name→lord)の確認ミス
 //					プロフィール設定値をプロフィールから消した時の処理
-//					w213以外の鯖にも対応
-// 2011/08/15 1.5	jQueryライブラリに変更
-//					複数メッセージに対応
+// 2011/09/14 1.45	w213以外の鯖にも対応,FirefoxでGM_getValue,GM_setValueからぉかｌStorageへ
 
 // Mokoと同じjQuery初期化を使用
 function bara_addJQuery(callback) {
@@ -68,31 +66,20 @@ function bara_addJQuery(callback) {
 //
 
 function jintory_main($) {
-
-	var locationhost = "w213.sengokuixa.jp";		// w213専用
-
+	var re = document.location.toString().match(/\/\/([^\/]+)\//);
+	var locationhost = RegExp.$1;
 	var lordname = $('li#lordName').text();
 	var shortlord;
 	var jintorymode;
 
-	try {
-		shortlord = GM_getValue('shortlord',null);
-	} catch (e) {
-		shortlord = window.localStorage.getItem('shortlord');
-	}
+	shortlord = window.localStorage.getItem('shortlord');
 	if (shortlord == null) shortlord = "";
 
-	try {
-		jintorymode = GM_getValue('jintorymode',null);
-	} catch (e) {
-		jintorymode = window.localStorage.getItem('jintorymode');
-	}
+	jintorymode = window.localStorage.getItem('jintorymode');
 	if (jintorymode == null) jintorymode = "";
 
 	//alert('lordname='+lordname+'\n'+'shortlord='+shortlord+'\n'+'jintorymode='+jintorymode);
 	
-	var threadname = $('div.ig_decksection_top').text();
-
 	var JintoryData = function( placename, pos, lord, frompos, fromlord, fromname, time, ext ) {
 		this.placename = placename;	//場所名
 		this.pos       = pos;		//座標
@@ -143,11 +130,13 @@ function jintory_main($) {
 	if (document.URL.match(/\/user\/(#ptop)?$/)) {    //プロフィール頁なら
 		// プロフィール頁からオプション取得・設定
 		checkUsersProfile();
-	} else {
+	} else {		//掲示板なら
+		var threadname = $('div.ig_decksection_top').text();
 		//alert('threadname='+threadname);
 		if (threadname.match("^陣張り")) {
 			//alert('陣張り');
 			if (document.body.innerHTML.match(/dmo=sortie/)) {		//攻撃中なら
+				//alert('http://' + locationhost + '/facility/unit_status.php?dmo=sortie');
 				pickKougekiData('http://' + locationhost + '/facility/unit_status.php?dmo=sortie');  	//攻撃中
 				setKougekiViser( 100 );
 			}
@@ -272,30 +261,31 @@ function jintory_main($) {
 	// places にデータが入る
 	// msgno に掲示板のメッセージ番号
 	function pickBoardDatas() {
-		var tds = $('div.chat_spacebottom table.chat_spacetable tr td');
-		var tdcount = tds.length / 4;
+		//var tds = $('div.chat_spacebottom table.chat_spacetable tr td');
+		//var tdcount = tds.length / 4 - 1;
+		var tbls = getClassTags(document.body.innerHTML,"table","chat_spacetable");
 		var found = -1;
-		if (tdcount > 0) {
-			for (var i = 1; i < tdcount; i++) {
-				if ("削除" != tds.eq(4*i + 1).text()) {
-					var s = tds.eq(4*i + 2).text();
-					var lines = s.split('\n');
-					//alert("lines.length="+lines.length);
-					//var tmp = "";    //拾ったデータを見るときはこのtmpを見て確認
-					for (var j = 0; j < lines.length; j++) {
-						var sd = checkLineAndGet(lines[j]);
-						placecount++;
-						if (sd[3].match(/\s*▼[0-9]+$/)) {
-							sd[3] = RegExp.leftContext;
-						}
-						places[j] = new BoardData(sd[0],sd[1],sd[2],sd[3]);
-						//alert('j='+j+':places[j]='+places[j].toString());
-						//tmp += places[j].toString() +"\n";
+		for (var i = 1; i < tbls.length; i++) {
+			var tgs = getClassTags(tbls[i], "td", "pl10 comment_wbr");
+			if (null != tgs) {
+				var s = getClassTagText(replaceWbr(replaceBr(tgs[0])),"td", "pl10 comment_wbr");
+				var lines = s.split('\n');
+				//alert("lines.length="+lines.length);
+				//var tmp = "";    //拾ったデータを見るときはこのtmpを見て確認
+				for (var j = 0; j < lines.length; j++) {
+					var sd = checkLine(lines[j]);
+					placecount++;
+					if (sd[3].match(/\s*▼[0-9]+$/)) {
+						sd[3] = RegExp.leftContext;
 					}
-					msgno = tds.eq(4*i + 0).text().replace("No\.","▼");
-					found = i;
-					break;
+					places[j] = new BoardData(sd[0],sd[1],sd[2],sd[3]);
+					//alert('j='+j+':places[j]='+places[j].toString());
+					//tmp += places[j].toString() +"\n";
 				}
+				var msgtg = getClassTags(tbls[i],"td","fs10 center");
+				msgno = getClassTagText(msgtg[0],"td","fs10 center").replace("No\.","▼");
+				found = i;
+				break;
 			}
 		}
 		//alert("i=" + i + "\nmsgno=" + msgno);
@@ -304,12 +294,8 @@ function jintory_main($) {
 	}
 
 	//前の掲示の行の確認
-	// 戻り値 座標,城主名,時刻,ext
-	function checkLineAndGet(s0) {
-		var s;
-		if (s0.match(/\s*▼[0-9]+(\s*)$/)) s = RegExp.leftContext;
-		else s = s0;
-		var ans = new Array();
+	function checkLine(s) {
+		var ans = new Array(1);
 		var savesp = "";
 		var re = s.match(/^\s*\(?\s*((\-|－|ー)?[0-9０-９]+)\s*(,|，|\.|．|､|、|・)\s*((\-|－|ー)?[0-9０-９]+)\s*\)?\s+([^\s.]+)\s+([;:：；・．.時分秒0-9０-９]+)(\s*(頃|ころ|ごろ)?)/);
 		if (re) {
@@ -357,7 +343,7 @@ function jintory_main($) {
 				ans[3] = s;
 			}
 		}
-		//alert("checkLineAndGet\n" + ans[0] +" "+ ans[1] + " " + ans[2] + "#" + ans[3]);
+		//alert("checkLine\n" + ans[0] +" "+ ans[1] + " " + ans[2] + "#" + ans[3]);
 		return ans;
 	}
 
@@ -413,21 +399,19 @@ function jintory_main($) {
 			dataType: "text",
 			success: function (html){
 				//alert('ajax get');
-				var tbls = $(html).find("table.paneltable.table_fightlist");
+				var s = getTags(html,"table","paneltable table_fightlist");
 				mycount = 0;
 				//var re = /<span>[0-9]+\-[0-9]+\-[0-9]+\s([0-9]+:[0-9]+:[0-9]+)/;
-				for (var i = 0; i < tbls.length; i++) {
-					//alert(tbls.eq(i).find("tr.noborder td img").eq(0).attr("src"));
-					if ((jintory == true && tbls.eq(i).find("tr.noborder td img").eq(0).attr("src").match(/icon_attack\.png/) != null) || jintory == false) {		//陣張りだけ,領地取りも？
-						//alert(tbls.eq(i).find('tr td span').eq(0).text());
-						var dm = tbls.eq(i).find('tr td span').eq(0).text().match(/[0-9]+\-[0-9]+\-[0-9]+\s([0-9]+:[0-9]+:[0-9]+:?[0-9]*)/);
+				for (var i = 0; i < s.length; i++) {
+					if ((jintory == true && s[i].match(/icon_attack\.png/) != null) || jintory == false) {		//陣張りだけ,領地取りも？
+						var dm = s[i].match(/<span>[0-9]+\-[0-9]+\-[0-9]+\s([0-9]+:[0-9]+:[0-9]+:?[0-9]*)/);
 						if (dm) {
 							var placenm = "";
 							var dt = checkTime(RegExp.$1);
-							var ss = tbls.eq(i).find("tr td.td_bggray span");
-							var fps = ss.eq(0).text().match(/\s+\((\-*[0-9]+,\-*[0-9]+)\)/);
+							var ss = getClassTags(s[i], "td", "td_bggray");
+							var fps = ss[0].match(/\s+\((\-*[0-9]+,\-*[0-9]+)\)/);
 							var fpz = RegExp.$1;
-							var tps = ss.eq(1).text().match(/\s+\((\-*[0-9]+,\-*[0-9]+)\)/);
+							var tps = ss[1].match(/\s+\((\-*[0-9]+,\-*[0-9]+)\)/);
 							var tpz = RegExp.$1;
 							if ("" == shortlord) { 
 								myplaces[mycount] = new JintoryData(placenm, tpz, lordname, fpz, lordname, "", dt, "");
@@ -455,7 +439,9 @@ function jintory_main($) {
 
 	//プロフィール頁でオプション値の変更があったら設定・保存する
 	function checkUsersProfile() {
-		var s = $("p.info").text();
+		var ss = getClassTags(document.body.innerHTML,"p","info");		
+		//alert(ss);
+		var s = getClassTagText(replaceWbr(replaceBr(ss[0])),"p","info");
 		//alert(s);
 		var newshortlord = shortlord;
 		var newjintory = jintorymode;
@@ -475,25 +461,17 @@ function jintory_main($) {
 			if (newshortlord != shortlord) {
 				tmp += '\n' + '【城主名略称】' + newshortlord;
 				try {
-					GM_setValue('shortlord',newshortlord);
+					window.localStorage.setItem('shortlord',newshortlord);
 				} catch (e) {
-					try {
-						window.localStorage.setItem('shortlord',newshortlord);   // Chrome用
-					} catch (e) {
-						alert("cannot setItem('shortlord,'"+ newshortlord + ")");   
-					}
+					alert("cannot setItem('shortlord,'"+ newshortlord + ")");   
 				}
 			}
 			if (newjintory != jintorymode) {
 				tmp += '\n' + '【Jintory】' + newjintory;
 				try {
-					GM_setValue('jintorymode',newjintory);
+					window.localStorage.setItem('jintorymode',newjintory);
 				} catch (e) {
-					try {
-						window.localStorage.setItem('jintorymode',newjintory);    // Chrome用
-					} catch (e) {
-						alert("cannot setItem('jintorymode,'"+ newjintory + ")");
-					}
+					alert("cannot setItem('jintorymode,'"+ newjintory + ")");
 				}
 			}
 			alert(tmp);
@@ -573,6 +551,127 @@ function jintory_main($) {
 		var sub2 = sub[1].split("\">");
 		return sub2[0];
 	}
+
+	// XML assist
+
+	function getBody(html){
+	  var reg = new RegExp("<body((\\s|.)*)</body>", "ig");
+	  return html.match(reg);
+	}
+
+	function getAttrTags(html, tagName, attrName, attrStr){
+		var cls = "";
+		if(attrName){
+			if (attrStr) {
+				cls = '[^>]*?' + attrName + '="' + attrStr + '"';
+			} else {
+				cls = '[^>]*?' + attrName + '="[^"]*"';
+			}
+		}
+		var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
+		return html.match(reg);
+	}
+
+	function getAttrTag(html, tagName, attrName, attrStr){
+	  var tags = getClassTags(html, tagName, attrName, attrStr);
+	  return (tags && tags.length) ? tags[0] : "";
+	}
+
+	function getAttrTagText(html, tagName, attrName, attrStr){
+	  return getAttrTag(html, tagName, attrName, attrStr) ? RegExp.$2 : "";
+	}
+
+
+	function getClassTags(html, tagName, className){
+	  var cls = "";
+	  if(className){
+		cls = '[^>]*?class="' + className + '"';
+	  }
+	  var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
+	  return html.match(reg);
+	}
+
+	function getClassTag(html, tagName, className){
+	  var tags = getClassTags(html, tagName, className);
+	  return (tags && tags.length) ? tags[0] : "";
+	}
+
+	function getClassTagText(html, tagName, className){
+	  return getClassTag(html, tagName, className) ? RegExp.$2 : "";
+	}
+
+	//function getTagText(html,tagName) {
+	//	var reg = new RegExp("<" + tagName + "(\\s|.)*?>([^<]*)</" + tagName + ">", "i");
+	//	var tag = html.match(reg);
+	//	alert(tag.length);
+	//	alert("tag="+tag);
+	//	return (tag) ? RegExp.$2 : "";
+	//}
+	
+	function getTags(html,tagName) {
+		var reg = new RegExp("<" + tagName + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
+		return html.match(reg);
+	}
+
+	function getTagText(html,tagName) {
+		//var reg = new RegExp("<" + tagName + "(\\s|.)*?>([^<]*)</" + tagName + ">", "i");
+		var reg = new RegExp("<" + tagName + "(\\s|.)*?>((\\s|.)*?)</" + tagName + ">", "i");
+		var tag = html.match(reg);
+		var txt = RegExp.$2;
+		if (tag) {
+			// 2重以上のタグ構造になってる場合を考慮
+			var regsub = new RegExp("<([^>^\\s]+)(\\s|.)*?>((\\s|.)*?)</" + tagName + ">","i");
+			var subtag = txt.match(regsub);
+			if (subtag) {
+				txt = getTagText(txt, RegExp.$1);
+			}
+			//reg = new RegExp("<" + tagName + "(\\s|.)*?><.*>([^<]*)<.*></" + tagName + ">", "i");
+		}
+		return (tag) ? txt : "";
+	}
+
+
+	function getIdTags(html, tagName, idName){
+	  var ids = "";
+	  if(idName){
+		ids = '[^>]*?id="' + idName + '"';
+	  }
+	  var reg = new RegExp("<" + tagName + ids + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
+	  return html.match(reg);
+	}
+
+	function getIdTag(html, tagName, idName){
+	  var tags = getIdTags(html, tagName, idName);
+	  return (tags && tags.length) ? tags[0] : "";
+	}
+
+	function getIdTagText(html, tagName, idName){
+	  return getIdTag(html, tagName, idName) ? RegExp.$2 : "";
+	}
+	
+	function getSrc(html, flg) {
+		if (flg == 0) {
+			var src = '<img src="([^"]*)/([^"/]+)"';
+		} else {
+			var src = '<(img src=)"([^"]*)"';	//フル
+		}
+		var ans = html.match(src,"ig");
+		return (ans && ans.length) ? RegExp.$2 : "";
+	}
+
+
+	function getHref(html) {
+		var src = '<a href="([^"]*)"';	//フル
+		var ans = html.match(src,"i");
+		return (ans && ans.length) ? RegExp.$1 : "";
+	}
+
+	function getAlt(html) {
+		var src = '<img src="([^"]*)"(\\s|.)*?alt="([^"]*)"';	//フル
+		var ans = html.match(src,"i");
+		return (ans && ans.length) ? RegExp.$3 : "";
+	}
+
 
 	function replaceAmp(s) {
 		return s.replace(/&amp;/g,'&');
