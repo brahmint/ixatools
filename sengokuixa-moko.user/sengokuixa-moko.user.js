@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110914
+// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110915
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -53,6 +53,7 @@
 // ・全解散のパフォーマンスアップをw24.mouri.ne1/1.8.6.216.20110904版から借用
 // ・同じく、全編成: グループアイコン右クリック時に逆順
 // ・IXA状態表示仕様変更に伴う表示されない問題に対応 20110914
+// ・検知しなくなった敵襲に対応 20110915
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -1069,7 +1070,7 @@ function Moko_main($) {
 			$('#ixamoko_dialog').hide();
 		});
 		if (options['raid']) {
-			var $raid = $('IMG.fade[alt="敵襲！"]');
+			var $raid = $('IMG.fade[alt="敵襲"]');
 			if ($raid.get().length>0) {
 				// 敵襲あり
 				var href = $raid.parent().attr('href');
@@ -1081,7 +1082,7 @@ function Moko_main($) {
 		}
 
 		if (options['inside_attack_view']) {
-			var $raid = $('IMG.fade[alt="敵襲！"]');
+			var $raid = $('IMG.fade[alt="敵襲"]');
 			if ($raid.get().length>0) {
 				// 敵襲あり
 				var href = $raid.parent().attr('href');
