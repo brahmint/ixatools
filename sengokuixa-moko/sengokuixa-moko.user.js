@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110914
+// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110915
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -58,6 +58,7 @@
 // ・全解散のパフォーマンスアップをw24.mouri.ne1/1.8.6.216.20110904版から借用
 // ・同じく、全編成: グループアイコン右クリック時に逆順
 // ・IXA状態表示仕様変更に伴う表示されない問題に対応 20110914
+// ・検知しなくなった敵襲に対応 20110915
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -138,6 +139,7 @@ function Moko_main($) {
 		map_rightdblclick		: {tag: 'map',		caption: 'ダブルクリックで対象の合戦報告書を表示'},
 		prohibitionArea			: {tag: 'map',		caption: '陣取り禁止区域表示'},
 		zoomMap					: {tag: 'map',		caption: 'カーソル選択対象を拡大表示'},
+		mapAdjust				: {tag: 'map',		caption: 'mappanel_maindataarea'},
 		faci_list				: {tag: 'faci',		caption: 'レベル別施設＆建築中数表示'},
 		unit_list_hp			: {tag: 'unit',		caption: '武将HP表示'},
 		unit_list_hp_bgc		: {tag: 'unit',		caption: '武将のHPが100でない場合は色づけ'},
@@ -778,6 +780,7 @@ function Moko_main($) {
 	map_rightdblclick();
 	map_rightclick();
 	map_butai_status();
+	mapAdjust();
 	fade_button_check();
 	bbs_check();
 	reportlist_check();
@@ -1074,7 +1077,7 @@ function Moko_main($) {
 			$('#ixamoko_dialog').hide();
 		});
 		if (options['raid']) {
-			var $raid = $('IMG.fade[alt="敵襲！"]');
+			var $raid = $('IMG.fade[alt="敵襲"]');
 			if ($raid.get().length>0) {
 				// 敵襲あり
 				var href = $raid.parent().attr('href');
@@ -1086,7 +1089,7 @@ function Moko_main($) {
 		}
 
 		if (options['inside_attack_view']) {
-			var $raid = $('IMG.fade[alt="敵襲！"]');
+			var $raid = $('IMG.fade[alt="敵襲"]');
 			if ($raid.get().length>0) {
 				// 敵襲あり
 				var href = $raid.parent().attr('href');
@@ -1936,6 +1939,19 @@ function Moko_main($) {
 				}
 			});
 		return;
+	}
+	function mapAdjust() {
+		if (location.pathname!="/map.php") return;
+		if (!options['mapAdjust']) return;
+		$('div.ig_mappanel_maindataarea').click(function(e) {
+			$(this).css('z-index','1001');
+			$('table#act_battle_data').css('z-index','999');
+		});
+		$('table#act_battle_data').click(function(e) {
+			$(this).css('z-index','1001');
+			$('div.ig_mappanel_maindataarea').css('z-index','999');
+		});
+
 	}
 
 	//////////////////////
