@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110915
+// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110917
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -54,6 +54,8 @@
 // ・同じく、全編成: グループアイコン右クリック時に逆順
 // ・IXA状態表示仕様変更に伴う表示されない問題に対応 20110914
 // ・検知しなくなった敵襲に対応 20110915
+// ・地図画面で隠れたパネルを上に出す
+// ・サイドバー表示位置調整 20110917
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -134,6 +136,7 @@ function Moko_main($) {
 		map_rightdblclick		: {tag: 'map',		caption: 'ダブルクリックで対象の合戦報告書を表示'},
 		prohibitionArea			: {tag: 'map',		caption: '陣取り禁止区域表示'},
 		zoomMap					: {tag: 'map',		caption: 'カーソル選択対象を拡大表示'},
+		mapAdjust				: {tag: 'map',		caption: '隠れたパネルを上に出す'},
 		faci_list				: {tag: 'faci',		caption: 'レベル別施設＆建築中数表示'},
 		unit_list_hp			: {tag: 'unit',		caption: '武将HP表示'},
 		unit_list_hp_bgc		: {tag: 'unit',		caption: '武将のHPが100でない場合は色づけ'},
@@ -160,43 +163,12 @@ function Moko_main($) {
 	var HPres0 = [18, 19, 20, 21, 23, 25, 27, 29, 31, 34, 37, 40, 43, 46, 49, 52, 56, 60, 64, 68, 72];
 	var HPres1 = [90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 135, 138, 141, 144, 147, 150];
 	var groups_def = [
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		''
+		'','','','','','','','','','','','','','','','',''
 	];
 	var groupsx_def = [
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888'
+		'#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888'
 	];
-	
+
 	var groups_img_def = [
 	"data:image/gif,GIF89a%1E%00%1E%00%D5%00%00qV4M.%15%AB%A8%A7%B8%A6r%C3%B4%7CI*%15%FF%FF%FF%E7%DC%9B%DB%CE%91W%3C*%94~SY%3B%1FlWI%88qH%F3%E9%A5P3%1FeI)%AC%99g%81rhs%60T%88%7Bs%9D%96%92%A4%9F%9DeN%3F%89ug%8F%84%7D%7Dc%3EZ%3D*%95%83vfK9%B9%AC%A4%A1%90%85%D0%C8%C3%7DgX%A0%8C%5DqYH%CF%C1%86zi%5E%96%8D%88%5EE4%FF%F7%B0B!%0B%B2%B2%B2%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00!%F9%04%00%00%00%00%00%2C%00%00%00%00%1E%00%1E%00%00%06%FF%40%83%01%C4%19%19%8F%C8%A4r%C4%01%09%0D%98T%E2D%ADZ%AF%D8S%22%851xR%14%95xL.%9B%C7%A5%94%A739%BB%DF%E2G'e%82%DB%CBi%FAyr*U%EEh)ze%16%01%03%0D%01'%02e%26%12%16x%82ue%13%0D((%0E%10%92b%26%01%00%05%19dy%9Ab%02%05%07%96%0ARV%05%04(%04%01%A0b%A2%93%95%97%24%B7%B8%24%08%96(%0A%17%81%83%9B%01%A7%96%22%96%00(%24%C6%24%82)%B1*%B3%A4%0F%11(%03%C5%C7%C9%CB)%17%7F%C0%9A%0C%0D%07%10%C8(%C6(%C8%CA%C9%0B%A9a%B2%91c%17%0A%1A%00%0A%96%D6%BD(%08%D6%08%BB%08)%DD%D1%A0%01%10!%E2%1E%09%7B(%0E%1C%3C%40P%C4%02I%01%05%94(%C1%80%9C9t%DA%26J%F0f%C6%84El%E9%98%15h%E7.%98%0A%0AZ%3E%9E%CB%96%2C%02%89%00mJ%8EJ%D1%A0%A0%A5%83%D5%12%1Et%60%E9%40%0A%98%8Ec%B6%A4%00%00%81%A6%A0%05%01RtJ*(%01PR%17R%10%10%91%E2%00%82%00%1APDXpp%40%00%06%A1%DE%A1%09%D05%851%02)vE%08%C0%13A%81G2%C9%3ChU.%C5Af%D4%1C%A4%A0vNS%40%15%0Fv.%90%EA*E%3D%B4%E42%3D%85%B6%00%C0W%0AJ%0B%94(%20HB%02%08%10%0A%2C%8AK%A6%82%84n%16Ll%16%ADB%80%04%09%9B9%03%B2%93fC%CC%D5p%12l%F8%90%02%2Cl7%0CR%7C0%10%22%C5%83%2C%C0%B3%3C%E0b%20%08%00%3B",
 	"data:image/gif,GIF89a%1E%00%1E%00%D5%00%00qV4%88qH%5D%1E%19%DB%CE%91%AC%99g%CA%14U%FF%FF%FF%A0%8C%5D%E7%DC%9B%B8%16K%B8%A6rM.%15%9D%18%3C%94%197x%1C(K%20%0F%81%1B-T%1F%14%94~S%C3%B4%7CY%3B%1FeI)%7Dc%3E%89ug%C1%15P%A6%18A%D0%C8%C3o%1C%23%A1%90%85Z%3D*fK9%95%83v%B9%AC%A4%7DgX%F3%E9%A5qYH%8B%1A2%AF%17F%CF%C1%86f%1D%1E%FF%F7%B0B!%0B%D4%14Z%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00!%F9%04%00%00%00%00%00%2C%00%00%00%00%1E%00%1E%00%00%06%FF%40%83A%F3%19%19%8F%C8%A4r%F4%D1%08%0D%97%94%E0D%ADZ%AF%D8%93%20u1%80R%0C%95xL.%9B%C7%A4%14%C8%039%BB%DF%E2%88'U*%170fL%02%AEJ%D3%C9%05%0F)R%10%05*%18%83)'%24n~uc%09)(%26%13%15%0D*%0D%00%93%04%14%97f%8Ee)%22(%22%16%8C%02%04(%AA%01%02%86e%A0d)%26%93%8A%0C%A2%A4%07%22%15%02%7Bd%B0%05%25%25%B2%93%12%01)%01%AB%A2%22%12)%0E%8F%7D%83%8F%11%89%B3%A3(%01%A3%04)%A9%AA%08%01%0B%8C%D0%7F*%DB%26%26%A3%22%E6%AA%93%B3%EB%AB%1Bb%B0%10Z%92%B4%C8%03%89%83%0A%AA%04%0F%BD%B0bJ%2CP5%C0%02%02%82%E6L%0CP%25%82B%98x%D1%7CiZ%17%60%96%89D%13%15%A4p%25%EE%99%0AT%EED%2CDp%A0%E4%3E%14%00%3CA%1C%A7B%985w(%26%60T%05%C0%23%C0%13%C8%10N8%A8%00%80O%9D%094Uv%14%93a%81%08%11%07%2F%D63Q%F2%C0I%87%BE%22%AAx%40%60%00%05%8B)%06N%020h%C1%00%04%00Z%A1%91%FA%A0%C2%20%AC%16%D6%A53g%CD%D2%D8q%09H%08%C3%BAo%94%D2a%08%16dx%EB%91%9C%5DM%12%B0%9E%9D%24%20*K1%F5%06%0C0V-%A1%DD%13%86%FB%A6%98%C0%D4%82%A0Y%DA%06%110%11%00%1E%DF2%10%06%9DpP%C0A%A20%B6%14%F5Z%D9%F7L%82%12%1C%1B%A5%E8%D0%86%8Fm1%02%3Aphv%9B%8Fi%0E%06B%A4%88%90%A5x%96i%5D%82%00%00%3B",
@@ -774,6 +746,7 @@ function Moko_main($) {
 	map_rightdblclick();
 	map_rightclick();
 	map_butai_status();
+	mapAdjust();
 	fade_button_check();
 	bbs_check();
 	reportlist_check();
@@ -989,24 +962,28 @@ function Moko_main($) {
 	//////////////////////
 	function allpage_check() {
 		if (options['sidebox_change']) {
-			var $sidebottom = $('#sideboxBottom');
-			var $seisan_div = $sidebottom.find('DIV.sideBox h3.sidebox_cardbg img[alt="生産"]').parent().parent().addClass('last');
-			var $kyoten_div = $sidebottom.find('DIV.sideBox h3.sidebox_cardbg img[alt="表示拠点選択"]').parent().parent();
-			var $joutai_div = $sidebottom.find('DIV.sideBox h3.sidebox_cardbg img[alt="カード"]').parent().parent().removeClass('last');
+			var $sidetop    = $('#sideboxTop');
+			var $money_div  = $('#sideboxTop > DIV.sideBox:eq(1)').addClass('last');	//銅銭・金
+			var $card_div   = $('#sideboxTop > DIV.sideBox:eq(2)');						//カード
+			var $joutai_div = $('#sideboxTop > DIV.sideBox:eq(3)');						//状態
+
+			var $sidebottom = $('#sideboxBottom');		//生産～
+			var $seisan_div = $('#sideboxBottom > DIV.sideBox:eq(0)');		//生産
+			var $kyoten_div = $('#sideboxBottom > DIV.sideBox:eq(1)');							//拠点
+			var $report_div = $('#sideboxBottom > DIV.sideBox:eq(2)').removeClass('last');		//報告書
 			
-			$joutai_div.after($seisan_div).after($kyoten_div);
+			$('#sideboxTop > DIV.sideBox:eq(0)').after($kyoten_div).after($joutai_div).after($report_div);
+			$('#sideboxBottom > DIV.sideBox:eq(0)').after($money_div).after($card_div);
 			
-			var $sidebox1 = $('#sideboxTop > DIV.sideBox:eq(1)');		//銅銭・金
-			var $sidebox2 = $('#sideboxTop > DIV.sideBox:eq(2)');		//カード
-			$sidebottom.after($sidebox1).after($sidebox2);
-			
-			//$('#sideboxTop > DIV.sideBox:eq(0)').after($sidebottom);
 			$('TABLE.situationWorldTable').remove();
+
 			if (options['tohankaku']) {
-				$('INPUT[type="text"]').change(function(e) {
-					var $this = $(this);
-					$this.val(toHankaku($this.val()));
-				});
+				if (!location.pathname.match(/\/message\//)) {
+					$('INPUT[type="text"]').change(function(e) {
+						var $this = $(this);
+						$this.val(toHankaku($this.val()));
+					});
+				}
 			}
 		}
 		if (options['chat_mapcood']) {
@@ -1307,13 +1284,13 @@ function Moko_main($) {
 	//////////////////////
 	function map_rightclick() {
 		if (location.pathname!="/map.php") return;
+		if (!options['map_rightclick']) return true;
 		//
 		// ターゲット対象の敵拠点のイメージを置き換え
 		//
 		mapPoz.init();
 		mapPoz.repTargets();
 
-		if (!options['map_rightclick']) return true;
 		if (options['map_rightclick_type'] == '0') { // 地図移動
 			$('AREA[href^="/land.php"]').live('contextmenu', function(e) {
 				map_move_ajax($(this));
@@ -1932,6 +1909,19 @@ function Moko_main($) {
 				}
 			});
 		return;
+	}
+	function mapAdjust() {
+		if (location.pathname!="/map.php") return;
+		if (!options['mapAdjust']) return;
+		$('div.ig_mappanel_maindataarea').click(function(e) {
+			$(this).css('z-index','1001');
+			$('table#act_battle_data').css('z-index','999');
+		});
+		$('table#act_battle_data').click(function(e) {
+			$(this).css('z-index','1001');
+			$('div.ig_mappanel_maindataarea').css('z-index','999');
+		});
+
 	}
 
 	//////////////////////
