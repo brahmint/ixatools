@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110915
+// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110917
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -51,6 +51,7 @@
 // ・同じく、どこ近を追加
 // ・同じく、@を追加（マップ右クリックメニューとデッキ）
 // ・JQueryライブラリを使用してソースをコンパクトに
+// ・移動中の時の表示拠点並び替えがされない問題の修正
 // ・部隊編成画面で部隊スキル窓移動 20110901
 // ・マークした敵の拠点を地図上で表示 20110905
 // ・永劫の秘境の全部隊出発対応 20110912
@@ -59,6 +60,8 @@
 // ・同じく、全編成: グループアイコン右クリック時に逆順
 // ・IXA状態表示仕様変更に伴う表示されない問題に対応 20110914
 // ・検知しなくなった敵襲に対応 20110915
+// ・地図画面で隠れたパネルを上に出す
+// ・サイドバー表示位置調整 20110917
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -139,7 +142,7 @@ function Moko_main($) {
 		map_rightdblclick		: {tag: 'map',		caption: 'ダブルクリックで対象の合戦報告書を表示'},
 		prohibitionArea			: {tag: 'map',		caption: '陣取り禁止区域表示'},
 		zoomMap					: {tag: 'map',		caption: 'カーソル選択対象を拡大表示'},
-		mapAdjust				: {tag: 'map',		caption: 'mappanel_maindataarea'},
+		mapAdjust				: {tag: 'map',		caption: '隠れたパネルを上に出す'},
 		faci_list				: {tag: 'faci',		caption: 'レベル別施設＆建築中数表示'},
 		unit_list_hp			: {tag: 'unit',		caption: '武将HP表示'},
 		unit_list_hp_bgc		: {tag: 'unit',		caption: '武将のHPが100でない場合は色づけ'},
@@ -166,41 +169,10 @@ function Moko_main($) {
 	var HPres0 = [18, 19, 20, 21, 23, 25, 27, 29, 31, 34, 37, 40, 43, 46, 49, 52, 56, 60, 64, 68, 72];
 	var HPres1 = [90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 135, 138, 141, 144, 147, 150];
 	var groups_def = [
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		''
+		'','','','','','','','','','','','','','','','',''
 	];
 	var groupsx_def = [
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888',
-		'#888'
+		'#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888','#888'
 	];
 
 	var groups_img_def = [
@@ -418,9 +390,6 @@ function Moko_main($) {
 	// 婆羅門追加 end
 	//
 
-	/*
-	var setting_dialog_str = '<div id="nowLoadingContent" style="position:absolute;width:220px;height:20px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;しばらくお待ちください<br><img src="http://www.jj-midi.com/image/rel_interstitial_loading.gif"></div><DIV id="ixamoko_boxes"><DIV id="ixamoko_dialog" style="position:absolute;width:400px;height:360px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window"><B>'+TOOL_NAME+'設定</B> | <A style="color:#000;" href="#" class="close">[ 設定する ]</A><DIV style="border-top:1px solid #000;padding-top:10px;line-height:1.5em;">';
-	*/
 	var setting_dialog_str = '<div id="nowLoadingContent" style="position:absolute;width:220px;height:20px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;しばらくお待ちください<br><img src="' + IMAGES.rel_interstitial_loading + '"></div><DIV id="ixamoko_boxes"><DIV id="ixamoko_dialog" style="position:absolute;width:400px;height:400px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window"><B>'+TOOL_NAME+'設定</B> | <A style="color:#000;" href="#" class="close">[ 設定する ]</A><DIV style="border-top:1px solid #000;padding-top:10px;line-height:1.5em;">';
 	var changed = false;
 	setting_dialog_str += '<DIV id="ixamoko_set_grp">';
@@ -456,10 +425,6 @@ function Moko_main($) {
 				
 				if (typeof(options[key])=='undefined') {
 					changed = true;
-					// change start
-//					if (key=='hikyou_where') {
-//						options[key] = '2';
-//					} else if (key=='map_starx') {
 					if (key=='rank_lock') {
 						options[key] = 2;
 					} else if (key=='def_kind_soldier') {
@@ -996,24 +961,28 @@ function Moko_main($) {
 	//////////////////////
 	function allpage_check() {
 		if (options['sidebox_change']) {
-			var $sidebottom = $('#sideboxBottom');
-			var $seisan_div = $sidebottom.find('DIV.sideBox h3.sidebox_cardbg img[alt="生産"]').parent().parent().addClass('last');
-			var $kyoten_div = $sidebottom.find('DIV.sideBox h3.sidebox_cardbg img[alt="表示拠点選択"]').parent().parent();
-			var $joutai_div = $sidebottom.find('DIV.sideBox h3.sidebox_cardbg img[alt="カード"]').parent().parent().removeClass('last');
+			var $sidetop    = $('#sideboxTop');
+			var $money_div  = $('#sideboxTop > DIV.sideBox:eq(1)').addClass('last');	//銅銭・金
+			var $card_div   = $('#sideboxTop > DIV.sideBox:eq(2)');						//カード
+			var $joutai_div = $('#sideboxTop > DIV.sideBox:eq(3)');						//状態
+
+			var $sidebottom = $('#sideboxBottom');		//生産～
+			var $seisan_div = $('#sideboxBottom > DIV.sideBox:eq(0)');		//生産
+			var $kyoten_div = $('#sideboxBottom > DIV.sideBox:eq(1)');							//拠点
+			var $report_div = $('#sideboxBottom > DIV.sideBox:eq(2)').removeClass('last');		//報告書
 			
-			$joutai_div.after($seisan_div).after($kyoten_div);
+			$('#sideboxTop > DIV.sideBox:eq(0)').after($kyoten_div).after($joutai_div).after($report_div);
+			$('#sideboxBottom > DIV.sideBox:eq(0)').after($money_div).after($card_div);
 			
-			var $sidebox1 = $('#sideboxTop > DIV.sideBox:eq(1)');		//銅銭・金
-			var $sidebox2 = $('#sideboxTop > DIV.sideBox:eq(2)');		//カード
-			$sidebottom.after($sidebox1).after($sidebox2);
-			
-			//$('#sideboxTop > DIV.sideBox:eq(0)').after($sidebottom);
 			$('TABLE.situationWorldTable').remove();
+
 			if (options['tohankaku']) {
-				$('INPUT[type="text"]').change(function(e) {
-					var $this = $(this);
-					$this.val(toHankaku($this.val()));
-				});
+				if (!location.pathname.match(/\/message\//)) {
+					$('INPUT[type="text"]').change(function(e) {
+						var $this = $(this);
+						$this.val(toHankaku($this.val()));
+					});
+				}
 			}
 		}
 		if (options['chat_mapcood']) {
@@ -1314,13 +1283,13 @@ function Moko_main($) {
 	//////////////////////
 	function map_rightclick() {
 		if (location.pathname!="/map.php") return;
+		if (!options['map_rightclick']) return true;
 		//
 		// ターゲット対象の敵拠点のイメージを置き換え
 		//
 		mapPoz.init();
 		mapPoz.repTargets();
 
-		if (!options['map_rightclick']) return true;
 		if (options['map_rightclick_type'] == '0') { // 地図移動
 			$('AREA[href^="/land.php"]').live('contextmenu', function(e) {
 				map_move_ajax($(this));
