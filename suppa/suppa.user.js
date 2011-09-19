@@ -9,68 +9,33 @@
 //
 // 20110715 1.01	初版
 // 20110720 1.02	すべての武将がデッキのある時に集計されない問題対応
-
+// 20110918 1.03	Chromeでもコピペできるようにダイアログ表示へ
 //
 // Mokoと同じjQuery初期化
 //
 
 
-//function bara_addJQuery(callback) {
-//    if (typeof(unsafeWindow.tb_init)!='undefined') {
-//        tb_init = unsafeWindow.tb_init;
-//    }
-//    
-//    if (typeof(unsafeWindow.jQuery)!='undefined') {
-//		var links = document.createElement('link');
-//		links.rel = 'stylesheet';
-//		links.href = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/themes/base/jquery-ui.css';
-//		document.getElementsByTagName('head')[0].appendChild(links);
-//        var script = document.createElement("script");
-//        script.setAttribute("src", "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js");
-//        document.body.appendChild(script);
-//
-//        jQuery = unsafeWindow.jQuery;
-//        callback(unsafeWindow.jQuery);
-//    } else {
-//        var script = document.createElement("script");
-//        script.setAttribute("src", "http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js");
-//        script.addEventListener('load', function() {
-//            var script = document.createElement("script");
-//            script.textContent = "(" + callback.toString() + ")(jQuery);";
-//            document.body.appendChild(script);
-//        }, false);
-//        document.body.appendChild(script);
-//    }
-//}
-//
+function bara_addJQuery(callback) {
+    if (typeof(unsafeWindow.tb_init)!='undefined') {
+        tb_init = unsafeWindow.tb_init;
+    }
+    
+    if (typeof(unsafeWindow.jQuery)!='undefined') {
+        jQuery = unsafeWindow.jQuery;
+        callback(unsafeWindow.jQuery);
+    } else {
+        var script = document.createElement("script");
+        script.setAttribute("src", "http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js");
+        script.addEventListener('load', function() {
+            var script = document.createElement("script");
+            script.textContent = "(" + callback.toString() + ")(jQuery);";
+            document.body.appendChild(script);
+        }, false);
+        document.body.appendChild(script);
+    }
+}
 
-
-(function (d, func) {
-    var h = d.getElementsByTagName('head')[0];
-	var links = d.createElement('link');
-	links.setAttribute("rel", "stylesheet");
-	links.setAttribute("type", "text/css");
-	links.setAttribute("href", "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/themes/base/jquery-ui.css");
-	var ui = d.createElement("script");
-	ui.setAttribute("src", "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.js");
-    var s1 = d.createElement("script");
-    s1.setAttribute("src", "http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js");
-    s1.addEventListener('load', function() {
-        var s2 = d.createElement("script");
-        s2.textContent = "jQuery.noConflict();(" + func.toString() + ")(jQuery);";
-        h.appendChild(s2);
-    }, false);
-	h.appendChild(s1);
-    h.appendChild(links);
-	h.appendChild(ui);
-})(document, function($) {
-    // ここにメインの処理を書く
-//    $('#button').click(function(){
-//        alert('clicked!');
-//    });
-
-//function suppa_main($) {
-
+function suppa_main($) {
 	var gifsuppa = 'data:image/gif;base64,'+
 	'R0lGODlhNwAYAOYAAP////f8/O75+eX39+L19cPr673p6bLl5a3k5KTh4Zze3pXc3IvY2IPW1nzT'+
 	'03fS0nLQ0I/FxWvOznvJyWbMzH6/v4y5uXW8vGC/v4C1tWi4uGS2tm2vr1uzs3upqXmoqHClpW2k'+
@@ -194,32 +159,68 @@
 		}
 		return s;
 	}
-	
+
 
 	//
 	//
 	//
 	//
-	
+
 	function mergeAndShow() {
+		var th_style = 'width="25" style="text-align:left"';
+		var td_style = 'width="25" style="text-align:right"';
+
 		for (var i = 0; i < decksoldcount; i++) {
 			addNumDeck(decksold[i].sname, decksold[i].numdeck);
 		}
 		for (var i = 0; i < stdbysoldcount; i++) {
 			addNumDeck(stdbysold[i].sname, stdbysold[i].numstdby);
 		}
-				
-		var msg = "";
+
+		var htm = '<table width="150" class="suppa_soldiers">';
 		var total = 0;
 		for (var i = 0; i < soldiers.length; i++) {
-			msg += numFormat(i,2) + "：" + strFormat(soldiers[i].sname,4) + numFormat(soldiers[i].numwait + soldiers[i].numtrain + soldiers[i].numdeck + soldiers[i].numstdby,8) + "\n";
+			htm += '<tr><th '+th_style+'>'+soldiers[i].sname+'</th><td '+td_style+'>'+numFormat(soldiers[i].numwait + soldiers[i].numtrain + soldiers[i].numdeck + soldiers[i].numstdby,8)+'</tr>';
 			total += soldiers[i].numwait + soldiers[i].numtrain + soldiers[i].numdeck + soldiers[i].numstdby;
 		}
-		msg += "  "+"：" + "＊合計＊" + numFormat(total,8);
-		alert(msg);
+		htm += '<tr><th '+th_style+'>＊合計＊</th><td '+td_style+'>'+numFormat(total,8)+'</tr>';
+		htm += '</table>';
+
+		suppa_dialog(htm);
+
 		suppajob = false;
 	}
-	
+
+	function suppa_dialog(msg) {
+		var dialog_str =	'<DIV id="suppa_dialog" style="position:absolute;width:400px;height:400px;display:none;z-index:9999;padding:20px;'
+								+'background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window">'
+								+'<B>数把</B> | <A style="color:#000;" href="#" class="close">[ 閉じる ]</A>'
+								+'<DIV style="border-top:1px solid #000;padding-top:10px;line-height:2.0em;">'
+								+msg
+							+'</DIV></DIV>';
+		dialog_str += '<DIV style="position:absolute;z-index:9000;background-color:#000;display:none;" id="suppa_mask"></DIV>';
+
+		$('BODY').prepend(dialog_str);
+
+		var id = '#suppa_dialog';
+		var maskHeight = $(document).height();
+		var maskWidth = $(window).width();
+		$('#suppa_mask').css({'width':maskWidth,'height':maskHeight}).fadeTo(0 ,0.8).show();
+		var winH = $(window).height();
+		var winW = $(window).width();
+		$(id).css('top',  winH/2-$(id).height()/2).css('left', winW/2-$(id).width()/2).fadeIn(500);
+
+		$('#suppa_dialog').show();
+
+		$('#suppa_dialog .close').click(function(e) {
+			e.preventDefault();
+			$('#suppa_mask, #suppa_dialog').hide();
+		});	   
+		$('#suppa_mask').click(function(e) {
+			$(this).hide();
+			$('#suppa_dialog').hide();
+		});
+	}
 	//
 	//待機中の兵士、訓練中の兵士の数を数える
 	//
@@ -717,7 +718,7 @@
 		return false;
 	});
 
-});
+}
 
 
-//bara_addJQuery(suppa_main);
+bara_addJQuery(suppa_main);
