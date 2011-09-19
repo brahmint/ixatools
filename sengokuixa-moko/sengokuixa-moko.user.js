@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110917
+// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20110919
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -62,6 +62,7 @@
 // ・検知しなくなった敵襲に対応 20110915
 // ・地図画面で隠れたパネルを上に出す
 // ・サイドバー表示位置調整 20110917
+// ・敵襲画像変更 20110919
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -117,6 +118,7 @@ function Moko_main($) {
 		place_skip_str			: {tag: 'all',		caption: 'スキップ文字列'},
 		ad_sort					: {tag: 'all',		caption: '昇順降順'},
 		fall_check				: {tag: 'all',		caption: '陥落中の表示'},
+		atkpict_replace			: {tag: 'all',		caption: '敵襲画像を置換'},
 		chat_mapcood			: {tag: 'chat',		caption: 'チャット中の座標っぽいものをリンクに'},
 		chat_mikire				: {tag: 'chat',		caption: 'チャットの見切れを修正'},
 		chat_linkchg			: {tag: 'chat',		caption: '「チャット履歴」のリンク先修正'},
@@ -390,7 +392,7 @@ function Moko_main($) {
 	// 婆羅門追加 end
 	//
 
-	var setting_dialog_str = '<div id="nowLoadingContent" style="position:absolute;width:220px;height:20px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;しばらくお待ちください<br><img src="' + IMAGES.rel_interstitial_loading + '"></div><DIV id="ixamoko_boxes"><DIV id="ixamoko_dialog" style="position:absolute;width:400px;height:400px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window"><B>'+TOOL_NAME+'設定</B> | <A style="color:#000;" href="#" class="close">[ 設定する ]</A><DIV style="border-top:1px solid #000;padding-top:10px;line-height:1.5em;">';
+	var setting_dialog_str = '<div id="nowLoadingContent" style="position:absolute;width:220px;height:20px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;しばらくお待ちください<br><img src="' + IMAGES.rel_interstitial_loading + '"></div><DIV id="ixamoko_boxes"><DIV id="ixamoko_dialog" style="position:absolute;width:400px;height:480px;display:none;z-index:9999;padding:20px;background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window"><B>'+TOOL_NAME+'設定</B> | <A style="color:#000;" href="#" class="close">[ 設定する ]</A><DIV style="border-top:1px solid #000;padding-top:10px;line-height:1.5em;">';
 	var changed = false;
 	setting_dialog_str += '<DIV id="ixamoko_set_grp">';
 	var setting_dialog_strxx = '';
@@ -444,7 +446,6 @@ function Moko_main($) {
 						options[key] = true;
 					}
 				}
-				// change start
 				if (key=='rank_lock') {
 					setting_dialog_strx += '<INPUT type="checkbox" checked disabled /> '+options_param[key].caption+'<SELECT class="ixamoko_setting" key="'+key+'"><OPTION value="0">非活性化しない</OPTION>';
 					var lock_list = {
@@ -492,7 +493,6 @@ function Moko_main($) {
 					}
 
 					setting_dialog_strx += '</TBODY></TABLE></DIV><BR/><BR/>';
-				// change end
 				} else if (key=='map_starx') {
 					setting_dialog_strx += '<INPUT type="checkbox" checked disabled /> '+options_param[key].caption+'<SELECT class="ixamoko_setting" key="'+key+'"><OPTION value="0">表示しない</OPTION>';
 					var hoshi_list = {
@@ -1068,6 +1068,11 @@ function Moko_main($) {
 				$('div#status.clearfix').css('background','url(' + IMAGES.bg_status_red + ')');
 				//$('span.sep').last().after('<span class="normal"><a href="'+href+'">敵襲</a></span>');
 			}
+		}
+
+		if (options['atkpict_replace']) {	//敵襲・アイコン置換
+			var $raid = $('IMG.fade[alt="敵襲"]');
+			$raid.attr('src','https://sites.google.com/site/ixatools/home/images/raid.gif');
 		}
 
 		if (options['timeout_countdown']) {
@@ -2793,37 +2798,31 @@ function Moko_main($) {
 				if (options['unit_list_icon']) $pparent.find('IMG:eq(0)').get()[0].src = groups_img[group_setting[card_id]];
 			});
 			localStorage.setItem('ixamoko_card_name', toJSON(cardname_setting));
-			$('.ixamoko_grp').live('click', function(e) {
-                var $this = $(this);
-                var card_id = $this.attr('cardid');
-                switch( e.which ){
-                    // 左クリック
-                    case 1 :
-                        ++group_setting[card_id];
-                        if (group_setting[card_id]>=groups.length)
-                            group_setting[card_id] = 0;
-                    break;
-                    // 右クリック
-                    case 3 :
-                        --group_setting[card_id];
-                        if (group_setting[card_id] < 0)
-                            group_setting[card_id] =groups.length-1;
-                    break;
-                    default:
-                        return false;
-                }
-                if (typeof(hpstatus[card_id])!='undefined') {
-                    if (hpstatus[card_id]=='100/100') {
-                        $this.parent().parent().css({backgroundColor:groups[group_setting[card_id]]});
-                    } else {
-                        $this.parent().parent().css({backgroundColor:groupsx[group_setting[card_id]]});
-                    }
-                } else {
-                    $this.parent().parent().css({backgroundColor:groups[group_setting[card_id]]});
-                }
-                if (options['unit_list_icon']) $this.get()[0].src = groups_img[group_setting[card_id]];
-                localStorage.setItem('ixamoko_group_set', toJSON(group_setting));
-                return false;
+			var tEvent = (navigator.userAgent.indexOf('Chrome') > 0) ? 'click contextmenu' : 'click';	//Chromeでは、右ボタンクリックでClick発生しない
+			$('.ixamoko_grp').live(tEvent, function(e) {
+				var $this = $(this);
+				var card_id = $this.attr('cardid');
+				if ( e.which == 1){		// 左クリック
+					++group_setting[card_id];
+					if (group_setting[card_id]>=groups.length)
+						group_setting[card_id] = 0;
+				} else {
+					--group_setting[card_id];
+					if (group_setting[card_id] < 0)
+						group_setting[card_id] =groups.length-1;
+				}
+				if (typeof(hpstatus[card_id])!='undefined') {
+					if (hpstatus[card_id]=='100/100') {
+						$this.parent().parent().css({backgroundColor:groups[group_setting[card_id]]});
+					} else {
+						$this.parent().parent().css({backgroundColor:groupsx[group_setting[card_id]]});
+					}
+				} else {
+					$this.parent().parent().css({backgroundColor:groups[group_setting[card_id]]});
+				}
+				if (options['unit_list_icon']) $this.get()[0].src = groups_img[group_setting[card_id]];
+				localStorage.setItem('ixamoko_group_set', toJSON(group_setting));
+				return false;
 			});
 			$('#ixamoko_grp').click(function(e) {
 				for(var i=groups.length-1;i>0;--i) {
