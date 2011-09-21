@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110919
+// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20110921
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -56,7 +56,7 @@
 // ・検知しなくなった敵襲に対応 20110915
 // ・地図画面で隠れたパネルを上に出す
 // ・サイドバー表示位置調整 20110917
-// ・敵襲画像変更 20110919
+// ・敵襲画像変更 20110919　アニメーション化 20110921
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -220,6 +220,8 @@ function Moko_main($) {
 		wait: 'data:image/gif;base64,R0lGODlhEgASAMQaAHl5d66urMXFw3l5dpSUk5WVlKOjoq+vrsbGw6Sko7u7uaWlpbm5t3h4doiIhtLSz4aGhJaWlsbGxNHRzrCwr5SUkqKiobq6uNHRz4eHhf///wAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFAAAaACwAAAAAEgASAAAFaaAmjmRplstyrkmbrCNFaUZtaFF0HvyhWRZNYVgwBY4BEmFJOB1NlYpJoYBpHI7RZXtZZb4ZEbd7AodFDIYVAjFJJCYA4ISoI0hyuUnAF2geDxoDgwMnfBoYiRgaDQ1WiIqPJBMTkpYaIQAh+QQFAAAaACwBAAEAEAAQAAAFY6AmjhpFkSh5rEc6KooWzIG2LOilX3Kd/AnSjjcyGA0oBiNlsZAkEtcoEtEgrghpYVsQeAVSgpig8UpFlQrp8Ug5HCiMHEPK2DOkOR0A0NzxJBMTGnx8GhAQZwOLA2ckDQ0uIQAh+QQFAAAaACwBAAEAEAAQAAAFZKAmjpqikCh5rVc6SpLGthSFIjiiMYx2/AeSYCggBY4B1DB1JD0ertFiocFYMdGENnHFugxgg2YyiYosFhIAkIpEUOs1qUAvkAb4gcbh0BD+BCgNDRoZhhkaFRVmh4hmIxAQLiEAIfkEBQAAGgAsAQABABAAEAAABWOgJo6aJJEoiaxIOj6PJsyCpigopmNyff0X0o43AgZJk0mKwSABAK4RhaJ5PqOH7GHAHUQD4ICm0YiKwCSHI7VYoDLwDClBT5Di8khEY+gbUBAQGgWEBRoWFmYEiwRmJBUVLiEAIfkEBQAAGgAsAQABABAAEAAABWSgJo7a85Aoia1YOgKAxraShMKwNk0a4iOkgXBAEhgFqEYjZSQ5HK6RQqHJWDPRi/Zyxbq2Fw0EEhUxGKRIJEWhoArwAulAP5AIeIJmsdAE/gEoFRUaCYYJfoFRBowGZSQWFi4hACH5BAUAABoALAEAAQAQABAAAAVloCaOGgCQKGma6eg42iAP2vOgWZ5pTaNhQAxJtxsFhSQIJDWZkCKR1kgi0RSuBSliiyB4CVKBWKCpVKQiMWmxSCkUqIQ8QbrYLySD3qChUDR3eCQWFhoHhwcaDAxoAY4BaCSOLSEAIfkEBQAAGgAsAQABABAAEAAABWOgJo6a45Aoma1ZOkaRxrYAgBZ4oUGQVtckgpBAGhgHqEol1WiQFgvX6PHQJK4JKWaLMXgNWq7GYpGKJhMShZKSSFCH+IGEqCNIgXxAo1BoBIACKHkaF4YXf4JSh4hmIwwMLiEAIfkEBQAAGgAsAQABABAAEAAABWSgJo5aFJEoWaxFOi6LRsyE5jhooidaVWmZYIZkKBpIwiHJYklBICQKxTUCADSH7IFqtQa+AepgPNB8qaJGg6RQpB4P1GV+IWHuGBK9LpFo8HkkDAwaCIYIGhMTaAKNAmgkjS4hADs%3D',
 	panel_rollover_pink: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAACXBIWXMAAAsRAAALEQF/ZF+RAAABPUlEQVR4nO3bUQ6CMAwGYE/C8TwxKHgYp0ZnYLZbN7Y2uP/hjwka7Wfb8cTJOTc8c+okg3UB6jEvAGCAAQYYYIAB7ifmBQAMMMAAAwwwwP3EvACAAQYYYIABBrifmBcAMMAAHw98n9zZ52/BX+SFz+HBMVwqhwHvQZKpPPb6yOsq62sJtF8HM3CyyB0dTWZ8pzl40x2qUxrokU418M/ozY2gks4Kkw1md24OYtVlaYjOyw4eCpw73rHP+9f1vXpycXjBHybrMFc4hZBMRqvDjkn+Dqe+lBv3VxbmeukqCDtd75TmwDHg7XM9fE+yDhSsAFnnPhzr9MLEY8PVoJAF49oULMKHyd1hAr631irgDZ7qUM7pWqmTamCy87m3lMpINXB07BWRJmAOr/3bJmDLmBcAMMAAAwxwAtzVo3gPOnSIPDelmfwAAAAASUVORK5CYII%3D',
 	}
+	//敵襲アイコン
+	var gifraid = 'data:image/gif;base64,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';
 
 	var group_setting = null;
 	var cardname_setting = null;
@@ -1066,7 +1068,7 @@ function Moko_main($) {
 
 		if (options['atkpict_replace']) {	//敵襲・アイコン置換
 			var $raid = $('IMG.fade[alt="敵襲"]');
-			$raid.attr('src','https://sites.google.com/site/ixatools/home/images/raid.gif');
+			$raid.attr('src',gifraid);
 		}
 
 		if (options['timeout_countdown']) {
@@ -1348,38 +1350,40 @@ function Moko_main($) {
 		// @ 表示拠点変更
 		//
 		if (!(user_name == "　")) {
-			var posSign = null;
-			var lnk = null;
-			var aes = $("div.sideBoxInner ul li:contains('"+ place_name + "') a");
-			//alert('aes.eq(0)='+aes.eq(0).html());
-			//alert("aes.length="+aes.length)
-			if (aes.length != 0) {
-				var href = aes.eq(0).attr('href');
-				//alert('href='+href);
-				var ttl = aes.eq(0).attr('title');
-				if (ttl.indexOf(place_name+' ') > -1) {
-					var s = href.match(/(village_id=[0-9]+)&/);
-					lnk = RegExp.leftContext + RegExp.$1 + '&from=menu&page=/map.php';
-					posSign = "@ ここを表示拠点にする";
+			if ($('li#lordName').text() == user_name) {		//自分の拠点なら
+				var posSign = null;
+				var lnk = null;
+				var aes = $("div.sideBoxInner ul li:contains('"+ place_name + "') a");
+				//alert('aes.eq(0)='+aes.eq(0).html());
+				//alert("aes.length="+aes.length)
+				if (aes.length != 0) {
+					var href = aes.eq(0).attr('href');
+					//alert('href='+href);
+					var ttl = aes.eq(0).attr('title');
+					if (ttl.indexOf(place_name+' ') > -1) {
+						var s = href.match(/(village_id=[0-9]+)&/);
+						lnk = RegExp.leftContext + RegExp.$1 + '&from=menu&page=/map.php';
+						posSign = "@ ここを表示拠点にする";
+					}
+					//alert(tmp);
+				} else {
+					//alert("aes.length="+aes.length);
+					if ($("div.sideBoxInner ul li.on span").text() == place_name) {
+						lnk = document.URL;
+						posSign = "* 現在の表示拠点";
+					}
 				}
-				//alert(tmp);
-			} else {
-				//alert("aes.length="+aes.length);
-				if ($("div.sideBoxInner ul li.on span").text() == place_name) {
-					lnk = document.URL;
-					posSign = "* 現在の表示拠点";
+				if (posSign != null) {
+					$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="text-align:center; color:black; padding:0px 10px; cursor:default">'+ posSign + '</li>');
+					$('#fUnit'+list_id).hover(function() {
+						$(this).css({color:'white', 'background-color':'blue'});
+					}, function() {
+						$(this).css({color:'', 'background-color':''});
+					}).click(function(e) {
+						location.href = lnk;
+					});
+					list_id++;
 				}
-			}
-			if (posSign != null) {
-				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="text-align:center; color:black; padding:0px 10px; cursor:default">'+ posSign + '</li>');
-				$('#fUnit'+list_id).hover(function() {
-					$(this).css({color:'white', 'background-color':'blue'});
-				}, function() {
-					$(this).css({color:'', 'background-color':''});
-				}).click(function(e) {
-					location.href = lnk;
-				});
-				list_id++;
 			}
 		}
 
