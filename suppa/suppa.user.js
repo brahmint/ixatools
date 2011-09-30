@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Suppa
-// @version        1.10
+// @version        1.12
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    Suppa 1.02 20110720
+// @description    Suppa 1.12 20110930
 // @include        http://*.sengokuixa.jp/facility/unit_list.php
 // @match          http://*.sengokuixa.jp/facility/unit_list.php
 // ==/UserScript==
@@ -11,6 +11,8 @@
 // 20110720 1.02	すべての武将がデッキのある時に集計されない問題対応
 // 20110918 1.03	Chromeでもコピペできるようにダイアログ表示へ
 // 20110919 1.10	グラフ機能追加
+// 20110919 1.11	パーセント値、フィルター機能追加
+// 20110930 1.12	鉄砲足軽を中級兵→上級兵に
 //
 // Mokoと同じjQuery初期化
 //
@@ -20,7 +22,7 @@ function bara_addJQuery(callback) {
     if (typeof(unsafeWindow.tb_init)!='undefined') {
         tb_init = unsafeWindow.tb_init;
     }
-    
+
     if (typeof(unsafeWindow.jQuery)!='undefined') {
         jQuery = unsafeWindow.jQuery;
         callback(unsafeWindow.jQuery);
@@ -66,104 +68,83 @@ function suppa_main($) {
 	var dialog_top=
 	'<style type="text/css">'+
 	'.suppa_soldiers {'+
-	'	font-size: 12px;'+
-	'	font-style: normal;'+
-	'	line-height: normal;'+
-	'	font-weight: normal;'+
-	'	font-variant: normal;'+
-	'	text-transform: none;'+
-	'	color: #000;'+
-	'	background-color: #EEE;'+
-	'	overflow: hidden;'+
-	'	position: absolute;'+
-	'	visibility: visible;'+
-	'	z-index: auto;'+
-	'	height: auto;'+
-	'	width: auto;'+
-	'	top: 80px;'+
-	'	left: 15px;'+
+	'font-size: 12px;'+
+	'font-style: normal;'+
+	'line-height: normal;'+
+	'font-weight: normal;'+
+	'font-variant: normal;'+
+	'text-transform: none;'+
+	'color: #000;'+
+	'background-color: #EEE;'+
+	'overflow: hidden;'+
+	'position: absolute;'+
+	'visibility: visible;'+
+	'z-index: auto;'+
+	'height: auto;'+
+	'width: auto;'+
+	'top: 60px;'+
+	'left: 15px;'+
 	'}'+
 	'.suppa_selected {'+
-	'	font-size: 14px;'+
-	'	font-style: normal;'+
-	'	line-height: normal;'+
-	'	font-weight: normal;'+
-	'	font-variant: normal;'+
-	'	color: #00C;'+
-	'	background-color: #FCF;'+
-	'	height: auto;'+
-	'	width: auto;'+
-	'	position: absolute;'+
-	'	top: 80px;'+
-	'	left: 180px;'+
+	'font-size: 14px;'+
+	'font-style: normal;'+
+	'line-height: normal;'+
+	'font-weight: normal;'+
+	'font-variant: normal;'+
+	'color: #00C;'+
+	'background-color: #FCF;'+
+	'height: auto;'+
+	'width: auto;'+
+	'position: absolute;'+
+	'top: 60px;'+
+	'left: 190px;'+
 	'}'+
 	'.suppa_options1 {'+
-	'	position: absolute;'+
-	'	height: 124px;'+
-	'	width: 83px;'+
-	'	top: 350px;'+
-	'	left: 20;'+
-	'	left: 15px;'+
-	'	text-align: left;'+
-	'	vertical-align: top;'+
+	'position: absolute;'+
+	'height: 124px;'+
+	'width: 83px;'+
+	'top: 330px;'+
+	'left: 20px;'+
+	'text-align: left;'+
+	'vertical-align: top;'+
 	'}'+
 	'.suppa_options2 {'+
-	'	position: absolute;'+
-	'	height: 79px;'+
-	'	width: 124px;'+
-	'	top: 350px;'+
-	'	left: 85px;'+
+	'position: absolute;'+
+	'height: 79px;'+
+	'width: 124px;'+
+	'top: 330px;'+
+	'left: 85px;'+
 	'}'+
 	'.suppa_graph {'+
-	'	height: 200px;'+
-	'	width: 240px;'+
-	'	position: absolute;'+
-	'	top: 180px;'+
-	'	left: 180px;'+
+	'height: 200px;'+
+	'width: 240px;'+
+	'position: absolute;'+
+	'top: 200px;'+
+	'left: 180px;'+
 	'}'+
 	'</style>';
 
 	var suppa_form_str =
 	'<form action="" name="form_soltype" class="suppa_options1" id="suppa_soltype">'+
 	'	<p>'+
-	'		<label>'+
-	'			<input name="g1_low" type="checkbox" id="g1_low" checked />'+
-	'			下級兵'+
-	'		</label>'+
-	'		<br />'+
-	'		<label>'+
-	'			<input name="g1_mid" type="checkbox" id="g1_mid" checked />'+
-	'			中級兵</label>'+
-	'		<br />'+
-	'		<label>'+
-	'			<input name="g1_high" type="checkbox" id="g1_high" checked />'+
-	'			上級兵</label>'+
-	'		<br />'+
-	'		<label>'+
-	'			<input name="g1_npc" type="checkbox" id="g1_npc" checked />'+
-	'			NPC兵</label><br />'+
+	'		<label><input name="g1_low"  type="checkbox" id="g1_low"  class="suppa_option" checked />下級兵</label><br />'+
+	'		<label><input name="g1_mid"  type="checkbox" id="g1_mid"  class="suppa_option" checked />中級兵</label><br />'+
+	'		<label><input name="g1_high" type="checkbox" id="g1_high" class="suppa_option" checked />上級兵</label><br />'+
+	'		<label><input name="g1_npc"  type="checkbox" id="g1_npc"  class="suppa_option" checked />NPC兵</label><br />'+
 	'	</p>'+
 	'</form>'+
 	'<form action="" name="form_solcond" class="suppa_options2" id="suppa_solcond">'+
 	'	<p>'+
-	'		<label>'+
-	'			<input name="g2_train" type="checkbox" id="g2_training" checked />'+
-	'			鍛錬中'+
-	'		</label><br />'+
-	'		<label>'+
-	'			<input name="g2_ondeck" type="checkbox" id="g2_ondeck" checked />'+
-	'			デッキ搭載中'+
-	'		</label>'+
-	'		<br />'+
+	'		<label><input name="g2_train"  type="checkbox" id="g2_training" class="suppa_option" checked />鍛錬中</label><br />'+
+	'		<label><input name="g2_ondeck" type="checkbox" id="g2_ondeck"   class="suppa_option" checked />デッキ搭載中</label><br />'+
+	'		<label><input name="g2_wait"   type="checkbox" id="g2_wait"     class="suppa_option" checked />陣屋・長屋待機</label><br />'+
+	'		<label><input name="g2_oncard" type="checkbox" id="g2_oncard"   class="suppa_option" checked />カード搭載</label><br />'+
 	'	</p>'+
 	'</form>';
 	var suppa_graph_str =
-	'<img src="list_img04.jpg" alt="image" width="240" height="200" id="suppa_chart" class="suppa_graph" />';
+	'</div><img src="list_img04.jpg" alt="image" width="240" height="200" id="suppa_chart" class="suppa_graph" />';
 
-
-//<img src="../../../../../../../../Pictures/WS000009.jpg" alt="image" width="200" height="208" class="suppa_graph" />
-
-	var sdata = "足軽,1,1:長槍足軽,1,2:武士,1,4:弓足軽,2,1:長弓兵,2,2:弓騎馬,2,4:騎馬兵,3,1:精鋭騎馬,3,2:赤備え,3,4:破城槌,4,1:攻城櫓,4,2:大筒兵,4,4:鉄砲足軽,5,2:騎馬鉄砲,5,4:国人衆,1,3:海賊衆,2,3:母衣衆,3,3:雑賀衆,5,3:";
+	var sdata = "足軽,1,1:長槍足軽,1,2:武士,1,4:弓足軽,2,1:長弓兵,2,2:弓騎馬,2,4:騎馬兵,3,1:精鋭騎馬,3,2:赤備え,3,4:破城槌,4,1:攻城櫓,4,2:大筒兵,4,4:鉄砲足軽,5,4:騎馬鉄砲,5,4:国人衆,1,3:海賊衆,2,3:母衣衆,3,3:雑賀衆,5,3:";
 
 	var SoldData = function ( sname, stype, sclass, nums) {
 		this.sname     = sname;		//名前 足軽、武士とか		
@@ -255,7 +236,7 @@ function suppa_main($) {
 		}
 		return s;
 	}
-	
+
 	function strFormat(s, width) {
 		if (s.length < width) {
 			s = s + ("　　　　　　　　　").substr(0, width - s.length);
@@ -263,35 +244,66 @@ function suppa_main($) {
 		return s;
 	}
 
+	function rateItems(rates) {
+		if (!(rates.length > 0)) return null;
+		var r = new Array();
+		var m = new Array();
+		for (var i = 0; i < rates.length; i++) {
+			var s = '000000'+rates[i];
+			m[i] = s.charAt(s.length-1);
+			r[i] = s.substring(s.length-5, s.length-1);
+			//GM_log("i:"+i+", rate:"+rates[i]+", r:"+r[i]+", m:"+m[i]);
+		}
+		var sum = 0;
+		for (var i = 0; i < rates.length; i++) {
+			sum += Number(r[i]);
+		}
+		var d = 1000 - sum;
+		//GM_log('sum:'+sum+", d:"+d);
+		for (var c = 0; c < d; c++) {
+			var px = -1;
+			var mx = -1;
+			for (var i = 0; i < rates.length; i++) {
+				if (Number(m[i]) > mx) {
+					px = i;
+					mx = Number(m[i]);
+				}
+			}
+			var rs = "000000"+(Number(r[px]) + 1);
+			r[px] = rs.substring(rs.length-4, rs.length);
+			m[px] = '-1';
+		}
+		for (var i = 0; i < rates.length; i++) {
+			//GM_log("i:"+i+", rate:"+rates[i]+", r:"+r[i]+", m:"+m[i]);
+			r[i] = r[i].substr(0, 3)+'.'+r[i].substr(-1,1)+'%';
+			r[i] = r[i].replace(/^00/,'');
+			r[i] = r[i].replace(/^0/,'');
+			r[i] = r[i].replace(/^\.0/,'0.0');
+		}
+		//for (var i = 0; i < rates.length; i++) {
+		//	GM_log("i:"+i+", rate:"+rates[i]+", r:"+r[i]+", m:"+m[i]);
+		//}
+		return r;
+	}
 
 	// 兵数集計 兵種:stype 兵級:sclass で 鍛錬中除く:add_training, デッキ搭載除く: add_deck
-	function countSoldiers(stype, sclass, add_training, add_deck) {
+	function countSoldiers(stype, sclass, add_training, add_deck, add_stb, add_wait) {
 		var num = 0;
 		for (var i = 0; i < soldiers.length; i++) {
 			if (stype == soldiers[i].stype) {
 				if (sclass == soldiers[i].sclass) {
-					//GM_log('stype='+stype+', scalass='+sclass+', soldiers['+i+'].numwait='+soldiers[i].numwait);
-					//GM_log('stype='+stype+', scalass='+sclass+', soldiers['+i+'].numstdby='+soldiers[i].numstdby);
-					//GM_log('stype='+stype+', scalass='+sclass+', soldiers['+i+'].numtrain='+soldiers[i].numtrain);
-					//GM_log('stype='+stype+', scalass='+sclass+', soldiers['+i+'].numdeck='+soldiers[i].numdeck);
-					num += Number(soldiers[i].numwait) + Number(soldiers[i].numstdby);
 					if (add_training) num +=  Number(soldiers[i].numtrain);
 					if (add_deck)     num +=  Number(soldiers[i].numdeck);					
+					if (add_stb)      num +=  Number(soldiers[i].numstdby);
+					if (add_wait)     num +=  Number(soldiers[i].numwait);					
 				}
 			}
 		}
 		//GM_log('stype='+stype+', scalass='+sclass+', num='+num);
 		return num;
 	}
-	//
-	//
-	//
-	//
 
 	function mergeAndShow() {
-		var th_style = 'width="70" style="text-align:left"';
-		var td_style = 'width="70" style="text-align:right"';
-
 		for (var i = 0; i < decksoldcount; i++) {
 			addNumDeck(decksold[i].sname, decksold[i].numdeck);
 		}
@@ -299,7 +311,9 @@ function suppa_main($) {
 			addNumStdby(stdbysold[i].sname, stdbysold[i].numstdby);
 		}
 
-		var htm1 = '<table width="150" border="1" class="suppa_soldiers" id="soldiers" name="soldiers">';
+		var htm1 = '<table width="150" border="1" class="suppa_soldiers" id="soldiers" name="soldiers"><tr><th colspan="2" style="text-align:center">兵別合計</th></tr>';
+		var th_style = 'width="70" style="text-align:left"';
+		var td_style = 'width="70" style="text-align:right"';
 		var total = 0;
 		for (var i = 0; i < soldiers.length; i++) {
 			htm1 += '<tr><th '+th_style+'>'+soldiers[i].sname+'</th><td '+td_style+'>'+numFormat(soldiers[i].numwait + soldiers[i].numtrain + soldiers[i].numdeck + soldiers[i].numstdby,8)+'</tr>';
@@ -308,30 +322,39 @@ function suppa_main($) {
 		htm1 += '<tr><th '+th_style+'>＊合計＊</th><td '+td_style+'>'+numFormat(total,8)+'</tr>';
 		htm1 += '</table>';
 
-		var htm2 = '<table width="200" border="1" class="suppa_selected" id="selected" name="selected">'+
+		var htm2 = '<table width="220" border="1" class="suppa_selected" id="selected" name="selected">'+
 		'<tr>'+
-		'<th width="73" scope="row">槍</th>'+
-		'<td width="111" id="sel_spares" style="text-align:right">&nbsp;</td>'+
+		'<th colspan="3" style="text-align:center">兵種別集計</th>'+
 		'</tr>'+
 		'<tr>'+
-		'<th scope="row">弓</th>'+
+		'<th width="50" scope="row" style="text-align:center">槍</th>'+
+		'<td width="100" id="sel_spares" style="text-align:right">&nbsp;</td>'+
+		'<td width="70" id="sel_spares_rate" style="text-align:right">&nbsp;</td>'+
+		'</tr>'+
+		'<tr>'+
+		'<th scope="row" style="text-align:center">弓</th>'+
 		'<td id="sel_bows" style="text-align:right">&nbsp;</td>'+
+		'<td id="sel_bows_rate" style="text-align:right">&nbsp;</td>'+
 		'</tr>'+
 		'<tr>'+
-		'<th scope="row">馬</th>'+
+		'<th scope="row" style="text-align:center">馬</th>'+
 		'<td id="sel_horses" style="text-align:right">&nbsp;</td>'+
+		'<td id="sel_horses_rate" style="text-align:right">&nbsp;</td>'+
 		'</tr>'+
 		'<tr>'+
-		'<th scope="row">器</th>'+
+		'<th scope="row" style="text-align:center">器</th>'+
 		'<td id="sel_weapons" style="text-align:right">&nbsp;</td>'+
+		'<td id="sel_weapons_rate" style="text-align:right">&nbsp;</td>'+
 		'</tr>'+
 		'<tr>'+
-		'<th scope="row">砲</th>'+
+		'<th scope="row" style="text-align:center">砲</th>'+
 		'<td id="sel_guns" style="text-align:right">&nbsp;</td>'+
+		'<td id="sel_guns_rate" style="text-align:right">&nbsp;</td>'+
 		'</tr>'+
 		'<tr>'+
-		'<th scope="row">合計</th>'+
+		'<th scope="row" style="text-align:center">合計</th>'+
 		'<td id="sel_total" style="text-align:right">&nbsp;</td>'+
+		'<td id="sel_total_rate" style="text-align:right">&nbsp;</td>'+
 		'</tr>'+
 		'</table>';
 
@@ -344,13 +367,46 @@ function suppa_main($) {
 		return x = parseInt(v / base * 100 + 0.5)/100;
 	}
 
-	function reWrite(flag1, flag2) {
-		var spares  = countSoldiers( 1, 1, flag1, flag2) + countSoldiers( 1, 2, flag1, flag2) + countSoldiers( 1, 3, flag1, flag2) + countSoldiers( 1, 4, flag1, flag2);
-		var bows    = countSoldiers( 2, 1, flag1, flag2) + countSoldiers( 2, 2, flag1, flag2) + countSoldiers( 2, 3, flag1, flag2) + countSoldiers( 2, 4, flag1, flag2);
-		var horses  = countSoldiers( 3, 1, flag1, flag2) + countSoldiers( 3, 2, flag1, flag2) + countSoldiers( 3, 3, flag1, flag2) + countSoldiers( 3, 4, flag1, flag2);
-		var weapons = countSoldiers( 4, 1, flag1, flag2) + countSoldiers( 4, 2, flag1, flag2) + countSoldiers( 4, 3, flag1, flag2) + countSoldiers( 4, 4, flag1, flag2);
-		var guns    = countSoldiers( 5, 1, flag1, flag2) + countSoldiers( 5, 2, flag1, flag2) + countSoldiers( 5, 3, flag1, flag2) + countSoldiers( 5, 4, flag1, flag2);
+	function reWrite() {
+		var flag_tr = $('#g2_training').attr('checked');
+		var flag_dk = $('#g2_ondeck').attr('checked');
+		var flag_sb = $('#g2_oncard').attr('checked');
+		var flag_wt = $('#g2_wait').attr('checked');
+		var spares  = 	($('#g1_low').attr('checked')  ? countSoldiers( 1, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 1, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 1, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_npc').attr('checked')  ? countSoldiers( 1, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
+		var bows    = 	($('#g1_low').attr('checked')  ? countSoldiers( 2, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 2, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 2, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_npc').attr('checked')  ? countSoldiers( 2, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
+		var horses  = 	($('#g1_low').attr('checked')  ? countSoldiers( 3, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 3, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 3, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_npc').attr('checked')  ? countSoldiers( 3, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
+		var weapons = 	($('#g1_low').attr('checked')  ? countSoldiers( 4, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 4, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 4, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_npc').attr('checked')  ? countSoldiers( 4, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
+		var guns    = 	($('#g1_low').attr('checked')  ? countSoldiers( 5, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 5, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 5, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
+						($('#g1_npc').attr('checked')  ? countSoldiers( 5, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
 		var total   = spares + bows + horses + weapons + guns;
+
+		var spares_rate  = (total != 0) ? Math.floor(spares*10000/total) : -1;
+		var bows_rate    = (total != 0) ? Math.floor(bows*10000 / total) : -1;
+		var horses_rate  = (total != 0) ? Math.floor(horses*10000 / total) : -1;
+		var weapons_rate = (total != 0) ? Math.floor(weapons*10000 / total) : -1;
+		var guns_rate    = (total != 0) ? Math.floor(guns*10000 / total) : -1;
+		var total_rate   = (total != 0) ? Math.floor(total*10000 / total) : -1;
+		var rates = new Array(spares_rate, bows_rate, horses_rate, weapons_rate, guns_rate);
+		var ratestr = (total != 0) ? rateItems(rates): null;
+		if (ratestr == null) {
+			ratestr = new Array('***', '***', '***', '***', '***', '---' );
+		} else {
+			ratestr[5] = '100.0%';
+		}
 
 		$('table#selected').find('td#sel_spares').text(numFormat(spares,8));
 		$('table#selected').find('td#sel_bows').text(numFormat(bows,8));
@@ -358,29 +414,35 @@ function suppa_main($) {
 		$('table#selected').find('td#sel_weapons').text(numFormat(weapons,8));
 		$('table#selected').find('td#sel_guns').text(numFormat(guns,8));
 		$('table#selected').find('td#sel_total').text(numFormat(total,8));
+		$('table#selected').find('td#sel_spares_rate').text(ratestr[0]);
+		$('table#selected').find('td#sel_bows_rate').text(ratestr[1]);
+		$('table#selected').find('td#sel_horses_rate').text(ratestr[2]);
+		$('table#selected').find('td#sel_weapons_rate').text(ratestr[3]);
+		$('table#selected').find('td#sel_guns_rate').text(ratestr[4]);
+		$('table#selected').find('td#sel_total_rate').text(ratestr[5]);
 
 		var vmax = 0;
-		if (vmax < spares) vmax = spares;
-		if (vmax < bows) vmax = bows;
-		if (vmax < horses) vmax = horses;
+		if (vmax < spares)  vmax = spares;
+		if (vmax < bows)    vmax = bows;
+		if (vmax < horses)  vmax = horses;
 		if (vmax < weapons) vmax = weapons;
-		if (vmax < guns) vmax = spares;
+		if (vmax < guns)    vmax = spares;
 		var vbase = vmax / 100.0;
 
 		var chart = 'https://chart.googleapis.com/chart?'+
 			  'cht=p&'+
 			  'chs=240x200&'+
 			  'chd=t:'+cscale(spares,vbase)+','+cscale(bows,vbase)+','+cscale(horses,vbase)+','+cscale(weapons,vbase)+','+cscale(guns,vbase)+'&'+
-			  'chp=-1.57&&chtt=兵種割合&chl=槍|弓|馬|器|砲&chof=png';
+			  'chp=-1.57&&chtt=兵種別割合&chl=槍|弓|馬|器|砲&chof=png';
 		$('img#suppa_chart').attr('src',encodeURI(chart));
-		GM_log(encodeURI(chart));
+		//GM_log(encodeURI(chart));
 	}
 
 	function suppa_dialog(msg) {
 		var dialog_str = dialog_top +
-				'<DIV id="suppa_dialog" style="position:absolute;width:400px;height:400px;display:none;z-index:9999;padding:20px;'
+				'<DIV id="suppa_dialog" style="position:absolute;width:400px;height:390px;display:none;z-index:9999;padding:20px;'
 				+'background-color:#fff;border:3px solid #f00;-moz-border-radius:5px;-webkit-border-radius:5px;" class="window">'
-				+'<B>数把</B> | <A style="color:#000;" href="#" class="close">[ 閉じる ]</A>'
+				+'<B>数把</B><div style="position: absolute; top: 10px; right: 10px"><a style="color:#000; text-decoration: none" href="#" class="close" >[ 閉じる ]</a></div>'
 				+'<DIV style="border-top:1px solid #000;padding-top:10px;line-height:2.0em;">'
 				+msg
 				+suppa_form_str
@@ -408,7 +470,13 @@ function suppa_main($) {
 			$('#suppa_dialog').hide();
 		});
 
-		reWrite(true,true);
+		$('.suppa_option').click(function(e) {
+			var a=$(this).attr('id');
+			var v=$(this).attr('checked');
+			reWrite();
+		});
+
+		reWrite();
 	}
 	//
 	//待機中の兵士、訓練中の兵士の数を数える
@@ -463,14 +531,6 @@ function suppa_main($) {
 				rdysold = true;		//準備完了
 				//				
 
-				//var msg = "";
-				//for (var i = 0; i < soldiers.length; i++) {
-				//	msg += i + ":" + soldiers[i].sname + "[" + soldiers[i].stype + "," + soldiers[i].sclass + "]," + soldiers[i].numwait + "," + soldiers[i].numtrain + "," + soldiers[i].numdeck + "," + soldiers[i].numstdby + "\n";
-				//}
-				//alert(msg);
-				//alert('count='+thcount+ '\n'+ths);
-				//alert('count='+tdcount+ '\n'+tds);
-				//alert('tericount=' + tericount);
 			},
 			error: function (XMLHttpRequest, textStatus, errorThrown) {
 				alert('$.ajax countWaitAndTrainin() error');
@@ -530,11 +590,6 @@ function suppa_main($) {
 				deckjobs++;
 				if (deckjobs >= 5) {
 					rdydeck = true;		//準備完了
-					//var msg = "";
-					//for (var i = 0; i < decksoldcount; i++) {
-					//	msg += "\n"+ decksold[i].name + "," + decksold[i].cost + "," + decksold[i].sname + "," + decksold[i].numdeck;
-					//}
-					//alert("Msg:"+msg);
 				}
 
 			},
@@ -614,11 +669,6 @@ function suppa_main($) {
 									stdbysoldcount++;
 								}
 								rdystdby = true;	//準備完了
-								//var msg = "";
-								//for (var i = 0; i < stdbysoldcount; i++) {
-								//	msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
-								//}
-								//alert("Msg:"+msg);
 							},
 							error: function (XMLHttpRequest, textStatus, errorThrown) {
 								alert('$.ajax countStdby() pg2 error');
@@ -628,11 +678,6 @@ function suppa_main($) {
 	
 					} else {
 						rdystdby = true;	//準備完了
-						//var msg = "";
-						//for (var i = 0; i < stdbysoldcount; i++) {
-						//	msg += "\n"+ stdbysold[i].name + "," + stdbysold[i].sname + "," + stdbysold[i].numstdby;
-						//}
-						//alert("Msg:"+msg);
 					}
 				} else {
 					rdystdby = true;	//件数０で、準備完了
@@ -646,7 +691,6 @@ function suppa_main($) {
 
 		return;
 	}
-
 
 	//------------------------------
 	//
