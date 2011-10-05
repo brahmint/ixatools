@@ -2,7 +2,7 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20111003
+// @description	戦国IXA用ツール ver 1.8.6a 20110403 + 婆羅門機能追加 20111004
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
 // ==/UserScript==
@@ -65,6 +65,7 @@
 // ・敵襲画像変更 20110919　アニメーション化 20110921
 // ・敵マーク画像をソース埋込に 20111001 修正 1003
 // ・Informer機能 20111003
+// ・右クリックメニューへ敵襲追加 20111004
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -1509,163 +1510,178 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 		});
 		list_id++;
 
-		if (user_name == "　") return;		//空き地ならここまで、以下は拠点
-		//
-		//
-		// 城主報告書
-		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">城主報告書</li>');
-		$('#fUnit'+list_id).hover(function() {
-			$(this).css({color:'white', 'background-color':'blue'});
-		}, function() {
-			$(this).css({color:'', 'background-color':''});
-		}).click(function(e) {
-			location.href='/war/list.php?m=&s=1&name=lord&word='+$(this).attr('name')+'&coord=map&x=&y=';
-		});
-		list_id++;
-		// 同盟報告書
-		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + alliance_name+ '" style="color:black; padding:0px 10px; cursor:default">同盟報告書</li>');
-		$('#fUnit'+list_id).hover(function() {
-			$(this).css({color:'white', 'background-color':'blue'});
-		}, function() {
-			$(this).css({color:'', 'background-color':''});
-		}).click(function(e) {
-			location.href='/war/list.php?m=&s=1&name=alliance&word='+$(this).attr('name')+'&coord=map&x=&y=';
-		});
-		list_id++;
-		//
-		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
-		list_id++;
-		// 城主合戦格付
-		// 敵国の格付はそのままではでない。攻撃国、防御国、援軍国ボタンを押す…
-		// 別ページを読まずにcが特定出来る方法はあるのか？
-		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">城主合戦格付</li>');
-		$('#fUnit'+list_id).hover(function() {
-			$(this).css({color:'white', 'background-color':'blue'});
-		}, function() {
-			$(this).css({color:'', 'background-color':''});
-		}).click(function(e) {
-			location.href='/war/war_ranking.php?m=&find_rank=&find_name=' + $(this).attr('name');
-		});
-		list_id++;
-		// 同盟合戦格付
-		// 敵国の格付はそのままではでない。攻撃国、防御国、援軍国ボタンを押す…
-		// 別ページを読まずにcが特定出来る方法はあるのか？
-		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + alliance_name+ '" style="color:black; padding:0px 10px; cursor:default">同盟合戦格付</li>');
-		$('#fUnit'+list_id).hover(function() {
-			$(this).css({color:'white', 'background-color':'blue'});
-		}, function() {
-			$(this).css({color:'', 'background-color':''});
-		}).click(function(e) {
-			location.href='/war/war_alliance_ranking.php?m=&find_rank=&find_name=' + $(this).attr('name');
-		});
-		list_id++;
-		// 城主格付
-		// とりあえず、c=0にして全体格付表示で…
-		// 別ページを読まずにcが特定出来る方法はあるのか？
-		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">城主格付</li>');
-		$('#fUnit'+list_id).hover(function() {
-			$(this).css({color:'white', 'background-color':'blue'});
-		}, function() {
-			$(this).css({color:'', 'background-color':''});
-		}).click(function(e) {
-			location.href='/user/ranking.php?m=&find_rank=&find_name=' + $(this).attr('name') + '&c=0';
-		});
-		list_id++;
-		// 同盟格付
-		// とりあえず、c=0にして全体格付表示で…別ページを読まずにcが特定出来る方法はあるのか？
-		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + alliance_name+ '" style="color:black; padding:0px 10px; cursor:default">同盟格付</li>');
-		$('#fUnit'+list_id).hover(function() {
-			$(this).css({color:'white', 'background-color':'blue'});
-		}, function() {
-			$(this).css({color:'', 'background-color':''});
-		}).click(function(e) {
-			location.href='/alliance/list.php?m=&find_rank=&find_name=' + $(this).attr('name') + '&c=0';
-		});
-		list_id++;
-		if ($('li#lordName').text() != user_name) {
-			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
-			list_id++;
-			// プロフィール
-			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="プロフィール" style="color:black; padding:0px 10px; cursor:default">プロフィール</li>');
+		if (user_name != "　") {		//空き地ならここまで、以下は拠点
+			//
+			//
+			// 城主報告書
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">城主報告書</li>');
 			$('#fUnit'+list_id).hover(function() {
 				$(this).css({color:'white', 'background-color':'blue'});
 			}, function() {
 				$(this).css({color:'', 'background-color':''});
 			}).click(function(e) {
-				//location.href=profUrl($(target).attr('href'));
-				$.ajax({
-					type: "POST",
-					url: $(target).attr('href'),
-					cache: false, 
-					dataType: "text",
-					success: function (html){
-						var profUrl = $(html).find('div.ig_mappanel_dataarea a').eq(0).attr('href');
-						location.href=profUrl;
-					},
-					error: function (XMLHttpRequest, textStatus, errorThrown) {
-						//console.log(textStatus);
-					}
-				});
+				location.href='/war/list.php?m=&s=1&name=lord&word='+$(this).attr('name')+'&coord=map&x=&y=';
 			});
 			list_id++;
-			// 同盟情報
-			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="プロフィール" style="color:black; padding:0px 10px; cursor:default">同盟情報</li>');
+			// 同盟報告書
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + alliance_name+ '" style="color:black; padding:0px 10px; cursor:default">同盟報告書</li>');
 			$('#fUnit'+list_id).hover(function() {
 				$(this).css({color:'white', 'background-color':'blue'});
 			}, function() {
 				$(this).css({color:'', 'background-color':''});
 			}).click(function(e) {
-				//location.href=profUrl($(target).attr('href'));
-				$.ajax({
-					type: "POST",
-					url: $(target).attr('href'),
-					cache: false, 
-					dataType: "text",
-					success: function (html){
-						var alliUrl = $(html).find('div.ig_mappanel_dataarea a').eq(1).attr('href');
-						location.href=alliUrl;
-					},
-					error: function (XMLHttpRequest, textStatus, errorThrown) {
-						//console.log(textStatus);
-					}
-				});
+				location.href='/war/list.php?m=&s=1&name=alliance&word='+$(this).attr('name')+'&coord=map&x=&y=';
 			});
 			list_id++;
-		}
-		//
-		// Targetize
-		//
-		if (mapPoz.isEnemy == true) {		//敵拠点なら
+			//
 			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
 			list_id++;
-			if (mapPoz.user_name == targetEnemy) {
-				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵のマークをやめる</li>');
+			// 城主合戦格付
+			// 敵国の格付はそのままではでない。攻撃国、防御国、援軍国ボタンを押す…
+			// 別ページを読まずにcが特定出来る方法はあるのか？
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">城主合戦格付</li>');
+			$('#fUnit'+list_id).hover(function() {
+				$(this).css({color:'white', 'background-color':'blue'});
+			}, function() {
+				$(this).css({color:'', 'background-color':''});
+			}).click(function(e) {
+				location.href='/war/war_ranking.php?m=&find_rank=&find_name=' + $(this).attr('name');
+			});
+			list_id++;
+			// 同盟合戦格付
+			// 敵国の格付はそのままではでない。攻撃国、防御国、援軍国ボタンを押す…
+			// 別ページを読まずにcが特定出来る方法はあるのか？
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + alliance_name+ '" style="color:black; padding:0px 10px; cursor:default">同盟合戦格付</li>');
+			$('#fUnit'+list_id).hover(function() {
+				$(this).css({color:'white', 'background-color':'blue'});
+			}, function() {
+				$(this).css({color:'', 'background-color':''});
+			}).click(function(e) {
+				location.href='/war/war_alliance_ranking.php?m=&find_rank=&find_name=' + $(this).attr('name');
+			});
+			list_id++;
+			// 城主格付
+			// とりあえず、c=0にして全体格付表示で…
+			// 別ページを読まずにcが特定出来る方法はあるのか？
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + user_name+ '" style="color:black; padding:0px 10px; cursor:default">城主格付</li>');
+			$('#fUnit'+list_id).hover(function() {
+				$(this).css({color:'white', 'background-color':'blue'});
+			}, function() {
+				$(this).css({color:'', 'background-color':''});
+			}).click(function(e) {
+				location.href='/user/ranking.php?m=&find_rank=&find_name=' + $(this).attr('name') + '&c=0';
+			});
+			list_id++;
+			// 同盟格付
+			// とりあえず、c=0にして全体格付表示で…別ページを読まずにcが特定出来る方法はあるのか？
+			$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="' + alliance_name+ '" style="color:black; padding:0px 10px; cursor:default">同盟格付</li>');
+			$('#fUnit'+list_id).hover(function() {
+				$(this).css({color:'white', 'background-color':'blue'});
+			}, function() {
+				$(this).css({color:'', 'background-color':''});
+			}).click(function(e) {
+				location.href='/alliance/list.php?m=&find_rank=&find_name=' + $(this).attr('name') + '&c=0';
+			});
+			list_id++;
+			if ($('li#lordName').text() != user_name) {
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+				list_id++;
+				// プロフィール
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="プロフィール" style="color:black; padding:0px 10px; cursor:default">プロフィール</li>');
 				$('#fUnit'+list_id).hover(function() {
 					$(this).css({color:'white', 'background-color':'blue'});
 				}, function() {
 					$(this).css({color:'', 'background-color':''});
 				}).click(function(e) {
-					targetEnemy = "";
-					targetAlli  = "";
-					saveTargeties();
-					mapPoz.repTargets();
+					//location.href=profUrl($(target).attr('href'));
+					$.ajax({
+						type: "POST",
+						url: $(target).attr('href'),
+						cache: false, 
+						dataType: "text",
+						success: function (html){
+							var profUrl = $(html).find('div.ig_mappanel_dataarea a').eq(0).attr('href');
+							location.href=profUrl;
+						},
+						error: function (XMLHttpRequest, textStatus, errorThrown) {
+							//console.log(textStatus);
+						}
+					});
 				});
-				list_id++;				
-			} else {
-				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵をマークする</li>');
+				list_id++;
+				// 同盟情報
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="プロフィール" style="color:black; padding:0px 10px; cursor:default">同盟情報</li>');
 				$('#fUnit'+list_id).hover(function() {
 					$(this).css({color:'white', 'background-color':'blue'});
 				}, function() {
 					$(this).css({color:'', 'background-color':''});
 				}).click(function(e) {
-					targetEnemy = mapPoz.user_name;
-					targetAlli  = mapPoz.alliance_name;
-					saveTargeties();
-					mapPoz.repTargets();
+					//location.href=profUrl($(target).attr('href'));
+					$.ajax({
+						type: "POST",
+						url: $(target).attr('href'),
+						cache: false, 
+						dataType: "text",
+						success: function (html){
+							var alliUrl = $(html).find('div.ig_mappanel_dataarea a').eq(1).attr('href');
+							location.href=alliUrl;
+						},
+						error: function (XMLHttpRequest, textStatus, errorThrown) {
+							//console.log(textStatus);
+						}
+					});
 				});
-				list_id++;				
+				list_id++;
+			}
+			//
+			// Targetize
+			//
+			if (mapPoz.isEnemy == true) {		//敵拠点なら
+				$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+				list_id++;
+				if (mapPoz.user_name == targetEnemy) {
+					$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵のマークをやめる</li>');
+					$('#fUnit'+list_id).hover(function() {
+						$(this).css({color:'white', 'background-color':'blue'});
+					}, function() {
+						$(this).css({color:'', 'background-color':''});
+					}).click(function(e) {
+						targetEnemy = "";
+						targetAlli  = "";
+						saveTargeties();
+						mapPoz.repTargets();
+					});
+					list_id++;				
+				} else {
+					$('#cm_mapItem').append('<li id="fUnit'+list_id+'" style="color:black; padding:0px 10px; cursor:default">この敵をマークする</li>');
+					$('#fUnit'+list_id).hover(function() {
+						$(this).css({color:'white', 'background-color':'blue'});
+					}, function() {
+						$(this).css({color:'', 'background-color':''});
+					}).click(function(e) {
+						targetEnemy = mapPoz.user_name;
+						targetAlli  = mapPoz.alliance_name;
+						saveTargeties();
+						mapPoz.repTargets();
+					});
+					list_id++;				
+				}
 			}
 		}
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="break" style="color:black; padding:0px 10px; cursor:default">---------------</li>');
+		list_id++;
+		// 敵襲表示
+		$('#cm_mapItem').append('<li id="fUnit'+list_id+'" name="敵襲表示" style="color:black; padding:0px 10px; cursor:default">距離20以内の敵襲表示</li>');
+        $('#fUnit'+list_id).hover(function() {
+            $(this).css({color:'white', 'background-color':'blue'});
+        }, function() {
+            $(this).css({color:'', 'background-color':''});
+        }).click(function(e) {
+			//     /war/fight_history.php?find_x=-39&find_y=-1&find_length=20
+			var re = $(target).attr('href').match(/x=(-?[0-9]+)&y=(-?[0-9]+)&c=[0-9]+/);
+			location.href='/war/fight_history.php?find_x='+RegExp.$1+'&find_y='+RegExp.$2+'&find_length=20';
+        });
+		list_id++;
 	}
 
 	function map_move_ajax(area) {
