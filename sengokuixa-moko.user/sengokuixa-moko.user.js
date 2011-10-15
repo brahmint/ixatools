@@ -2,9 +2,10 @@
 // @name		sengokuixa-moko
 // @namespace	sengokuixa-ponpoko
 // @author		server1+2.nao****
-// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20111004
+// @description	戦国IXA用ツール ver 1.8.6a 20110330 + 婆羅門機能追加 20111008
 // @include		http://*.sengokuixa.jp/*
 // @match		http://*.sengokuixa.jp/*
+// @icon		data:image/png;base64,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
 // ==/UserScript==
 //
 
@@ -60,6 +61,8 @@
 // ・敵マーク画像をソース埋込に 20111001 修正 1003
 // ・Informer機能 20111003
 // ・右クリックメニューへ敵襲追加 20111004
+// ・３章空地必要戦力に対応 20111008
+// ・自分の拠点名称に'('などの特殊文字があった場合にマップの右クリックメニュー出ない問題の修正 
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -154,6 +157,7 @@ function Moko_main($) {
 		market_desc				: {tag: 'faci',		caption: '取引を上部に表示'},	//add
 		non_back				: {tag: 'faci',		caption: '復活するボタンを非表示'},
 		map_potential			: {tag: 'faci',		caption: '空地戦力を表示'},
+		season3					: {tag:	'faci',		caption: '空地戦力は３章対応'},
 		facility_selecter		: {tag: 'faci',		caption: '訓練施設内に他訓練施設リンクを設置'},
 		facility_tool			: {tag: 'faci',		caption: '右クリックで施設操作ツールを表示'},
 		facility_maxsoldier		: {tag: 'sol',		caption: '各兵生産施設で最大作成可能兵数リンク設置'},
@@ -353,14 +357,15 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 	mapPoz.mid;
 	mapPoz.init = function() {
 		this.areas = mapPoz.mapContainer.find('map#mapOverlayMap area');
-		if (this.areas.length == 121) {			//10x10
+		this.mapsAll = mapPoz.mapContainer.find('div#ig_mapsAll');
+		var mapscount = this.mapsAll.find('img').length;
+		if (mapscount == 123) {			//10x10
 			this.size = 11;
-		} else if (this.areas.length == 225) {	//15x15
+		} else if (mapscount == 227) {	//15x15
 			this.size = 15;
 		} else {									//20x20
 			this.size = 20;
 		}
-		this.mapsAll = mapPoz.mapContainer.find('div#ig_mapsAll');
 		var tlurl = this.areas.eq(0).attr('href');
 		var re0 = tlurl.match(/x=(-?[0-9]+)&y=(-?[0-9]+)&c=([0-9]+)/);
 		this.xtl = Number(RegExp.$1);
@@ -373,7 +378,14 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 		this.btmright = RegExp.$1 + ',' + RegExp.$2;
 	}
 	mapPoz.setTarget = function(target) {			//target は areaを指定
-		var onmouseover = $(target).attr('onmouseover').toString().match(/(?:[^'"]|\\.)*/g);
+		var onmouseover = $(target).attr('onmouseover');
+		if (onmouseover == undefined) {
+			this.user_name = undefined;
+			this.alliance_name = undefined;
+			this.place_name = undefined;
+			return false;
+		}
+		onmouseover = $(target).attr('onmouseover').toString().match(/(?:[^'"]|\\.)*/g);
 		this.user_name = unescapeUnicode(onmouseover[6]);
 		this.alliance_name = unescapeUnicode(onmouseover[18]);
 		this.place_name = unescapeUnicode(onmouseover[2]);
@@ -418,6 +430,7 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 				
 			}
 		}
+		return true;
 	}
 	mapPoz.replaceFile = function(mid) {
 		if (this.isEnemy) {
@@ -442,13 +455,14 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 	mapPoz.repTargets = function() {		//mapのターゲット拠点の画像置換え
 		for (var x = 0;  x < mapPoz.size; x++) {
 			for (var y = 0; y < mapPoz.size; y++) {
-				mapPoz.setTarget(mapPoz.areas.eq(x*mapPoz.size + y));
-				if (mapPoz.user_name == targetEnemy) {
-					mapPoz.replaceFile('_t_');
-				} else if (mapPoz.alliance_name == targetAlli) {
-					mapPoz.replaceFile('_v_');
-				} else {
-					mapPoz.replaceFile('_r_');
+				if (mapPoz.setTarget(mapPoz.areas.eq(x*mapPoz.size + y)) == true) {
+					if (mapPoz.user_name == targetEnemy) {
+						mapPoz.replaceFile('_t_');
+					} else if (mapPoz.alliance_name == targetAlli) {
+						mapPoz.replaceFile('_v_');
+					} else {
+						mapPoz.replaceFile('_r_');
+					}
 				}
 			}
 		}
@@ -1442,21 +1456,20 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 			if ($('li#lordName').text() == user_name) {		//自分の拠点なら
 				var posSign = null;
 				var lnk = null;
-				var aes = $("div.sideBoxInner ul li:contains('"+ place_name + "') a");
-				//alert('aes.eq(0)='+aes.eq(0).html());
-				//alert("aes.length="+aes.length)
-				if (aes.length != 0) {
-					var href = aes.eq(0).attr('href');
-					//alert('href='+href);
-					var ttl = aes.eq(0).attr('title');
-					if (ttl.indexOf(place_name+' ') > -1) {
-						var s = href.match(/(village_id=[0-9]+)&/);
-						lnk = RegExp.leftContext + RegExp.$1 + '&from=menu&page=/map.php';
-						posSign = "@ ここを表示拠点にする";
+				var aes = $("div.sideBoxInner ul li a");
+				var href = null;
+				for (var i = 0; i < aes.length; i++) {
+					if (aes.eq(i).text() == place_name) {
+						href = aes.eq(i).attr('href');
+						break;
 					}
+				}
+				if (href != null) {
+					var s = href.match(/(village_id=[0-9]+)&/);
+					lnk = RegExp.leftContext + RegExp.$1 + '&from=menu&page=/map.php';
+					posSign = "@ ここを表示拠点にする";
 					//alert(tmp);
 				} else {
-					//alert("aes.length="+aes.length);
 					if ($("div.sideBoxInner ul li.on span").text() == place_name) {
 						lnk = document.URL;
 						posSign = "* 現在の表示拠点";
@@ -2421,9 +2434,6 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 	function map_potential() {
 		if (location.pathname!="/facility/send_troop.php" && location.pathname!="/land.php") return;
 		if (!options['map_potential']) return;
-		/*
-		$('#mokotool').append('<SPAN class="normal">★1　[平 1000]　馬 155<BR />★1　[平 0100]　弓 155<BR />★1　[平 0100]　弓 155<BR />---<BR />★2　[鉄 0020]　全 520<BR />★2　[平 0001]　槍 370<BR />---<BR />★3　[木 2010]　馬 730<BR />★3　[綿 0210]　弓 730<BR />★3　[糧 0012]　槍 730<BR />---<BR />★4　[木 3010]　馬 2310<BR />★4　[綿 0300]　弓 2210<BR />★4　[鉄 0031]　全 3200<BR />★4　[糧 0003]　槍 2320<BR />---<BR />★5　[木 4011]　馬 6445<BR />★5　[綿 0411]　弓 5985<BR />★5　[鉄 0040]　全 11800<BR />★5　[糧 0005]　槍 6370<BR />★5　[木 3223]　弓 8050<BR />---<BR />★6　[木 5011]　馬 16200　<BR />★6　[綿 0511]　弓 17510　<BR />★6　[鉄 1051]　全 61600<BR />★6　[糧 2228]　槍 16900<BR />---<BR />★7　[山 5555]　馬 47950<BR />★7　[山 1211]　弓 57800<BR />★7　[山 4450]　全 104800<BR />★7　[山 2223]　槍 46950<BR /></SPAN>');
-		*/
 		var tmp = location.search.match(/x=([-]*\d+).*y=([-]*\d+).*c=(\d+)/);
 		if (tmp!==null) {
 			get_map_potential(tmp[1], tmp[2], tmp[3]);
@@ -2431,37 +2441,76 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 	}
 
 	function get_map_potential(x, y, c) {
-		const potential_list = {
-			'1000': '★1　[平 1000]<ul><li>×槍245</li><li>×弓185</li><li>◎馬155</li><li>×器203</li></ul>',
-			'0100': '★1　[平 0100]<ul><li>×槍185</li><li>◎弓155</li><li>×馬245</li><li>×器173</li></ul>',
-			'0020': '★2　[鉄 0020]<ul><li>×槍520</li><li>×弓520</li><li>×馬520</li><li>◎器448</li></ul>',
-			'0001': '★2　[平 0001]<ul><li>◎槍370</li><li>×弓550</li><li>×馬430</li><li>◎器370</li></ul>',
-			'2010': '★3　[木 2010]<ul><li>×槍2170</li><li>×弓1210</li><li>◎馬730</li><li>×器1498</li></ul>',
-			'0210': '★3　[綿 0210]<ul><li>×槍1210</li><li>◎弓730</li><li>×馬2170</li><li>×器1018</li></ul>',
-			'0012': '★3　[糧 0012]<ul><li>◎槍730</li><li>×弓2170</li><li>×馬1210</li><li>×器1018</li></ul>',
-			'3010': '★4　[木 3010]<ul><li>×槍4890</li><li>×弓3170</li><li>◎馬2310</li><li>×器3686</li></ul>',
-			'0300': '★4　[綿 0300]<ul><li>×槍3220</li><li>◎弓2210</li><li>×馬5240</li><li>×器2816</li></ul>',
-			'0031': '★4　[鉄 0031]<ul><li>◎計3200</li></ul>',
-			'0003': '★4　[糧 0003]<ul><li>◎槍2320</li><li>×弓5080</li><li>×馬3240</li><li>×器2872</li></ul>',
-			'4011': '★5　[木 4011]<ul><li>×槍17360</li><li>×弓11390</li><li>◎馬6445</li><li>×器12341</li></ul>',
-			'0411': '★5　[綿 0411]<ul><li>×槍11470</li><li>◎弓5985</li><li>×馬17680</li><li>×器8868</li></ul>',
-			'0040': '★5　[鉄 0040]<ul><li>×槍11800</li><li>×弓11800</li><li>×馬11800</li><li>◎器10360</li></ul>',
-			'0005': '★5　[糧 0005]<ul><li>◎槍6370</li><li>×弓17785</li><li>×馬11540</li><li>×器8536</li></ul>',
-			'3223': '★5　[木 3223]<ul><li>×槍15250</li><li>◎弓8050</li><li>×馬12850</li><li>×器10930</li></ul>',
-			'5011': '★6　[木 5011]<ul><li>×槍62250</li><li>×弓31550</li><li>◎馬16200</li><li>×器40760</li></ul>',
-			'0511': '★6　[綿 0511]<ul><li>×槍31960</li><li>◎弓17510</li><li>×馬60860</li><li>×器26180</li></ul>',
-			'1051': '★6　[鉄 1051]<ul><li>◎計61600</li></ul>',
-			'2228': '★6　[糧 2228]<ul><li>◎槍16900</li><li>×弓62500</li><li>×馬32100</li><li>×器26020</li></ul>',
-			'5555': '★7　[山 5555]<ul><li>×槍186700</li><li>×弓94200</li><li>◎馬47950</li><li>×器121950</li></ul>',
-			'1211': '★7　[山 1211]<ul><li>×槍103700</li><li>◎弓57800</li><li>×馬195500</li><li>×器85340</li></ul>',
-			'4450': '★7　[山 4450]<ul><li>◎計104800</li></ul>',
-			'2223': '★7　[山 2223]<ul><li>◎槍46950</li><li>×弓187800</li><li>×馬93900</li><li>×器75120</li></ul>',
+		const potentialLists = {
+			2: {
+				'10000': '★1　[平 1000]<ul><li>×槍245</li><li>×弓185</li><li>◎馬155</li><li>×器203</li></ul>',
+				'01000': '★1　[平 0100]<ul><li>×槍185</li><li>◎弓155</li><li>×馬245</li><li>×器173</li></ul>',
+				'00200': '★2　[鉄 0020]<ul><li>×槍520</li><li>×弓520</li><li>×馬520</li><li>◎器448</li></ul>',
+				'00010': '★2　[平 0001]<ul><li>◎槍370</li><li>×弓550</li><li>×馬430</li><li>◎器370</li></ul>',
+				'20100': '★3　[木 2010]<ul><li>×槍2170</li><li>×弓1210</li><li>◎馬730</li><li>×器1498</li></ul>',
+				'02100': '★3　[綿 0210]<ul><li>×槍1210</li><li>◎弓730</li><li>×馬2170</li><li>×器1018</li></ul>',
+				'00120': '★3　[糧 0012]<ul><li>◎槍730</li><li>×弓2170</li><li>×馬1210</li><li>×器1018</li></ul>',
+				'30100': '★4　[木 3010]<ul><li>×槍4890</li><li>×弓3170</li><li>◎馬2310</li><li>×器3686</li></ul>',
+				'03001': '★4　[綿 0300]<ul><li>×槍3220</li><li>◎弓2210</li><li>×馬5240</li><li>×器2816</li></ul>',
+				'00310': '★4　[鉄 0031]<ul><li>◎計3200</li></ul>',
+				'00031': '★4　[糧 0003]<ul><li>◎槍2320</li><li>×弓5080</li><li>×馬3240</li><li>×器2872</li></ul>',
+				'40110': '★5　[木 4011]<ul><li>×槍17360</li><li>×弓11390</li><li>◎馬6445</li><li>×器12341</li></ul>',
+				'04110': '★5　[綿 0411]<ul><li>×槍11470</li><li>◎弓5985</li><li>×馬17680</li><li>×器8868</li></ul>',
+				'00402': '★5　[鉄 0040]<ul><li>×槍11800</li><li>×弓11800</li><li>×馬11800</li><li>◎器10360</li></ul>',
+				'00052': '★5　[糧 0005]<ul><li>◎槍6370</li><li>×弓17785</li><li>×馬11540</li><li>×器8536</li></ul>',
+				'32230': '★5　[木 3223]<ul><li>×槍15250</li><li>◎弓8050</li><li>×馬12850</li><li>×器10930</li></ul>',
+				'50111': '★6　[木 5011]<ul><li>×槍62250</li><li>×弓31550</li><li>◎馬16200</li><li>×器40760</li></ul>',
+				'05111': '★6　[綿 0511]<ul><li>×槍31960</li><li>◎弓17510</li><li>×馬60860</li><li>×器26180</li></ul>',
+				'10511': '★6　[鉄 1051]<ul><li>◎計61600</li></ul>',
+				'22280': '★6　[糧 2228]<ul><li>◎槍16900</li><li>×弓62500</li><li>×馬32100</li><li>×器26020</li></ul>',
+				'55552': '★7　[山 5555]<ul><li>×槍186700</li><li>×弓94200</li><li>◎馬47950</li><li>×器121950</li></ul>',
+				'12110': '★7　[山 1211]<ul><li>×槍103700</li><li>◎弓57800</li><li>×馬195500</li><li>×器85340</li></ul>',
+				'44503': '★7　[山 4450]<ul><li>◎計104800</li></ul>',
+				'22230': '★7　[山 2223]<ul><li>◎槍46950</li><li>×弓187800</li><li>×馬93900</li><li>×器75120</li></ul>',
+			},
+			3: {
+				'10000': '★1　[平 10000]<ul><li>×槍245</li><li>×弓185</li><li>◎馬155</li><li>×器203</li></ul>',
+				'01000': '★1　[平 01000]<ul><li>×槍185</li><li>◎弓155</li><li>×馬245</li><li>×器173</li></ul>',
+				'10010': '★2　[平 10010]<ul><li>◎槍370</li><li>×弓550</li><li>×馬430</li><li>◎器370</li></ul>',
+				'00200': '★2　[鉄 00200]<ul><li>×槍520</li><li>×弓520</li><li>×馬520</li><li>◎器448</li></ul>',
+				'11100': '★3　[平 11100]<ul><li>×槍1210</li><li>◎弓730</li><li>×馬2170</li><li>×器1018</li></ul>',
+				'11110': '★3　[平 11110]<ul><li>×槍2170</li><li>×弓1210</li><li>◎馬730</li><li>×器1498</li></ul>',
+				'01101': '★3　[平 01101]<ul><li>◎槍730</li><li>×弓2170</li><li>×馬1210</li><li>×器1018</li></ul>',
+				'20001': '★4　[木 20001]<ul><li>×槍5930</li><li>×弓3835</li><li>◎馬2788</li><li>×器4464</li></ul>',
+				'12000': '★4　[綿 12000]<ul><li>×槍3840</li><li>◎弓2640</li><li>×馬6240</li><li>×器3360</li></ul>',
+				'00210': '★4　[鉄 00210]<ul><li>◎槍2790</li><li>×弓6120</li><li>×馬3900</li><li>×器3456</li></ul>',
+				'11021': '★4　[糧 11021]<ul><li>◎計3840</li></ul>',
+				'50002': '★5　[木 50002]<ul><li>×槍19910</li><li>◎弓10550</li><li>×馬16790</li><li>×器14292</li></ul>',
+				'30021': '★5　[木 30021]<ul><li>◎槍8320</li><li>×弓23140</li><li>×馬15080</li><li>×器11128</li></ul>',
+				'13020': '★5　[綿 13020]<ul><li>×槍15340</li><li>×弓15340</li><li>×馬15340</li><li>◎器13468</li></ul>',
+				'02300': '★5　[鉄 02300]<ul><li>◎槍8385</li><li>×弓15763</li><li>×馬15470</li><li>×器9464</li></ul>',
+				'01520': '★5　[鉄 01520]<ul><li>×槍23200</li><li>×弓15400</li><li>◎馬8700</li><li>×器16540</li></ul>',
+				'30140': '★5　[糧 30140]<ul><li>×槍14970</li><li>◎弓7810</li><li>×馬23340</li><li>×器11596</li></ul>',
+				'30210': '★6　[木 30210]<ul><li>×槍39178</li><li>◎弓21578</li><li>×馬74378</li><li>×器32138</li></ul>',
+				'14321': '★6　[綿 14321]<ul><li>×槍56900</li><li>◎弓28450</li><li>×馬50800</li><li>×器40120</li></ul>',
+				'23122': '★6　[綿 23122]<ul><li>×槍86960</li><li>◎弓44160</li><li>×馬22760</li><li>×器57000</li></ul>',
+				'13432': '★6　[鉄 13432]<ul><li>×槍63200</li><li>×弓61100</li><li>◎馬32750</li><li>×器50030</li></ul>',
+				'22242': '★6　[糧 22242]<ul><li>×槍51400</li><li>◎弓25700</li><li>×馬56600</li><li>×器37160</li></ul>',
+				'03340': '★6　[糧 03340]<ul><li>◎槍22010</li><li>×弓81410</li><li>×馬41810</li><li>×器33890</li></ul>',
+				'42402': '★7　[山 42402]<ul><li>×槍210200</li><li>×弓114200</li><li>◎馬66200</li><li>×器14300</li></ul>',
+				'89331': '★7　[山 89331]<ul><li>×槍225000</li><li>×弓112500</li><li>◎馬56250</li><li>×器146250</li></ul>',
+				'13221': '★7　[山 13221]<ul><li>×槍112020</li><li>◎弓64020</li><li>×馬208020</li><li>×器92820</li></ul>',
+				'41151': '★7　[山 41151]<ul><li>×槍111000</li><li>◎弓55500</li><li>×馬222000</li><li>×器88800</li></ul>',
+				'52630': '★7　[山 52630]<ul><li>◎槍58000</li><li>×弓232000</li><li>×馬116000</li><li>×器92800</li></ul>',
+				'43510': '★7　[山 43510]<ul><li>◎槍67800</li><li>×弓202800</li><li>×馬112800</li><li>×器94800</li></ul>',
+				'62211': '★8　[山 62211]<ul><li>×槍243220</li><li>×弓132670</li><li>◎馬93320</li><li>×器167200</li></ul>',
+				'15112': '★8　[山 43510]<ul><li>◎槍98560</li><li>×弓181360</li><li>×馬126160</li><li>×器115120</li></ul>',
+				'21601': '★8　[山 21601]<ul><li>×槍125620</li><li>◎弓95820</li><li>×馬23020</li><li>×器109860</li></ul>',
+				'33310': '★8　[山 33310]<ul><li>◎計124800</li></ul>',
+			},
 		};
 		var tiles = new Array();
 		tiles['森林'] = '0';
 		tiles['綿花'] = '0';
 		tiles['鉄鉱山'] = '0';
 		tiles['畑'] = '0';
+		tiles['池'] = '0';
+		var potential_list = potentialLists[ (!options['season3'])? 2:3];
 
 		$.ajax({
 			url:'/land.php?x='+x+'&y='+y+'&c='+c,
@@ -2474,7 +2523,7 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 						tiles[tmp[1]] = tmp[2];
 					}
 				});
-				var tiles_text = tiles['森林'] + tiles['綿花'] + tiles['鉄鉱山'] + tiles['畑'];
+				var tiles_text = tiles['森林'] + tiles['綿花'] + tiles['鉄鉱山'] + tiles['畑'] + tiles['池'];
 				if (tiles_text in potential_list) {
 					$('#mokotool').append('<SPAN class="normal">必要攻撃力<BR />'+ potential_list[tiles_text] +'</SPAN>');
 				}
@@ -2484,7 +2533,6 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 			}
 		});
 	}
-
 
 	//////////////////////
 	//書状：ナビを上部に
