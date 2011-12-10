@@ -70,6 +70,7 @@
 // ・自分の拠点名称に'('などの特殊文字があった場合にマップの右クリックメニュー出ない問題の修正
 // ・trim関数を自前からjQueryライブラリへ 20111029
 // ・「ここを記憶」でゴミがくっつく問題の修正 20111029
+// ・どこ近で、自分の拠点を調べた場合、その拠点（距離0.0）は表示しない 20111030
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
 function Moko_addJQuery(callback) {
@@ -5444,6 +5445,7 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 				pos = data[i].pos.split(",");
 				x1 = parseFloat(pos[0]);
 				y1 = parseFloat(pos[1]);
+				if (x0 == x1 && y0 == y1) continue;	//同じ座標ならスキップ
 				d = Math.sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0));
 				//alert("x1="+x1+"\n"+ "y1="+y1+"\n" + "x0="+x0+"\n" + "y0="+y0+"\n"+ "d="+d);
 				//if (data[i].condition == this.txtFall) {
