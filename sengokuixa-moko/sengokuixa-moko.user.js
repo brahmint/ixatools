@@ -1723,55 +1723,13 @@ mapimg['village_v_s'] = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD8AAAA8C
 		this.ajflag = true;
 
 		var src = area.attr('onclick').toString();
-		var tmp = src.match(/land\.php\?(.+)\' \)\;/);
+		var tmp = src.match(/(\/map\.php\?x=(-?[0-9]+)&y=(-?[0-9]+)&c=[0-9]+)/);
 		if (tmp===null) {
 			this.ajflag = false;
 			return true;
 		}
-
-		$.ajax({
-			url: '/map.php?'+tmp[1], 
-			cache: false, 
-			dataType: "text",
-			success: function (html){
-				var $new_map = $(html).find('#ig_mapbox_container');
-				$('#ig_mapbox_container').replaceWith($new_map);
-				
-				delete html;
-				delete $new_map;
-				//
-				// Targetize : ターゲット対象の敵拠点のイメージを置き換え
-				//
-				mapPoz.mapContainer = $('#ig_mapbox_container');
-				mapPoz.init();
-				mapPoz.repTargets();
-
-				var basedata = $('.basename').find('LI.on > SPAN').attr('title');
-				var tmp = basedata.match(/^([^(]+)\((-?\d+),(-?\d+)\)$/);
-				if (tmp===null) {
-					map_move_ajax.ajflag = false;
-					return;
-				}
-				var base_name = tmp[0];
-				var base_x = parseInt(tmp[2]);
-				var base_y = parseInt(tmp[3]);
-				if (options['map_starx']) {
-					map_list2(base_x, base_y, base_name);
-				}
-				map_rightdblclick();
-				if (options['prohibitionArea']) {
-					prohibitionArea();
-				}
-				if(options['zoomMap']) {
-					zoomMap();
-				}
-				map_move_ajax.ajflag = false;
-			},
-			error: function (XMLHttpRequest, textStatus, errorThrown) {
-				map_move_ajax.ajflag = false;
-				//console.log(textStatus);
-			}
-		});
+		var murl = RegExp.$1;
+		location.href = murl;
 		this.ajflag = false;
 	}
 
