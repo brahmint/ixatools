@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name           Suppa
-// @version        1.12
+// @version        2.00
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    Suppa 1.12 20110930
-// @include        http://*.sengokuixa.jp/facility/unit_list.php
-// @match          http://*.sengokuixa.jp/facility/unit_list.php
+// @description    Suppa 2.00 20130901
+// @include        http://*.sengokuixa.jp/facility/set_unit_list.php
+// @match          http://*.sengokuixa.jp/facility/set_unit_list.php
 // ==/UserScript==
 //
 // 20110715 1.01	初版
@@ -13,6 +13,7 @@
 // 20110919 1.10	グラフ機能追加
 // 20110919 1.11	パーセント値、フィルター機能追加
 // 20110930 1.12	鉄砲足軽を中級兵→上級兵に
+// 20130901 2.00	新章6対応
 //
 // Mokoと同じjQuery初期化
 //
@@ -136,92 +137,48 @@ function suppa_main($) {
 	'<form action="" name="form_solcond" class="suppa_options2" id="suppa_solcond">'+
 	'	<p>'+
 	'		<label><input name="g2_train"  type="checkbox" id="g2_training" class="suppa_option" checked />鍛錬中</label><br />'+
-	'		<label><input name="g2_ondeck" type="checkbox" id="g2_ondeck"   class="suppa_option" checked />デッキ搭載中</label><br />'+
-	'		<label><input name="g2_wait"   type="checkbox" id="g2_wait"     class="suppa_option" checked />陣屋・長屋待機</label><br />'+
-	'		<label><input name="g2_oncard" type="checkbox" id="g2_oncard"   class="suppa_option" checked />カード搭載</label><br />'+
+	'		<label><input name="g2_listed" type="checkbox" id="g2_listed"   class="suppa_option" checked />即戦力</label><br />'+
 	'	</p>'+
 	'</form>';
 	var suppa_graph_str =
 	'</div><img src="list_img04.jpg" alt="image" width="240" height="200" id="suppa_chart" class="suppa_graph" />';
 
-	var sdata = "足軽,1,1:長槍足軽,1,2:武士,1,4:弓足軽,2,1:長弓兵,2,2:弓騎馬,2,4:騎馬兵,3,1:精鋭騎馬,3,2:赤備え,3,4:破城槌,4,1:攻城櫓,4,2:大筒兵,4,4:鉄砲足軽,5,4:騎馬鉄砲,5,4:国人衆,1,3:海賊衆,2,3:母衣衆,3,3:雑賀衆,5,3:";
+	var STBL = "足軽,1,1:長槍足軽,1,2:武士,1,4:弓足軽,2,1:長弓兵,2,2:弓騎馬,2,4:騎馬兵,3,1:精鋭騎馬,3,2:赤備え,3,4:破城槌,4,1:攻城櫓,4,2:焙烙火矢,4,3:大筒兵,4,4:鉄砲足軽,5,4:騎馬鉄砲,5,4:国人衆,1,3:海賊衆,2,3:母衣衆,3,3:雑賀衆,5,3:";
 
-	var SoldData = function ( sname, stype, sclass, nums) {
+	var SoldiersData = function ( sname, stype, sclass) {
 		this.sname     = sname;		//名前 足軽、武士とか		
 		this.stype     = Number(stype);		//兵種　槍1 弓2 馬3 器4 砲5
 		this.sclass    = Number(sclass);	//兵級　下級1 中級2 NPC3 上級4
-		this.numwait   = Number(nums);		//陣屋・長屋 待機兵数
 		this.numtrain  = 0;		//兵舎で訓練中の兵数
-		this.numdeck   = 0;		//デッキ搭載中の兵数
-		this.numstdby  = 0;		//カード搭載中の兵数
+		this.numlisted = 0;		//兵士一覧の兵数
 	}
 
-	//デッキ搭載中の兵数
-	var DeckData = function ( name, cost, sname, numdeck) {
-		this.name    = name;		//武将名
-		this.cost    = cost;		//コスト
-		this.sname   = sname;		//兵名
-		this.numdeck = numdeck;		//兵数
+	//訓練中の兵数
+	var SoldiersTraining = function ( tblidx, index, sname, nums ) {
+		this.tblidx  = tblidx;
+		this.index   = index;
+		this.sname   = (sname == null ? null : sname.replace('鎚','槌'));		//兵名
+		this.nums    = nums;		//兵数
 	}
 
-	//カード搭載中の兵数
-	var StdbyData = function ( name, sname, numstdby) {
-		this.name     = name;		//武将名
-		this.sname    = sname;		//兵名
-		this.numstdby = numstdby;	//兵数
+	//兵士一覧の兵数
+	var SoldirsListed = function( index, stype, sname, nums ) {
+		this.index		= index;
+		this.stype		= stype;	//槍兵科:1　弓兵科:2　騎馬兵科:3　兵器兵科:4
+		this.sname		= (sname == null ? null : sname.replace('鎚','槌'));	//兵名
+		this.nums		= Number(nums);		//兵数
 	}
 
-	var suppajob  = false;
-	var soldiers  = new Array();
-	var decksold  = new Array();
-	var stdbysold = new Array();
-	var decksoldcount  = 0;
-	var stdbysoldcount = 0;
-	var rdysold    = false;
-	var rdydeck    = false;
-	var rdystdby   = false;
+	var suppajob   = false;
+	var soldiers   = new Array();	//SoldiersData
+	var trainsold  = new Array();	//SoldiersTraining  訓練中の兵数を収納
+	var listedsold = new Array();	//SoldirsListed     兵士一覧の兵数を収納
+	var trainsoldcount  = 0;		//訓練中の配列数
+	var listedsoldcount = 0;		//兵士一覧の配列数
+	var rdytrain   = false;		//訓練中の収集完了
+	var rdylisted  = false;		//兵士一覧の収集完了
 	var deckjobs   = 0;
 
-
-	//訓練中の兵をデータに集計
-	function addNumTrain(sname0,num) {
-		var sname = sname0.replace('鎚','槌');
-		for (var i = 0; i < soldiers.length; i++) {
-			if (soldiers[i].sname == sname) {
-				soldiers[i].numtrain += Number(num);
-				return;
-			}
-		}
-		soldiers[soldiers.length - 1].numtrain += Number(num);	//不明のものはここへ
-		return;
-	}
-
-	//デッキの兵をデータに集計
-	function addNumDeck(sname0,num) {
-		var sname = sname0.replace('鎚','槌');
-		for (var i = 0; i < soldiers.length; i++) {
-			if (soldiers[i].sname == sname) {
-				soldiers[i].numdeck += Number(num);
-				return;
-			}
-		}
-		soldiers[soldiers.length - 1].numdeck += Number(num);	//不明のものはここへ
-		return;
-	}
-	
-	
-	//待機中の兵をデータに集計
-	function addNumStdby(sname0,num) {
-		var sname = sname0.replace('鎚','槌');
-		for (var i = 0; i < soldiers.length; i++) {
-			if (soldiers[i].sname == sname) {
-				soldiers[i].numstdby += Number(num);
-				return;
-			}
-		}
-		soldiers[soldiers.length - 1].numstdby += Number(num);		//不明のものはここへ
-		return;
-	}
 
 	function _numFormat(n) {
 		var s = "" + n;
@@ -287,37 +244,71 @@ function suppa_main($) {
 	}
 
 	// 兵数集計 兵種:stype 兵級:sclass で 鍛錬中除く:add_training, デッキ搭載除く: add_deck
-	function countSoldiers(stype, sclass, add_training, add_deck, add_stb, add_wait) {
+	function countSoldiers(stype, sclass, add_training, add_listed) {
 		var num = 0;
 		for (var i = 0; i < soldiers.length; i++) {
 			if (stype == soldiers[i].stype) {
 				if (sclass == soldiers[i].sclass) {
 					if (add_training) num +=  Number(soldiers[i].numtrain);
-					if (add_deck)     num +=  Number(soldiers[i].numdeck);					
-					if (add_stb)      num +=  Number(soldiers[i].numstdby);
-					if (add_wait)     num +=  Number(soldiers[i].numwait);					
+					if (add_listed)   num +=  Number(soldiers[i].numlisted);					
 				}
 			}
 		}
 		//GM_log('stype='+stype+', scalass='+sclass+', num='+num);
 		return num;
 	}
+	
+	//デッキの兵をデータに集計
+	// scat:0 兵士一覧　scat:1 訓練中
+	function summaryMath(sname, num, scat) {
+		if (sname == null) return;
+		var px = soldiers.length;
+		for (var i = 0; i < px; i++) {
+			if (soldiers[i].sname == sname) {
+				if (scat == 0) soldiers[i].numlisted += Number(num);
+				else           soldiers[i].numtrain += Number(num);
+				return;
+			}
+		}
+		var re = new RegExp(sname+",([1-5]),([1-5]):");
+		var sreg = STBL.match(re);
+		if (null == sreg) {
+			soldiers[px] = new SoldiersData(sname,"-1", "-1");
+		} else {
+			soldiers[px] = new SoldiersData(sname,RegExp.$1, RegExp.$2);
+		}
+		if (scat == 0) soldiers[px].numlisted += Number(num);
+		else           soldiers[px].numtrain += Number(num);
+		return;
+	}
 
 	function mergeAndShow() {
-		for (var i = 0; i < decksoldcount; i++) {
-			addNumDeck(decksold[i].sname, decksold[i].numdeck);
+		//GM_log("trainsoldcount="+trainsoldcount+"  listedsoldcount="+listedsoldcount);
+		//var s = "\n";
+		for (var j = 0; j < listedsold.length; j++) {
+			summaryMath( listedsold[j].sname,listedsold[j].nums, 0);
+			//s += j + ": "+ listedsold[j].index + ":" + listedsold[j].stype +":" + listedsold[j].sname +":"+listedsold[j].nums+ "\n";
 		}
-		for (var i = 0; i < stdbysoldcount; i++) {
-			addNumStdby(stdbysold[i].sname, stdbysold[i].numstdby);
+		//GM_log(s);
+		//s = "\n";
+		for (var i = 0; i < trainsold.length; i++) {
+			summaryMath( trainsold[i].sname,trainsold[i].nums, 1);
+			//s +=  i + ": "+ trainsold[i].tblidx + ":" + trainsold[i].index +":" + trainsold[i].sname +":"+trainsold[i].nums + "\n";
 		}
+		//GM_log(s);
+		//s = "\n";
+		for (var k = 0; k < soldiers.length; k ++) {
+			//s += k + ": "+ soldiers[k].sname + ":" + soldiers[k].stype +":" +soldiers[k].sclass +":"+soldiers[k].numtrain +":"+soldiers[k].numlisted + "\n";
+		}
+		//GM_log(s);
 
 		var htm1 = '<table width="150" border="1" class="suppa_soldiers" id="soldiers" name="soldiers"><tr><th colspan="2" style="text-align:center">兵別合計</th></tr>';
 		var th_style = 'width="70" style="text-align:left"';
 		var td_style = 'width="70" style="text-align:right"';
 		var total = 0;
 		for (var i = 0; i < soldiers.length; i++) {
-			htm1 += '<tr><th '+th_style+'>'+soldiers[i].sname+'</th><td '+td_style+'>'+numFormat(soldiers[i].numwait + soldiers[i].numtrain + soldiers[i].numdeck + soldiers[i].numstdby,8)+'</tr>';
-			total += soldiers[i].numwait + soldiers[i].numtrain + soldiers[i].numdeck + soldiers[i].numstdby;
+			htm1 += '<tr><th '+th_style+'>'+soldiers[i].sname+'</th><td '+td_style+'>'+numFormat(soldiers[i].numlisted + soldiers[i].numtrain, 8) +'</tr>';
+			total += soldiers[i].numlisted + soldiers[i].numtrain;
 		}
 		htm1 += '<tr><th '+th_style+'>＊合計＊</th><td '+td_style+'>'+numFormat(total,8)+'</tr>';
 		htm1 += '</table>';
@@ -369,29 +360,28 @@ function suppa_main($) {
 
 	function reWrite() {
 		var flag_tr = $('#g2_training').attr('checked');
-		var flag_dk = $('#g2_ondeck').attr('checked');
-		var flag_sb = $('#g2_oncard').attr('checked');
-		var flag_wt = $('#g2_wait').attr('checked');
-		var spares  = 	($('#g1_low').attr('checked')  ? countSoldiers( 1, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_mid').attr('checked')  ? countSoldiers( 1, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_high').attr('checked') ? countSoldiers( 1, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_npc').attr('checked')  ? countSoldiers( 1, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
-		var bows    = 	($('#g1_low').attr('checked')  ? countSoldiers( 2, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_mid').attr('checked')  ? countSoldiers( 2, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_high').attr('checked') ? countSoldiers( 2, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_npc').attr('checked')  ? countSoldiers( 2, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
-		var horses  = 	($('#g1_low').attr('checked')  ? countSoldiers( 3, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_mid').attr('checked')  ? countSoldiers( 3, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_high').attr('checked') ? countSoldiers( 3, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_npc').attr('checked')  ? countSoldiers( 3, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
-		var weapons = 	($('#g1_low').attr('checked')  ? countSoldiers( 4, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_mid').attr('checked')  ? countSoldiers( 4, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_high').attr('checked') ? countSoldiers( 4, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_npc').attr('checked')  ? countSoldiers( 4, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
-		var guns    = 	($('#g1_low').attr('checked')  ? countSoldiers( 5, 1, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_mid').attr('checked')  ? countSoldiers( 5, 2, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_high').attr('checked') ? countSoldiers( 5, 4, flag_tr, flag_dk, flag_sb, flag_wt):0) +
-						($('#g1_npc').attr('checked')  ? countSoldiers( 5, 3, flag_tr, flag_dk, flag_sb, flag_wt):0);
+		var flag_ls = $('#g2_listed').attr('checked');
+		var spares  = 	($('#g1_low').attr('checked')  ? countSoldiers( 1, 1, flag_tr, flag_ls):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 1, 2, flag_tr, flag_ls):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 1, 4, flag_tr, flag_ls):0) +
+						($('#g1_npc').attr('checked')  ? countSoldiers( 1, 3, flag_tr, flag_ls):0);
+		var bows    = 	($('#g1_low').attr('checked')  ? countSoldiers( 2, 1, flag_tr, flag_ls):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 2, 2, flag_tr, flag_ls):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 2, 4, flag_tr, flag_ls):0) +
+						($('#g1_npc').attr('checked')  ? countSoldiers( 2, 3, flag_tr, flag_ls):0);
+		var horses  = 	($('#g1_low').attr('checked')  ? countSoldiers( 3, 1, flag_tr, flag_ls):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 3, 2, flag_tr, flag_ls):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 3, 4, flag_tr, flag_ls):0) +
+						($('#g1_npc').attr('checked')  ? countSoldiers( 3, 3, flag_tr, flag_ls):0);
+		var weapons = 	($('#g1_low').attr('checked')  ? countSoldiers( 4, 1, flag_tr, flag_ls):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 4, 2, flag_tr, flag_ls):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 4, 3, flag_tr, flag_ls):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 4, 4, flag_tr, flag_ls):0);
+						//($('#g1_npc').attr('checked')  ? countSoldiers( 4, 3, flag_tr, flag_ls):0);
+		var guns    = 	($('#g1_low').attr('checked')  ? countSoldiers( 5, 1, flag_tr, flag_ls):0) +
+						($('#g1_mid').attr('checked')  ? countSoldiers( 5, 2, flag_tr, flag_ls):0) +
+						($('#g1_high').attr('checked') ? countSoldiers( 5, 4, flag_tr, flag_ls):0) +
+						($('#g1_npc').attr('checked')  ? countSoldiers( 5, 3, flag_tr, flag_ls):0);
 		var total   = spares + bows + horses + weapons + guns;
 
 		var spares_rate  = (total != 0) ? Math.floor(spares*10000/total) : -1;
@@ -478,61 +468,43 @@ function suppa_main($) {
 
 		reWrite();
 	}
+
 	//
-	//待機中の兵士、訓練中の兵士の数を数える
+	//兵士一覧の兵士の数を数える
 	//
-	function countWaitAndTrainin() {
-		var ulUrl = 'http://' + window.location.host + '/facility/unit_list.php';
+	function countListed() {
+		var ulUrl = 'http://' + window.location.host + '/facility/set_unit_list.php';
 		$.ajax({
 			url: ulUrl, 
 			cache: false, 
-			dataType: "text",
-			success: function (html){
-				var tbls = getTags(html,"table","paneltable table_fightlist2");
-				//var mts =getIxaHrefs(tbltxt);
-				var ths = getTags(tbls[0],'th','');
-				var thcount = ths.length;
-				for (var i = 0; i < thcount; i++) {
-					ths[i] = getTagText(ths[i],'th');
-				}
-				var tds = getTdTags(tbls[0]);
-				var tdcount = tds.length;
-				for (var i = 0; i < tdcount; i++) {
-					tds[i] = getTdText(tds[i]);
-				}
-				//無用な物は削除
-				for (var i = 0; i < tdcount; i++) {
-					if (tds[tdcount - i - 1] == "") tds.splice(tdcount - i - 1,1);
-				}
-				for (var i = 0; i < thcount; i++) {
-					var sname = ths[i].replace('鎚','槌');
-					var re = new RegExp(sname+",([1-5]),([1-5]):");
-					var sreg = sdata.match(re);
-					if (null == sreg) {
-						soldiers[i] = new SoldData(sname,"-1", "-1", tds[i]);
-					} else {
-						soldiers[i] = new SoldData(sname,RegExp.$1, RegExp.$2, tds[i]);
+			dataType: "html",
+			success: function (data, textStatus){
+				var scatalog = $('table#soldiers_catalog tr', data);
+				listedsoldcount = $(scatalog).length;
+				$(scatalog).each( function (tr_index, e) {
+					var stype = null;
+					var sname = null;
+					var num   = "0";
+					var alt = $(this).find("td:not(.td_border_right) img.iepngfix").eq(0).attr('alt');
+					if (alt != null) {
+						stype = alt;
 					}
-				}
-				soldiers[soldiers.length] = new SoldData("不明","-1", "-1", "0");		//最後に不明欄を加える
-
-				//
-				for(var j = 1; j < tbls.length; j++) {
-					var trs = getTags(tbls[j],"tr","");
-					//alert("trs.length="+trs.length);
-					if (null == trs) continue;		//通常はありえない
-					for (var i = 1; i < trs.length; i++) {
-						tds = getTags(trs[i],"td","");
-						var nb = getTagText(tds[1],"td","");
-						trs[i].match(/alt="(.*)"/);
-						addNumTrain(RegExp.$1, nb);
+					var name = $(this).find("td img:not(.iepngfix)").eq(0).attr('alt');
+					if (name != null) {
+						sname = name;
 					}
-				}
-				rdysold = true;		//準備完了
+					var v = $(this).find("td.td_left_posi").eq(1).html();
+					if (v != null) {
+						num = v;
+					}
+					listedsold[tr_index] = new SoldirsListed( tr_index, stype, sname, num );
+					//alert( "tr_index="+tr_index+ "   stype=" + stype+ "   sname="+sname + "   num="+num);
+				} );
+				rdylisted = true;		//準備完了
 				//				
 
 			},
-			error: function (XMLHttpRequest, textStatus, errorThrown) {
+			error: function (xhr, textStatus, errorThrown) {
 				alert('$.ajax countWaitAndTrainin() error');
 				//console.log(textStatus);
 			}
@@ -541,347 +513,37 @@ function suppa_main($) {
 	}
 
 	//
-	//デッキに配置したカードの兵を集計する
+	//訓練中の兵士の数を数える
 	//
-	function countOnDeck(n) {
-		var dkUrl = 'http://' + window.location.host + '/card/deck.php?ano=' + n;
-		//alert("dkUrl="+dkUrl);
-		$.ajax({
-			url: dkUrl, 
-			cache: false, 
-			dataType: "text",
-			success: function (html){
-				var reg = new RegExp('<span class="ig_deck_unitdata_leader">([^<]*)<span><img[^>]*>([^<]*)</span><br[^<]*<img[^>]*alt="([^"]*)"[^>]*>([^<]*)人</span>', 'im');
-				var kkk = html.match(reg);
-				if (null != kkk) {
-					//alert(kkk[0]);
-					var leader = RegExp.$1;
-					var cost   = RegExp.$2;
-					var sname  = RegExp.$3;
-					var snum   = RegExp.$4;
-					leader = trim(leader);
-					cost   = trim(cost);
-					sname  = trim(sname);
-					snum   = trim(snum);
-					//alert(leader +"," +cost + "," + sname +"," + snum);
-					decksold[decksoldcount] = new DeckData(leader, cost, sname, snum);
-					decksoldcount++;
-		
-					var reg2 = new RegExp('<span class="ig_deck_unitdata_subleader">([^<]*)<span><img[^>]*>([^<]*)</span><br[^<]*<img[^>]*alt="([^"]*)"[^>]*>([^<]*)人</span>', 'igm');
-					var kks = html.match(reg2);
-					if (null != kks) {
-						for (var i=0; i< kks.length; i++) {
-							kkk = kks[i].match(reg2);
-							//alert(kkk);
-							var subleader = RegExp.$1;
-							cost   = RegExp.$2;
-							sname  = RegExp.$3;
-							snum   = RegExp.$4;
-							subleader = trim(subleader);
-							cost      = trim(cost);
-							sname     = trim(sname);
-							snum      = trim(snum);
-							//alert(subleader +"," +cost + "," + sname +"," + snum);
-							decksold[decksoldcount] = new DeckData(subleader, cost, sname, snum);
-							decksoldcount++;
-						}
-					}
-				}
-				deckjobs++;
-				if (deckjobs >= 5) {
-					rdydeck = true;		//準備完了
-				}
-
-			},
-			error: function (XMLHttpRequest, textStatus, errorThrown) {
-				alert('$.ajax countOnDeck('+n+') error');
-				//console.log(textStatus);
-			}
-		});	
-	}
-
-	//
-	//待機武将のカードに搭載された兵士を数える
-	//
-	function countStdby() {
-		var ulUrl = 'http://' + window.location.host + '/facility/set_unit_list.php?show_num=100';
+	function countTraining() {
+		var ulUrl = 'http://' + window.location.host + '/facility/unit_list.php';
 		$.ajax({
 			url: ulUrl, 
 			cache: false, 
-			dataType: "text",
-			success: function (html){
-				//GM_log("table:"+table);
-				var reg = new RegExp('<table class="common_table1 center mt10">','im');
-				//alert("1");
-				var tbl = html.match(reg);
-				//alert("tbl.length="+tbl.length);
-				var txt = RegExp.rightContext;
-				reg = new RegExp('</table>','im');
-				tbl = txt.match(reg);
-				txt = RegExp.leftContext;
-				var tds = getClassTags(txt,"td","");
-				//alert("tds.length="+tds.length);
-				//alert("3");
-				if (tds.length > 1) {
-					var pgs = html.match(/<li class="last">.*<\/li>/img);
-					//alert("4: pgs[0]="+pgs[0]);
-					var pg2 = null;
-					if (pgs.length != 0) {
-						pg2 = pgs[0].match(/show_num=100&amp;(_=[0-9]+&amp;)?p=2/);	//最初のページで101枚以上カードがあるかチェック
+			dataType: "html",
+			success: function (data, textStatus){
+				$('table.paneltable', data).each( function (tbl_index, e) {
+					if (tbl_index > 0) {
+						var trz = $(this).find("tr");
+						trainsoldcount += $(trz).length;
+						$(trz).each( function (tr_index, e) {
+							var alt = $(this).find("td img").eq(0).attr('alt');
+							var num = $(this).find("td").eq(1).html();
+							trainsold.push(new SoldiersTraining( tbl_index, tr_index, alt, num));
+							//alert("tbl_index="+tbl_index+"   tr_index="+tr_index+"   alt="+alt+"   num="+num);
+						} );
 					}
-					//alert("pg2="+pg2);
-					for (var i = 0; i < tds.length/7; i++) {
-						var name = getTagText( tds[i*7],"a","");
-						name = trim(name);
-						var s = tds[i*7 + 3];
-						var alt = getAlt(s);
-						var units = getIdTagText(s, "span", "now_unit_cnt_[0-9]+");
-						var leads = getIdTagText(s, "span", "lead_unit_[0-9]+");
-						//alert(alt + "\n" + units + "\n" + leads);
-						stdbysold[stdbysoldcount] = new StdbyData(name,alt,units);
-						stdbysoldcount++;
-					}
-					if (pg2 != null) {	//first pageで２ページ目がある場合
-						var ulUrl2 = ulUrl + '&p=2';
-						$.ajax({
-							url: ulUrl2, 
-							cache: false, 
-							dataType: "text",
-							success: function (html){
-								//GM_log("table:"+table);
-								var reg = new RegExp('<table class="common_table1 center mt10">','im');
-								//alert("1");
-								var tbl = html.match(reg);
-								var txt = RegExp.rightContext;
-								reg = new RegExp('</table>','im');
-								tbl = txt.match(reg);
-								txt = RegExp.leftContext;
-								var tds = getClassTags(txt,"td","");
-								for (var i = 0; i < tds.length/7; i++) {
-									var name = getTagText( tds[i*7],"a","");
-									name = trim(name);
-									var s = tds[i*7 + 3];
-									var alt = getAlt(s);
-									var units = getIdTagText(s, "span", "now_unit_cnt_[0-9]+");
-									var leads = getIdTagText(s, "span", "lead_unit_[0-9]+");
-									//alert(alt + "\n" + units + "\n" + leads);
-									stdbysold[stdbysoldcount] = new StdbyData(name,alt,units);
-									stdbysoldcount++;
-								}
-								rdystdby = true;	//準備完了
-							},
-							error: function (XMLHttpRequest, textStatus, errorThrown) {
-								alert('$.ajax countStdby() pg2 error');
-								//console.log(textStatus);
-							}
-						});	
-	
-					} else {
-						rdystdby = true;	//準備完了
-					}
-				} else {
-					rdystdby = true;	//件数０で、準備完了
-				}
+				} );
+				rdytrain = true;		//準備完了
+				//				
+
 			},
-			error: function (XMLHttpRequest, textStatus, errorThrown) {
-				alert('$.ajax countStdby() error');
+			error: function (xhr, textStatus, errorThrown) {
+				alert('$.ajax countTraining() error');
 				//console.log(textStatus);
 			}
 		});	
 
-		return;
-	}
-
-	//------------------------------
-	//
-	//
-	function getTdTags(html) {
-		var reg = new RegExp('<td width="70">([^<]*)</td>', "ig");
-		var tags = html.match(reg);
-		return tags;
-	}
-
-	function getTdText(html) {
-		var reg = new RegExp('<td width="70">([^<]*)</td>', "i");
-		var tag = html.match(reg);
-		return (tag) ? RegExp.$1 : "";
-	}
-
-	//------------------------------
-	// Removes leading whitespaces
-	function LTrim( value ) {
-		var re = /\s*((\S+\s*)*)/;
-		return value.replace(re, "$1");
-	}
-
-	// Removes ending whitespaces
-	function RTrim( value ) {
-		var re = /((\s*\S+)*)\s*/;
-		return value.replace(re, "$1");
-	}
-
-	// Removes leading and ending whitespaces
-	function trim( value ) {
-		return LTrim(RTrim(value));
-	}
-
-	function trimRmv( value) {
-		var re = /(\S+)(\s+)(\S+)/;
-		return trim(value).replace(re,"$1$3");
-	}
-
-	function rmvTabs( value ) {
-		var re = /(\t)\t+/mg;
-		return value.replace(re, "$1");
-	}
-
-	// innerHTML to URL
-	function inURL(s) {
-		var sub = s.split("href=\"");
-		var sub2 = sub[1].split("\">");
-		return sub2[0];
-	}
-
-
-	// XML assist
-	function getTags(html, tagName, className){
-	  var cls = "";
-	  if(className){
-		cls = "[^>]*?class=\"" + className + "\"";
-	  }
-	  var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
-	  return html.match(reg);
-	}
-
-	function getTag(html, tagName, className){
-	  var cls = "";
-	  if(className){
-		cls = "[^>]*?class=\"" + className + "\"";
-	  }
-	  var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "i");
-	  var tags = html.match(reg);
-	  return (tags && tags.length) ? tags[0] : "";
-	}
-
-	function getTaggedContent(html, tagName, className){
-	  var cls = "";
-	  if(className){
-		cls = "[^>]*?class=\"" + className + "\"";
-	  }
-	  var reg = new RegExp("(<" + tagName + cls + "(\\s|[^>])*?>)((\\s|.)*)(</" + tagName + ">)", "i");
-	  var tags = html.match(reg);
-	  return (tags && tags.length) ? trim(RegExp.$3) : "";
-	}
-
-	function getBody(html){
-	  var reg = new RegExp("<body((\\s|.)*)</body>", "i");
-	  return html.match(reg);
-	}
-
-	function getAttrTags(html, tagName, attrName, attrStr){
-		var cls = "";
-		if(attrName){
-			if (attrStr) {
-				cls = '[^>]*?' + attrName + '="' + attrStr + '"';
-			} else {
-				cls = '[^>]*?' + attrName + '="[^"]*"';
-			}
-		}
-		var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
-		return html.match(reg);
-	}
-
-	function getAttrTag(html, tagName, attrName, attrStr){
-	  var tags = getClassTags(html, tagName, attrName, attrStr);
-	  return (tags && tags.length) ? tags[0] : "";
-	}
-
-	function getAttrTagText(html, tagName, attrName, attrStr){
-	  return getAttrTag(html, tagName, attrName, attrStr) ? RegExp.$2 : "";
-	}
-
-	function getClassTags(html, tagName, className){
-	  var cls = "";
-	  if(className){
-		cls = '[^>]*?class="' + className + '"';
-	  }
-	  var reg = new RegExp("<" + tagName + cls + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
-	  return html.match(reg);
-	}
-
-	function getClassTag(html, tagName, className){
-	  var tags = getClassTags(html, tagName, className);
-	  return (tags && tags.length) ? tags[0] : "";
-	}
-
-	function getClassTagText(html, tagName, className){
-	  return getClassTag(html, tagName, className) ? RegExp.$2 : "";
-	}
-
-
-	function getTagText(html,tagName) {
-		var reg = new RegExp("<" + tagName + "(\\s|.)*?>([^<]*)</" + tagName + ">", "i");
-		var tag = html.match(reg);
-		return (tag) ? RegExp.$2 : "";
-	}
-
-	function getIdTags(html, tagName, idName){
-	  var ids = "";
-	  if(idName){
-		ids = '[^>]*?id="' + idName + '"';
-	  }
-	  var reg = new RegExp("<" + tagName + ids + "(\\s|.)*?>([^<]*)</" + tagName + ">", "ig");
-	  return html.match(reg);
-	}
-
-	function getIdTag(html, tagName, idName){
-	  var tags = getIdTags(html, tagName, idName);
-	  return (tags && tags.length) ? tags[0] : "";
-	}
-
-	function getIdTagText(html, tagName, idName){
-	  return getIdTag(html, tagName, idName) ? RegExp.$2 : "";
-	}
-
-	function getSrc(html, flg) {
-		if (flg == 0) {
-			var src = '<img src="([^"]*)/([^"/]+)"';
-		} else {
-			var src = '<(img src=)"([^"]*)"';	//フル
-		}
-		var ans = html.match(src,"ig");
-		return (ans && ans.length) ? RegExp.$2 : "";
-	}
-
-	function getIxaHrefs(html) {
-		var src = '<a href="([^"]*)(?=")';	//フル
-		var ans = html.match(src,"ig");
-		for (var i= 0; i < ans.length; i++) {
-			ans[i] = ans[i].substring(9);
-		}
-		return ans;
-	}
-
-	function getHref(html) {
-		var src = '<a href="([^"]*)"';	//フル
-		var ans = html.match(src,"i");
-		return (ans && ans.length) ? RegExp.$1 : "";
-	}
-
-	function getAlt(html) {
-		var src = '<img src="([^"]*)"(\\s|.)*?alt="([^"]*)"';	//フル
-		var ans = html.match(src,"ig");
-		return (ans && ans.length) ? RegExp.$3 : "";
-	}
-
-
-
-	function replaceAmp(s) {
-		return s.replace(/&amp;/g,'&');
-	}
-
-	function replaceNbsp(s) {
-		return s.replace(/&nbsp;/g,' ');
 	}
 
 	var wtcnt;
@@ -892,22 +554,24 @@ function suppa_main($) {
 		wtcnt = 0;
 		viserId = setInterval( function() {
 									wtcnt++;
-									if ( rdysold && rdydeck && rdystdby ) {
+									if ( rdytrain && rdylisted ) {
 										clearInterval(viserId);
 										mergeAndShow();
 									} else {
+GM_log("rdytrain="+rdytrain+"  rdylisted="+rdylisted);										
 										if (wtcnt>30) {
 											clearInterval(viserId);
 										}
 									}
 								}, timeVise);
 	}
+
 	//
 	//  ボタンの表示
 	//
 	function setbutton() {
-		var tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_suppa"><img src="' + gifsuppa + '" alt="数把" style="position: relative; top: 0px; left: -10px"></a>';
-		$('div.ig_decksection_top').append(tmp);
+		var tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_suppa"><img src="' + gifsuppa + '" alt="数把" style="float: right; padding-right: 20px; z-index:0;"></a>';
+		$('div#ig_deckmenu').append(tmp);
 		
 	}
 
@@ -923,29 +587,25 @@ function suppa_main($) {
 		if (suppajob) return false;		//実行中はなにもしない
 		suppajob  = true;
 		rdysold   = false;		//
-		rdydeck   = false;
-		rdystdby  = false;
 		soldiers.splice(0,soldiers.length);
-		decksold.splice(0,decksold.length);
-		stdbysold.splice(0,stdbysold.length);
-		decksoldcount  = 0;
 		deckjobs       = 0;
-		stdbysoldcount = 0;
+//alert("do_suppa");
 
-		countWaitAndTrainin();		//待機中の兵士と訓練中の兵士を数える
+		countListed();		//兵士一覧の兵士を数える
+		countTraining();	//訓練中の兵士を数える
 		//alert('countWaitAndTrainin() done');
 
-		countOnDeck(0);		//デッキの兵を数える
-		countOnDeck(1);
-		countOnDeck(2);
-		countOnDeck(3);
-		countOnDeck(4);
+		//countOnDeck(0);		//デッキの兵を数える
+		//countOnDeck(1);
+		//countOnDeck(2);
+		//countOnDeck(3);
+		//countOnDeck(4);
 		//alert('countOnDeck(n) done');
 
-		countStdby();		//兵士編成100件x2頁で数える
+		//countStdby();		//兵士編成100件x2頁で数える
 		//alert('countStdby() done');
 
-		setViser(250);
+		setViser(250); 
 		//calc_dokochika();
 		//setTimeout(calc_dokochika, 10);
 		return false;
