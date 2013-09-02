@@ -2,9 +2,9 @@
 // @name           Suppa
 // @version        2.00
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    Suppa 2.00 20130901
-// @include        http://*.sengokuixa.jp/facility/set_unit_list.php
-// @match          http://*.sengokuixa.jp/facility/set_unit_list.php
+// @description    Suppa 2.01 20130902
+// @include        http://*.sengokuixa.jp/facility/unit_list.php
+// @match          http://*.sengokuixa.jp/facility/unit_list.php
 // ==/UserScript==
 //
 // 20110715 1.01	初版
@@ -14,6 +14,7 @@
 // 20110919 1.11	パーセント値、フィルター機能追加
 // 20110930 1.12	鉄砲足軽を中級兵→上級兵に
 // 20130901 2.00	新章6対応
+// 20130902 2.01    ボタン表示画面を｢待機兵士一覧｣に
 //
 // Mokoと同じjQuery初期化
 //
@@ -177,7 +178,6 @@ function suppa_main($) {
 	var listedsoldcount = 0;		//兵士一覧の配列数
 	var rdytrain   = false;		//訓練中の収集完了
 	var rdylisted  = false;		//兵士一覧の収集完了
-	var deckjobs   = 0;
 
 
 	function _numFormat(n) {
@@ -558,7 +558,7 @@ function suppa_main($) {
 										clearInterval(viserId);
 										mergeAndShow();
 									} else {
-GM_log("rdytrain="+rdytrain+"  rdylisted="+rdylisted);										
+//GM_log("rdytrain="+rdytrain+"  rdylisted="+rdylisted);										
 										if (wtcnt>30) {
 											clearInterval(viserId);
 										}
@@ -570,11 +570,10 @@ GM_log("rdytrain="+rdytrain+"  rdylisted="+rdylisted);
 	//  ボタンの表示
 	//
 	function setbutton() {
-		var tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_suppa"><img src="' + gifsuppa + '" alt="数把" style="float: right; padding-right: 20px; z-index:0;"></a>';
-		$('div#ig_deckmenu').append(tmp);
+		var tmp = '<a href="javascript:void(0);" onclick="return false;" id="do_suppa"><img src="' + gifsuppa + '" alt="数把" style="float: right; padding-top: 5px; z-index:99;"></a>';
+		$('div#ig_deckmenu').find('a').eq(4).after(tmp);
 		
 	}
-
 
 	//
 	// main
@@ -588,26 +587,14 @@ GM_log("rdytrain="+rdytrain+"  rdylisted="+rdylisted);
 		suppajob  = true;
 		rdysold   = false;		//
 		soldiers.splice(0,soldiers.length);
-		deckjobs       = 0;
-//alert("do_suppa");
+
+		//alert("do_suppa");
 
 		countListed();		//兵士一覧の兵士を数える
 		countTraining();	//訓練中の兵士を数える
-		//alert('countWaitAndTrainin() done');
-
-		//countOnDeck(0);		//デッキの兵を数える
-		//countOnDeck(1);
-		//countOnDeck(2);
-		//countOnDeck(3);
-		//countOnDeck(4);
-		//alert('countOnDeck(n) done');
-
-		//countStdby();		//兵士編成100件x2頁で数える
-		//alert('countStdby() done');
 
 		setViser(250); 
-		//calc_dokochika();
-		//setTimeout(calc_dokochika, 10);
+
 		return false;
 	});
 
