@@ -1,3 +1,3 @@
 ixatools
 ========
-dokochika
+dokochika 1.24
