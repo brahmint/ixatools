@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name           Doredake
-// @version        1.02
+// @version        1.03
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    どれだけ Ver. 1.01	20110714
-// @include        http://w313.sengokuixa.jp/war/list.php*
-// @match          http://w313.sengokuixa.jp/war/list.php*
+// @description    どれだけ Ver. 1.03	20131004
+// @include        http://*.sengokuixa.jp/war/list.php*
+// @match          http://*.sengokuixa.jp/war/list.php*
 // @copyright      2011, brahmint@gmail.com
 // ==/UserScript==
 
@@ -12,6 +12,7 @@
 // 2011/07/13 1.0  初版 FireFox + GreaseMonkey でのみ動作
 // 2011/07/14 1.01 IXAサーバホスト名変更に対応
 // 2011/07/11 1.02 w313サーバ対応
+// 2013/10/04 1.03 鯖名変更に対応
 
 //
 // Mokoと同じjQuery初期化
