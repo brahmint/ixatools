@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Dorechika
-// @version        1.15
+// @version        1.16
 // @namespace      https://sites.google.com/site/ixamukakin/
-// @description    どれ近 Ver. 1.15	20131121
+// @description    どれ近 Ver. 1.16	20131127
 // @include        http://*.sengokuixa.jp/user/?user_id=*
 // @match          http://*.sengokuixa.jp/user/?user_id=*
 // @include        http://*.sengokuixa.jp/war/fight_history.php*
@@ -22,6 +22,7 @@
 // 2011/09/03 1.13 浅井家に対応
 // 2013/09/11 1.14 今川家に対応
 // 2013/11/21 1.15 東西戦に対応
+// 2013/11/27 1.16 ７章対応
 
 //
 // Mokoと同じjQuery初期化
@@ -80,10 +81,10 @@ function dore_main($) {
 
 	var mapcs = Array ('  ','織田家','足利家','武田家','上杉家','徳川家','毛利家',
 							 '浅井家','北条家','長宗我部家','島津家','大友家','最上家',
-							 '黒田家','石田家','伊達家','豊臣家','今川家','東西戦');
+							 '黒田家','石田家','伊達家','豊臣家','今川家','明智家','真田家','鈴木家','東西戦');
 	var mapx = Array ( -1, 1, 2, 3, 4, 5, 6,
 	                      7, 8, 9, 10, 11, 12,
-						  2, 12, 7, 11, 8, 99);
+						  2, 12, 7, 11, 8, 1,　2,　3,　99);
 						  
 
 	var Territ = function ( ttype, tname, pos, population, cond, map) {
@@ -352,7 +353,7 @@ function dore_main($) {
 	//
 	function showDorechika_f() {
 		//$('table.ig_battle_table tr:nth-child(2)').find('td:last').text("aaa");
-		var atwar = $('div#ig_battle_report_top p').text().match(/回　(.+(家|戦))/);
+		var atwar = $('div#ig_battle_report_top p').text().match(/回　((.+(家)|東西戦))/);
 		var warplace = RegExp.$1;
 		var n = mapcs.indexOf(warplace).toString();
 		var c = mapx[n];
@@ -365,6 +366,7 @@ function dore_main($) {
 			c=teridata[teridata.length-1].map;
 			if (c < 20) c = -1;
 		}
+//alert("warplace="+warplace+"  c="+c);
 		for (var i = 1; i < trs.length; i++) {
 			//var reg = trs.eq(i).find('td').eq(0).attr('href').match(/\((-?[0-9]+),(-?[0-9]+)\)$/);
 			//alert( trs.eq(i).find('td').eq(3).text());
